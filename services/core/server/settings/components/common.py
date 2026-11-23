@@ -125,7 +125,7 @@ STATICFILES_FINDERS = (
 
 STATICFILES_DIRS = (BASE_DIR.joinpath('server', 'common', 'django', 'static'),)
 
-SITE_NAME = config('DJANGO_SITE_NAME', default='Example shop')
+SITE_NAME = config('DJANGO_SITE_NAME', default='Quiet Garden')
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = config(
     'DJANGO_DATA_UPLOAD_MAX_MEMORY_SIZE',
