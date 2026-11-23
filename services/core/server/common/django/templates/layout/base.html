@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" data-theme="{{ theme }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      {% block title %}{{ site_name }}{% endblock title %}
+    </title>
+    <link
+      rel="icon"
+      href="{% static 'site/favicon.svg' %}"
+      type="image/svg+xml"
+    >
+    <link rel="stylesheet" href="{% static 'site/site.css' %}">
+    {% if theme_switcher %}
+      <script
+        type="module"
+        src="{% static 'components/site-theme.js' %}"
+      ></script>
+    {% endif %}
+    {% block scripts %}{% endblock scripts %}
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <header class="ds-header">
+      <nav class="ds-container flex items-center justify-between py-4">
+        <a
+          href="/"
+          class="font-heading text-xl font-semibold"
+        >{{ site_name }}</a>
+        {% if theme_switcher %}
+          <site-theme hidden>
+            <label class="flex items-center gap-2 text-sm">
+              <span>Theme</span>
+              <select class="ds-input py-1">
+                {% for name in themes %}
+                  <option
+                    value="{{ name }}"
+                    {% if name == theme %}selected{% endif %}
+                  >
+                    {{ name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </label>
+          </site-theme>
+        {% endif %}
+      </nav>
+    </header>
+    <main class="ds-container flex-1 py-8">
+      {% block content %}{% endblock content %}
+    </main>
+    <footer class="ds-footer">
+      <p class="ds-container py-6">{{ site_name }}</p>
+    </footer>
+  </body>
+</html>

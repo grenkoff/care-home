@@ -1,0 +1,182 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, production]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  commits:
+    name: Commit messages (Conventional Commits)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install toolchain from rust-toolchain.toml
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Pull request title
+        if: github.event_name == 'pull_request'
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: printf '%s' "$TITLE" | cargo run -q -p commit-lint --locked
+      - name: Commits of the pull request
+        if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: make commitlint RANGE="$BASE..$HEAD"
+      - name: Pushed commits
+        if: github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          if git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            make commitlint RANGE="$BEFORE..$AFTER"
+          else
+            make commitlint
+          fi
+
+  secrets:
+    name: Secrets (gitleaks)
+    runs-on: ubuntu-latest
+    env:
+      GITLEAKS_VERSION: 8.30.1
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install gitleaks
+        run: |
+          base="https://github.com/gitleaks/gitleaks/releases/download/v$GITLEAKS_VERSION"
+          archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfLO "$base/$archive"
+          curl -sSfL "$base/gitleaks_${GITLEAKS_VERSION}_checksums.txt" | grep " $archive$" | sha256sum --check
+          tar -xzf "$archive" gitleaks
+          sudo install gitleaks /usr/local/bin/gitleaks
+      - name: History and changes have no secrets
+        run: gitleaks git --no-banner --redact .
+
+  tooling:
+    name: Tooling (hooks, duplicates)
+    runs-on: ubuntu-latest
+    env:
+      BIOME_VERSION: 2.6.5
+      BIOME_SHA256: 0653fd798e50565efac8b1958c9a2786fada55cc6c362b7da4f16efff8dd30d8
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - name: Install toolchain from rust-toolchain.toml
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Install Biome
+        run: |
+          curl -sSfL -o biome "https://github.com/biomejs/biome/releases/download/%40biomejs%2Fbiome%40$BIOME_VERSION/biome-linux-x64"
+          echo "$BIOME_SHA256  biome" | sha256sum --check
+          sudo install biome /usr/local/bin/biome
+      - run: make hooks
+      - run: make js
+      - run: make duplicates
+
+  contracts:
+    name: Contracts (buf, generated code)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: bufbuild/buf-action@v1
+        with:
+          version: 1.75.0
+          setup_only: true
+      - uses: astral-sh/setup-uv@v7
+      - name: Install toolchain from rust-toolchain.toml
+        run: rustup show active-toolchain || rustup toolchain install
+      - run: make contracts
+
+  architecture:
+    name: Architecture (no distributed monolith)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: make architecture
+
+  rust:
+    name: Rust (fmt, clippy, coverage, eo-lint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: protoc
+      - name: Install toolchain from rust-toolchain.toml
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov,cargo-machete@0.9.2,cargo-deny@0.20.2
+      - uses: Swatinem/rust-cache@v2
+      - run: make rust
+
+  rust-mutants:
+    name: Rust mutation testing (cargo-mutants)
+    needs: rust
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: protoc
+      - name: Install toolchain from rust-toolchain.toml
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-mutants
+      - uses: Swatinem/rust-cache@v2
+      - run: make mutants-rust
+      - name: Surviving mutants
+        if: failure()
+        run: cat mutants.out/missed.txt
+
+  core:
+    name: Django (wemake-django-template CI)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Lint, type check, test
+        run: make core
+      - name: Mutation testing (mutmut)
+        run: make mutants-core
+      - name: ty (second type checker, non-blocking)
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        working-directory: services/core
+        run: docker compose run --rm --no-deps web ty check --output-format github
+
+  e2e:
+    name: End-to-end (docker compose)
+    needs: [rust, rust-mutants, core]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Start the system
+        run: make up
+      - name: Request goes through every service
+        run: ./scripts/e2e.sh
+      - name: Web components work in a browser
+        run: make browser
+      - name: Logs
+        if: failure()
+        run: docker compose logs --tail 100
+      - name: Stop
+        if: always()
+        run: docker compose down --volumes

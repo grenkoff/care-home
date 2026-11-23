@@ -1,0 +1,20 @@
+"""Routes of the pages of the catalog."""
+
+from django.urls import path
+
+from server.apps.catalog.views import pages
+
+urlpatterns = [
+    path('', pages.Home.as_view(), name='home'),
+    path(
+        'products/<uuid:identifier>/',
+        pages.ProductPage.as_view(),
+        name='product',
+    ),
+    path('search/', pages.Search.as_view(), name='search'),
+    path(
+        'products/<uuid:identifier>/thumbnail.jpg',
+        pages.ProductThumbnail.as_view(),
+        name='thumbnail',
+    ),
+]

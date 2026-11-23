@@ -1,0 +1,50 @@
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directories:
+      - /
+      - /services/core/native
+    target-branch: develop
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      rust:
+        patterns: ["*"]
+
+  - package-ecosystem: pip
+    directory: /services/core
+    target-branch: develop
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      python:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directories:
+      - /services/core/docker/django
+      - /services/images
+    target-branch: develop
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore
+      include: scope
+    ignore:
+      - dependency-name: python
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+      include: scope

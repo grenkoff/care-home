@@ -1,0 +1,30 @@
+{% extends "layout/base.html" %}
+{% block content %}
+  <div class="mb-6 flex items-baseline justify-between gap-4">
+    <h1 class="ds-heading">Products</h1>
+    <a href="{% url 'catalog:search' %}" class="ds-link">Search by name</a>
+  </div>
+  {% if products %}
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {% for product, price in products %}
+        <li class="ds-card">
+          {% if product.id in photographed %}
+            <img
+              src="{% url 'catalog:thumbnail' identifier=product.id %}"
+              alt="{{ product.name }}"
+              loading="lazy"
+              class="mb-3 w-full rounded-card"
+            >
+          {% endif %}
+          <a
+            href="{% url 'catalog:product' identifier=product.id %}"
+            class="ds-link text-lg font-medium"
+          >{{ product.name }}</a>
+          <p class="ds-price mt-2">{{ price }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="ds-muted">Nothing is on sale yet.</p>
+  {% endif %}
+{% endblock content %}

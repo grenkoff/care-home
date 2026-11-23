@@ -1,0 +1,25 @@
+[package]
+name = "images"
+version = "0.1.0"
+description = "Service that makes thumbnails of photos for core over gRPC"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+axum.workspace = true
+contracts.workspace = true
+image.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tonic.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+tower.workspace = true
+
+[lints]
+workspace = true
