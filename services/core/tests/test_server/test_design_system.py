@@ -7,10 +7,14 @@ from django.urls import reverse
 
 
 @pytest.mark.django_db
-def test_pages_carry_the_theme_of_the_site(client: Client) -> None:
+def test_pages_carry_the_theme_of_the_site(
+    client: Client,
+    settings: LazySettings,
+) -> None:
     response = client.get(reverse('catalog:home'))
 
-    assert '<html lang="en" data-theme="classic">' in response.content.decode()
+    expected = f'<html lang="en" data-theme="{settings.SITE_THEME}">'
+    assert expected in response.content.decode()
 
 
 @pytest.mark.django_db
