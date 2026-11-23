@@ -1,12 +1,12 @@
-# monolith-first
+# care-home
 
-A starting point for web projects built by AI agents and humans: a
+The website of a private care home, with video from the home for the
+relatives of its residents. Built from the
+[monolith-first](https://github.com/grenkoff/monolith-first) template: a
 **Django** modular monolith with server-rendered pages, **Python** and
-**Rust** working together, a module moving into a **Rust** service only
-when it has to, written in
+**Rust** working together, written in
 [Elegant Objects](https://www.elegantobjects.org/) style and checked by
-strict CI. Tell the agent "make me a website for a barbershop": it plans,
-asks the key questions and builds a working version.
+strict CI.
 
 | | |
 |---|---|
