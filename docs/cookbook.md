@@ -61,7 +61,12 @@ Example: the product page `GET /products/<id>/` in `server/apps/catalog/`.
    template; a domain error becomes `Http404` or a page with its status.
    Amounts of money go through `server.common.money.Cents`.
 4. The template in `templates/<app>/<page>.html` extends
-   `layout/base.html` and fills `content` (and `title`). It is styled with
+   `site/layout.html` of `server/templates/` (the navigation and footer of
+   the site, which knows the pages of every module and extends
+   `layout/base.html`) and fills `content` (and `title`). A module never
+   extends the templates of another module; it shows a part of another
+   module only through a template tag of that module in its
+   `templatetags/`. It is styled with
    the components and tokens of `docs/design-system.md` plus Tailwind
    layout utilities; forms carry `{% csrf_token %}`, labels and HTML
    validation (`required`, `min`), and work without JavaScript.
