@@ -1,0 +1,7 @@
+{% extends "care/layout.html" %}
+{% load i18n %}
+{% block title %}{% translate "Enquiry" %}{% endblock title %}
+{% block content %}
+  <h1 class="ds-heading mb-6">{% translate "Enquiry" %}</h1>
+  {% include "enquiries/form.html" %}
+{% endblock content %}
