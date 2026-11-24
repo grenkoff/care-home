@@ -18,6 +18,10 @@ from server.common.di import HasContainer
 class Send(HasContainer, View):
     """Page that takes the enquiry of a visitor."""
 
+    def get(self, request: HttpRequest) -> HttpResponse:
+        """Shows a blank enquiry form."""
+        return render(request, 'enquiries/send.html', {'form': EnquiryForm()})
+
     def post(self, request: HttpRequest) -> HttpResponse:
         """Keeps the enquiry and leads on, or shows the form with its errors."""
         form = EnquiryForm(request.POST)
