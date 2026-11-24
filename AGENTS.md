@@ -72,7 +72,6 @@ all of them, including the GitHub settings):
 | `proto/` | gRPC contracts, the single source of truth between services |
 | `contracts/` | Rust crate with the code generated from `proto/`; every Rust service depends on it |
 | `services/core/` | the monolith: every module, the public HTTP API, admin, its database |
-| `services/core/native/` | Rust extension module of `core` (PyO3, maturin): the resemblance of names behind the catalog search |
 | `services/images/` | the example of an extracted Rust service: thumbnails of photos over gRPC |
 | `services/<name>/` | modules extracted into Rust services, when a split criterion holds |
 | `tools/eo-lint/` | Elegant Objects linter for Rust |
