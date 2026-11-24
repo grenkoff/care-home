@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: care-home\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-24 08:41+0000\n"
+"POT-Creation-Date: 2026-11-24 08:44+0000\n"
 "PO-Revision-Date: 2026-11-24 08:45+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -43,6 +43,38 @@ msgstr "услуга"
 #: server/apps/care/models.py
 msgid "care services"
 msgstr "услуги"
+
+#: server/apps/care/templates/care/contacts.html
+msgid "Contacts"
+msgstr "Контакты"
+
+#: server/apps/care/templates/care/contacts.html
+msgid "Address"
+msgstr "Адрес"
+
+#: server/apps/care/templates/care/contacts.html
+msgid "12 Sadovaya Street, Moscow"
+msgstr "ул. Садовая, 12, Москва"
+
+#: server/apps/care/templates/care/contacts.html
+msgid "Open the map"
+msgstr "Открыть карту"
+
+#: server/apps/care/templates/care/contacts.html
+msgid "Phone"
+msgstr "Телефон"
+
+#: server/apps/care/templates/care/contacts.html
+msgid "E-mail"
+msgstr "Эл. почта"
+
+#: server/apps/care/templates/care/contacts.html
+msgid "Visiting hours"
+msgstr "Часы посещений"
+
+#: server/apps/care/templates/care/contacts.html
+msgid "every day from 10:00 to 20:00"
+msgstr "ежедневно с 10:00 до 20:00"
 
 #: server/apps/care/templates/care/home.html
 msgid ""

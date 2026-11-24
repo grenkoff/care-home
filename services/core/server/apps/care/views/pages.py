@@ -2,6 +2,7 @@
 
 from typing import final
 
+from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.utils.translation import get_language
@@ -19,6 +20,23 @@ class Home(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         """Renders the introduction in the language of the page."""
         return render(request, 'care/home.html')
+
+
+@final
+class Contacts(View):
+    """Page that tells how to reach the care home."""
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        """Renders the address, phone, e-mail, visiting hours and map link."""
+        return render(
+            request,
+            'care/contacts.html',
+            {
+                'phone': settings.SITE_PHONE,
+                'email': settings.SITE_EMAIL,
+                'map_url': settings.SITE_MAP_URL,
+            },
+        )
 
 
 @final
