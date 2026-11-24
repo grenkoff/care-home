@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: care-home\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-24 08:46+0000\n"
+"POT-Creation-Date: 2026-11-24 08:50+0000\n"
 "PO-Revision-Date: 2026-11-24 08:45+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -129,7 +129,9 @@ msgstr "Видео"
 msgid ""
 "Video from the cameras is never stored: relatives see only the live picture "
 "of the common rooms."
-msgstr "Видео с камер никогда не сохраняется: родственники видят только живую картинку общих комнат."
+msgstr ""
+"Видео с камер никогда не сохраняется: родственники видят только живую "
+"картинку общих комнат."
 
 #: server/apps/care/templates/care/privacy.html
 msgid "Cookies"
@@ -139,7 +141,9 @@ msgstr "Cookies"
 msgid ""
 "The site sets only the cookies it needs to work: the language, the session "
 "and the protection of forms. There is no analytics."
-msgstr "Сайт ставит только необходимые для работы cookies: язык, сессию и защиту форм. Аналитики нет."
+msgstr ""
+"Сайт ставит только необходимые для работы cookies: язык, сессию и защиту "
+"форм. Аналитики нет."
 
 #: server/apps/care/templates/care/services.html
 msgid "Care services"
@@ -153,6 +157,14 @@ msgstr "%(price)s в месяц"
 #: server/apps/care/templates/care/services.html
 msgid "Care services will be listed soon."
 msgstr "Список услуг скоро появится."
+
+#: server/common/django/templates/layout/base.html
+msgid "Language"
+msgstr "Язык"
+
+#: server/common/django/templates/layout/base.html
+msgid "Switch"
+msgstr "Сменить"
 
 #: server/settings/components/common.py
 msgid "Russian"
