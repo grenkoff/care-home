@@ -4,21 +4,12 @@ import io
 import os
 import signal
 from typing import final, override
-from uuid import UUID, uuid7
+from uuid import uuid7
 
-import msgspec
 import pytest
 from django.core.management import call_command
 
 from server.common.outbox.models import Event
-from server.common.outbox.outbox import StoredOutbox
-
-
-@final
-class _Fact(msgspec.Struct, frozen=True):
-    """Fact of a topic nobody subscribes to."""
-
-    id: UUID
 
 
 @final
@@ -34,7 +25,12 @@ class _Terminating(io.StringIO):
 
 @pytest.mark.django_db
 def test_relay_events_drains_outbox_on_sigterm() -> None:
-    StoredOutbox().add('tests.v1.unheard', _Fact(id=uuid7()))
+    identifier = uuid7()
+    Event.objects.create(
+        id=identifier,
+        topic='tests.v1.unheard',
+        payload={'id': str(identifier)},
+    )
 
     call_command('relay_events', stdout=_Terminating())
 

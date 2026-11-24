@@ -4,22 +4,23 @@ from typing import Final, final
 from uuid import UUID, uuid7
 
 import attrs
-import msgspec
 import pytest
 
 from server.common.outbox.models import Event
-from server.common.outbox.outbox import StoredOutbox
 from server.common.outbox.relay import Envelope, Relay
 
 _TOPIC: Final = 'tests.v1.first'
 
 
-@final
-class _Fact(msgspec.Struct, frozen=True):
-    """Fact of a test topic."""
-
-    id: UUID
-    text: str
+def _pending(topic: str, text: str) -> UUID:
+    """Keeps an event of the topic in the outbox and returns its id."""
+    identifier = uuid7()
+    Event.objects.create(
+        id=identifier,
+        topic=topic,
+        payload={'id': str(identifier), 'text': text},
+    )
+    return identifier
 
 
 @final
@@ -53,7 +54,7 @@ class _Broken:
 
 @pytest.mark.django_db
 def test_failed_delivery_leaves_the_event_pending() -> None:
-    StoredOutbox().add(_TOPIC, _Fact(id=uuid7(), text='retried'))
+    _pending(_TOPIC, 'retried')
     inbox = _Inbox()
 
     with pytest.raises(_SubscriberError):
@@ -65,9 +66,8 @@ def test_failed_delivery_leaves_the_event_pending() -> None:
 
 @pytest.mark.django_db
 def test_relay_delivers_pending_events_by_topic() -> None:
-    first = _Fact(id=uuid7(), text='first')
-    StoredOutbox().add(_TOPIC, first)
-    StoredOutbox().add('tests.v1.other', _Fact(id=uuid7(), text='other'))
+    first = _pending(_TOPIC, 'first')
+    _pending('tests.v1.other', 'other')
     inbox = _Inbox()
     relay = Relay({_TOPIC: (inbox,)})
 
@@ -75,6 +75,6 @@ def test_relay_delivers_pending_events_by_topic() -> None:
 
     assert deliveries == [True, True, False]
     assert inbox.received == [
-        Envelope(first.id, {'id': str(first.id), 'text': 'first'}),
+        Envelope(first, {'id': str(first), 'text': 'first'}),
     ]
     assert not Event.objects.exists()
