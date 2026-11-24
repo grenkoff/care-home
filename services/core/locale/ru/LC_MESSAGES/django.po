@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: care-home\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-24 08:50+0000\n"
+"POT-Creation-Date: 2026-11-24 08:52+0000\n"
 "PO-Revision-Date: 2026-11-24 08:45+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -45,6 +45,7 @@ msgid "care services"
 msgstr "услуги"
 
 #: server/apps/care/templates/care/contacts.html
+#: server/common/django/templates/layout/base.html
 msgid "Contacts"
 msgstr "Контакты"
 
@@ -98,6 +99,7 @@ msgid "Care services and prices"
 msgstr "Услуги и цены"
 
 #: server/apps/care/templates/care/privacy.html
+#: server/common/django/templates/layout/base.html
 msgid "Privacy policy"
 msgstr "Политика конфиденциальности"
 
@@ -157,6 +159,10 @@ msgstr "%(price)s в месяц"
 #: server/apps/care/templates/care/services.html
 msgid "Care services will be listed soon."
 msgstr "Список услуг скоро появится."
+
+#: server/common/django/templates/layout/base.html
+msgid "Services and prices"
+msgstr "Услуги и цены"
 
 #: server/common/django/templates/layout/base.html
 msgid "Language"
