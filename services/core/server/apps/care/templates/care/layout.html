@@ -1,0 +1,25 @@
+{% extends "layout/base.html" %}
+{% load i18n %}
+{% block home %}{% url 'care:home' %}{% endblock home %}
+{% block navigation %}
+  <ul class="flex flex-wrap gap-4">
+    <li>
+      <a
+        href="{% url 'care:services' %}"
+        class="ds-link"
+      >{% translate "Services and prices" %}</a>
+    </li>
+    <li>
+      <a
+        href="{% url 'care:contacts' %}"
+        class="ds-link"
+      >{% translate "Contacts" %}</a>
+    </li>
+  </ul>
+{% endblock navigation %}
+{% block footer %}
+  <a
+    href="{% url 'care:privacy' %}"
+    class="ds-link"
+  >{% translate "Privacy policy" %}</a>
+{% endblock footer %}

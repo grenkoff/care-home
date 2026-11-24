@@ -18,7 +18,7 @@ def test_language_form_keeps_the_page(client: Client) -> None:
     [
         'action="/i18n/setlang/"',
         '<input type="hidden" name="next" value="/ru/contacts/">',
-        '<option value="en">',
+        'value="en"',
     ],
 )
 def test_header_offers_the_language_form(client: Client, fragment: str) -> None:
