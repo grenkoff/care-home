@@ -1,10 +1,8 @@
 """Care services of the home, as staff keep them and pages show them."""
 
-from typing import Final, Protocol, final
+from typing import Protocol, final
 
 import attrs
-
-_ENGLISH: Final = 'en'
 
 
 @final
@@ -15,7 +13,7 @@ class UnknownLanguageError(LookupError):
 
 
 @final
-@attrs.define(slots=True, frozen=True)
+@attrs.define(slots=True, frozen=True, kw_only=True)
 class Bilingual:
     """Text written in Russian and in English."""
 
@@ -23,10 +21,14 @@ class Bilingual:
     _english: str
 
     def said_in(self, language: str) -> str:
-        """Returns the text in the language: English for `en`, else Russian."""
-        if language == _ENGLISH:
-            return self._english
-        return self._russian
+        """Returns the text in the language or raises UnknownLanguageError."""
+        match language:
+            case 'ru':
+                return self._russian
+            case 'en':
+                return self._english
+            case _:
+                raise UnknownLanguageError(language)
 
 
 @final

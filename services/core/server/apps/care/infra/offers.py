@@ -17,8 +17,11 @@ class StoredOffers:
         """Reads every care service in the order staff set."""
         return [
             Offer(
-                name=Bilingual(stored.name_ru, stored.name_en),
-                description=Bilingual(stored.description_ru, stored.description_en),
+                name=Bilingual(russian=stored.name_ru, english=stored.name_en),
+                description=Bilingual(
+                    russian=stored.description_ru,
+                    english=stored.description_en,
+                ),
                 price_cents=stored.price_cents,
             )
             for stored in models.Service.objects.order_by('position')
