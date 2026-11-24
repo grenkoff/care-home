@@ -639,6 +639,6 @@ Once the first real module exists, in its own pull request:
    `pyproject.toml`, the `target-lexicon` exception of `deny.toml` and
    the `exclude` of the root `Cargo.toml`.
 4. The checks that walk the example: the requests of `scripts/e2e.sh`
-   and the product page of `tests/browser/` (the theme switcher stays);
-   point them at the new module.
+   and the product page of `tests/browser/`; point them at the new
+   module.
 5. `make patterns`, `make check`.
