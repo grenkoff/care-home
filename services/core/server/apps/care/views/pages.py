@@ -14,15 +14,6 @@ from server.common.money import Cents
 
 
 @final
-class Home(View):
-    """Home page that introduces the care home."""
-
-    def get(self, request: HttpRequest) -> HttpResponse:
-        """Renders the introduction in the language of the page."""
-        return render(request, 'care/home.html')
-
-
-@final
 class Contacts(View):
     """Page that tells how to reach the care home."""
 
@@ -37,15 +28,6 @@ class Contacts(View):
                 'map_url': settings.SITE_MAP_URL,
             },
         )
-
-
-@final
-class Privacy(View):
-    """Page that says which data the site keeps and why."""
-
-    def get(self, request: HttpRequest) -> HttpResponse:
-        """Renders the privacy policy in the language of the page."""
-        return render(request, 'care/privacy.html')
 
 
 @final
