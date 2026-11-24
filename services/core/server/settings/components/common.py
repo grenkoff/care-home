@@ -131,6 +131,15 @@ STATICFILES_DIRS = (BASE_DIR.joinpath('server', 'common', 'django', 'static'),)
 
 SITE_NAME = config('DJANGO_SITE_NAME', default='Quiet Garden')
 
+SITE_PHONE = config('DJANGO_SITE_PHONE', default='+74950000000')
+
+SITE_EMAIL = config('DJANGO_SITE_EMAIL', default='hello@quiet-garden.example')
+
+SITE_MAP_URL = config(
+    'DJANGO_SITE_MAP_URL',
+    default='https://www.openstreetmap.org/?mlat=55.75&mlon=37.62&zoom=17',
+)
+
 DATA_UPLOAD_MAX_MEMORY_SIZE = config(
     'DJANGO_DATA_UPLOAD_MAX_MEMORY_SIZE',
     cast=int,

@@ -1,0 +1,26 @@
+{% extends "layout/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Contacts" %}{% endblock title %}
+{% block content %}
+  <h1 class="ds-heading mb-6">{% translate "Contacts" %}</h1>
+  <dl class="ds-card grid max-w-2xl gap-2">
+    <dt class="ds-muted">{% translate "Address" %}</dt>
+    <dd>
+      {% translate "12 Sadovaya Street, Moscow" %}
+      <a
+        href="{{ map_url }}"
+        class="ds-link ml-2"
+      >{% translate "Open the map" %}</a>
+    </dd>
+    <dt class="ds-muted">{% translate "Phone" %}</dt>
+    <dd>
+      <a href="tel:{{ phone }}" class="ds-link">{{ phone }}</a>
+    </dd>
+    <dt class="ds-muted">{% translate "E-mail" %}</dt>
+    <dd>
+      <a href="mailto:{{ email }}" class="ds-link">{{ email }}</a>
+    </dd>
+    <dt class="ds-muted">{% translate "Visiting hours" %}</dt>
+    <dd>{% translate "every day from 10:00 to 20:00" %}</dd>
+  </dl>
+{% endblock content %}
