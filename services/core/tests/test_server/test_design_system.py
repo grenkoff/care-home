@@ -11,7 +11,7 @@ def test_pages_carry_the_theme_of_the_site(
     client: Client,
     settings: LazySettings,
 ) -> None:
-    response = client.get(reverse('catalog:home'))
+    response = client.get('/ru/')
 
     expected = (
         f'<html lang="{settings.LANGUAGE_CODE}" data-theme="{settings.SITE_THEME}">'
@@ -26,7 +26,7 @@ def test_pages_carry_the_picked_theme(
 ) -> None:
     settings.SITE_THEME = 'bold'
 
-    response = client.get(reverse('catalog:home'))
+    response = client.get('/ru/')
 
     assert 'data-theme="bold"' in response.content.decode()
 

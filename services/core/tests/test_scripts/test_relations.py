@@ -7,9 +7,9 @@ from django.db import models
 
 from scripts.relations import RelationReport
 
-_CATALOG: Final = 'server.apps.catalog'
-_ORDERS: Final = 'server.apps.orders'
-_LABEL: Final = 'catalog'
+_CARE: Final = 'server.apps.care'
+_ACCOUNTS: Final = 'server.apps.accounts'
+_LABEL: Final = 'care'
 
 
 def _model(registry: Apps, name: str, label: str, **fields: Any) -> type:
@@ -18,27 +18,27 @@ def _model(registry: Apps, name: str, label: str, **fields: Any) -> type:
     return type(
         name,
         (models.Model,),
-        {'__module__': f'{_CATALOG}.models', 'Meta': meta, **fields},
+        {'__module__': f'{_CARE}.models', 'Meta': meta, **fields},
     )
 
 
 def test_reports_relation_to_another_module() -> None:
-    registry = Apps([_CATALOG, _ORDERS])
+    registry = Apps([_CARE, _ACCOUNTS])
     post = _model(registry, 'Post', _LABEL)
     _model(
         registry,
         'Line',
-        'orders',
+        'accounts',
         post=models.ForeignKey(post, on_delete=models.CASCADE),
     )
 
     problems = list(RelationReport(registry).problems())
 
-    assert problems == ['orders.Line.post refers to catalog.Post']
+    assert problems == ['accounts.Line.post refers to care.Post']
 
 
 def test_accepts_relations_inside_a_module() -> None:
-    registry = Apps([_CATALOG])
+    registry = Apps([_CARE])
     post = _model(registry, 'Post', _LABEL)
     _model(
         registry,
@@ -53,7 +53,7 @@ def test_accepts_relations_inside_a_module() -> None:
 
 
 def test_accepts_framework_relations_to_modules() -> None:
-    registry = Apps([_CATALOG, 'django.contrib.admin'])
+    registry = Apps([_CARE, 'django.contrib.admin'])
     post = _model(registry, 'Post', _LABEL)
     _model(
         registry,

@@ -15,8 +15,6 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 INSTALLED_APPS: tuple[str, ...] = (
     # Your apps go here:
     'server.apps.accounts',
-    'server.apps.catalog',
-    'server.apps.orders',
     'server.apps.care',
     'server.common.outbox',
     # Default django apps:
