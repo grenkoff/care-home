@@ -1,0 +1,16 @@
+{% extends "layout/base.html" %}
+{% load i18n %}
+{% block content %}
+  <section class="max-w-2xl">
+    <h1 class="ds-heading mb-4">{{ site_name }}</h1>
+    <p class="mb-4 text-lg">
+      {% translate "A small private care home with a garden, where older people live in comfort and in good company." %}
+    </p>
+    <p class="mb-6">
+      {% translate "Nurses look after the residents day and night, cooks prepare fresh meals, and relatives can visit at any time or see the common rooms online." %}
+    </p>
+    <a href="{% url 'care:services' %}" class="ds-button">
+      {% translate "Care services and prices" %}
+    </a>
+  </section>
+{% endblock content %}

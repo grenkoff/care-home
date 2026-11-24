@@ -13,6 +13,15 @@ from server.common.money import Cents
 
 
 @final
+class Home(View):
+    """Home page that introduces the care home."""
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        """Renders the introduction in the language of the page."""
+        return render(request, 'care/home.html')
+
+
+@final
 class Services(HasContainer, View):
     """Page that lists the care services with their monthly prices."""
 
