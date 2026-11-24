@@ -15,7 +15,18 @@ from server.common.di import HasContainer
 
 @final
 class InvitationAdmin(HasContainer, admin.ModelAdmin[Invitation]):
-    """Invitations that staff make for relatives."""
+    """Invitations that staff make for relatives and never change once sent."""
+
+    list_display = ('email', 'expires_at', 'accepted_at')
+
+    @override
+    def has_change_permission(
+        self,
+        request: HttpRequest,
+        _invitation: Invitation | None = None,
+    ) -> bool:
+        """Forbids changes, so a link already sent keeps working."""
+        return False
 
     @override
     def save_model(
