@@ -199,6 +199,8 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+INVITATION_DAYS = config('DJANGO_INVITATION_DAYS', cast=int, default=7)
+
 LOGIN_URL = 'accounts:sign_in'
 LOGIN_REDIRECT_URL = 'care:home'
 LOGOUT_REDIRECT_URL = 'care:home'
