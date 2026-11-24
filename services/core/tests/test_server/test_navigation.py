@@ -45,7 +45,7 @@ def test_layout_links_the_pages(client: Client, link: str) -> None:
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     'address',
-    ['/en/', '/en/services/', '/en/contacts/', '/en/privacy/'],
+    ['/en/', '/en/services/', '/en/contacts/', '/en/privacy/', '/en/enquiry/'],
 )
 def test_pages_return_to_themselves(client: Client, address: str) -> None:
     page = client.get(address).content.decode()
