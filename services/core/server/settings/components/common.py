@@ -199,6 +199,10 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+LOGIN_URL = 'accounts:sign_in'
+LOGIN_REDIRECT_URL = 'care:home'
+LOGOUT_REDIRECT_URL = 'care:home'
+
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.Argon2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',

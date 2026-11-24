@@ -15,6 +15,21 @@
         class="ds-link"
       >{% translate "Contacts" %}</a>
     </li>
+    <li>
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'accounts:sign_out' %}">
+          {% csrf_token %}
+          <button type="submit" class="ds-button-quiet">
+            {% translate "Sign out" %}
+          </button>
+        </form>
+      {% else %}
+        <a
+          href="{% url 'accounts:sign_in' %}"
+          class="ds-link"
+        >{% translate "Sign in" %}</a>
+      {% endif %}
+    </li>
   </ul>
 {% endblock navigation %}
 {% block footer %}
