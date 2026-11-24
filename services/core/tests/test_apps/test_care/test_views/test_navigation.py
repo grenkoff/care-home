@@ -25,3 +25,18 @@ def test_header_offers_the_language_form(client: Client, fragment: str) -> None:
     page = client.get('/ru/contacts/').content.decode()
 
     assert fragment in page
+
+
+@pytest.mark.parametrize(
+    'link',
+    [
+        'href="/en/"',
+        'href="/en/services/"',
+        'href="/en/contacts/"',
+        'href="/en/privacy/"',
+    ],
+)
+def test_layout_links_the_pages(client: Client, link: str) -> None:
+    page = client.get('/en/contacts/').content.decode()
+
+    assert link in page
