@@ -1,0 +1,9 @@
+{% extends "care/layout.html" %}
+{% load i18n %}
+{% block title %}{% translate "Enquiry received" %}{% endblock title %}
+{% block content %}
+  <h1 class="ds-heading mb-6">{% translate "Thank you" %}</h1>
+  <p class="max-w-2xl">
+    {% translate "We have received your enquiry. We will call you back within a working day." %}
+  </p>
+{% endblock content %}
