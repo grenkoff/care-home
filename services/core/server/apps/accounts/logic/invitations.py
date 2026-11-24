@@ -25,7 +25,7 @@ class Invitation:
 
     def open_at(self, moment: datetime) -> bool:
         """Tells whether the link still works at the moment."""
-        return False
+        return not self._accepted and moment < self._expires_at
 
 
 @final

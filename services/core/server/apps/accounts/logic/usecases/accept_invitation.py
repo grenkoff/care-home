@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, final
 
 import attrs
 
+from server.apps.accounts.logic.invitations import Digest, UnknownInvitationError
+
 if TYPE_CHECKING:
     from server.apps.accounts.logic.invitations import Clock, Invitations
 
@@ -20,7 +22,11 @@ class OpenInvitation:
 
     def __call__(self, token: str) -> str:
         """Returns the e-mail invited or raises UnknownInvitationError."""
-        return ''
+        digest = Digest(token).hexadecimal()
+        invitation = self._invitations.found(digest)
+        if not invitation.open_at(self._clock.now()):
+            raise UnknownInvitationError(digest)
+        return invitation.email
 
 
 @final
@@ -33,3 +39,5 @@ class AcceptInvitation:
 
     def __call__(self, token: str, password: str) -> None:
         """Makes the account or raises UnknownInvitationError."""
+        self._opened(token)
+        self._invitations.accept(Digest(token).hexadecimal(), password)
