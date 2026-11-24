@@ -15,12 +15,13 @@ class EnquiryAdmin(admin.ModelAdmin[Enquiry]):
     """Enquiries of visitors that staff call back, the newest first."""
 
     list_display = ('sent_at', 'name', 'phone', 'handled')
-    actions = ('mark_handled',)
 
     @admin.action(description=_('Mark as handled'))
     def mark_handled(self, request: HttpRequest, chosen: QuerySet[Enquiry]) -> None:
         """Marks the chosen enquiries as handled."""
         chosen.update(handled=True)
+
+    actions = (mark_handled,)
 
 
 admin.site.register(Enquiry, EnquiryAdmin)

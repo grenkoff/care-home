@@ -451,6 +451,5 @@ ignore_names = [
   "handled",
   "consent",
   "actions",
-  "mark_handled",
   "enquiry_form",
 ]
