@@ -15,6 +15,14 @@
         class="ds-link"
       >{% translate "Contacts" %}</a>
     </li>
+    {% if user.is_authenticated %}
+      <li>
+        <a
+          href="{% url 'accounts:password' %}"
+          class="ds-link"
+        >{% translate "Password" %}</a>
+      </li>
+    {% endif %}
     <li>
       {% if user.is_authenticated %}
         <form method="post" action="{% url 'accounts:sign_out' %}">
