@@ -2,12 +2,14 @@
 
 from http import HTTPStatus
 from types import MappingProxyType
+from typing import Final
 
 import pytest
 from django.test import Client
 
 from server.apps.enquiries.models import Enquiry
 
+_PAGE: Final = '/en/enquiry/'
 _SENT = MappingProxyType({
     'name': 'Anna',
     'phone': ' +7 495 123-45-67 ',
@@ -18,16 +20,20 @@ _SENT = MappingProxyType({
 
 @pytest.mark.django_db
 def test_sent_enquiry_is_kept_for_staff(client: Client) -> None:
-    client.post('/en/enquiry/', _SENT)
+    client.post(_PAGE, _SENT)
 
-    assert list(
-        Enquiry.objects.values_list('name', 'phone', 'message', 'handled'),
-    ) == [('Anna', '+7 495 123-45-67', 'A visit on Sunday', False)]
+    kept = Enquiry.objects.get()
+    assert (kept.name, kept.phone, kept.message, kept.handled) == (
+        'Anna',
+        '+7 495 123-45-67',
+        'A visit on Sunday',
+        False,
+    )
 
 
 @pytest.mark.django_db
 def test_sent_enquiry_leads_to_the_received_page(client: Client) -> None:
-    response = client.post('/en/enquiry/', _SENT)
+    response = client.post(_PAGE, _SENT)
 
     assert response.status_code == HTTPStatus.FOUND
     assert response['Location'] == '/en/enquiry/received/'
@@ -38,3 +44,31 @@ def test_received_page_promises_a_call(client: Client) -> None:
 
     assert response.status_code == HTTPStatus.OK
     assert 'We will call you back' in response.content.decode()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('missing', ['name', 'phone', 'consent'])
+def test_incomplete_enquiry_is_refused(client: Client, missing: str) -> None:
+    sent = {field: typed for field, typed in _SENT.items() if field != missing}
+
+    response = client.post(_PAGE, sent)
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert 'This field is required.' in response.content.decode()
+    assert not Enquiry.objects.exists()
+
+
+@pytest.mark.django_db
+def test_enquiry_with_a_wrong_phone_is_refused(client: Client) -> None:
+    response = client.post(_PAGE, {**_SENT, 'phone': 'call me'})
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert 'Enter a phone number' in response.content.decode()
+    assert not Enquiry.objects.exists()
+
+
+@pytest.mark.django_db
+def test_refused_enquiry_keeps_what_was_typed(client: Client) -> None:
+    response = client.post(_PAGE, {**_SENT, 'consent': ''})
+
+    assert 'A visit on Sunday</textarea>' in response.content.decode()
