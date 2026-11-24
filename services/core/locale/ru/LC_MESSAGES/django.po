@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: care-home\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-24 08:52+0000\n"
+"POT-Creation-Date: 2026-11-24 20:42+0000\n"
 "PO-Revision-Date: 2026-11-24 08:45+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -45,7 +45,7 @@ msgid "care services"
 msgstr "услуги"
 
 #: server/apps/care/templates/care/contacts.html
-#: server/common/django/templates/layout/base.html
+#: server/apps/care/templates/care/layout.html
 msgid "Contacts"
 msgstr "Контакты"
 
@@ -62,6 +62,7 @@ msgid "Open the map"
 msgstr "Открыть карту"
 
 #: server/apps/care/templates/care/contacts.html
+#: server/apps/enquiries/views/forms.py
 msgid "Phone"
 msgstr "Телефон"
 
@@ -98,8 +99,13 @@ msgstr ""
 msgid "Care services and prices"
 msgstr "Услуги и цены"
 
+#: server/apps/care/templates/care/layout.html
+msgid "Services and prices"
+msgstr "Услуги и цены"
+
+#: server/apps/care/templates/care/layout.html
 #: server/apps/care/templates/care/privacy.html
-#: server/common/django/templates/layout/base.html
+#: server/apps/enquiries/templates/enquiries/form.html
 msgid "Privacy policy"
 msgstr "Политика конфиденциальности"
 
@@ -160,9 +166,82 @@ msgstr "%(price)s в месяц"
 msgid "Care services will be listed soon."
 msgstr "Список услуг скоро появится."
 
-#: server/common/django/templates/layout/base.html
-msgid "Services and prices"
-msgstr "Услуги и цены"
+#: server/apps/enquiries/admin.py
+msgid "Mark as handled"
+msgstr "Отметить обработанными"
+
+#: server/apps/enquiries/models.py
+msgid "name"
+msgstr "имя"
+
+#: server/apps/enquiries/models.py
+msgid "phone"
+msgstr "телефон"
+
+#: server/apps/enquiries/models.py
+msgid "message"
+msgstr "сообщение"
+
+#: server/apps/enquiries/models.py
+msgid "sent"
+msgstr "отправлена"
+
+#: server/apps/enquiries/models.py
+msgid "handled"
+msgstr "обработана"
+
+#: server/apps/enquiries/models.py
+msgid "enquiry"
+msgstr "заявка"
+
+#: server/apps/enquiries/models.py
+msgid "enquiries"
+msgstr "заявки"
+
+#: server/apps/enquiries/templates/enquiries/form.html
+msgid "Ask us to call you back"
+msgstr "Попросите нас перезвонить"
+
+#: server/apps/enquiries/templates/enquiries/form.html
+msgid "Please correct the fields below."
+msgstr "Исправьте поля ниже."
+
+#: server/apps/enquiries/templates/enquiries/form.html
+msgid "Send"
+msgstr "Отправить"
+
+#: server/apps/enquiries/templates/enquiries/received.html
+msgid "Enquiry received"
+msgstr "Заявка получена"
+
+#: server/apps/enquiries/templates/enquiries/received.html
+msgid "Thank you"
+msgstr "Спасибо"
+
+#: server/apps/enquiries/templates/enquiries/received.html
+msgid ""
+"We have received your enquiry. We will call you back within a working day."
+msgstr "Мы получили вашу заявку. Мы перезвоним вам в течение рабочего дня."
+
+#: server/apps/enquiries/templates/enquiries/send.html
+msgid "Enquiry"
+msgstr "Заявка"
+
+#: server/apps/enquiries/views/forms.py
+msgid "Your name"
+msgstr "Ваше имя"
+
+#: server/apps/enquiries/views/forms.py
+msgid "Message"
+msgstr "Сообщение"
+
+#: server/apps/enquiries/views/forms.py
+msgid "I agree to the processing of my personal data"
+msgstr "Даю согласие на обработку моих персональных данных"
+
+#: server/apps/enquiries/views/pages.py
+msgid "Enter a phone number, for example +7 495 123-45-67."
+msgstr "Укажите номер телефона, например +7 495 123-45-67."
 
 #: server/common/django/templates/layout/base.html
 msgid "Language"
