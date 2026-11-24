@@ -1,0 +1,27 @@
+"""Tests of the links and the language form every page carries."""
+
+import pytest
+from django.test import Client
+
+
+def test_language_form_keeps_the_page(client: Client) -> None:
+    response = client.post(
+        '/i18n/setlang/',
+        {'language': 'en', 'next': '/ru/services/'},
+    )
+
+    assert response.headers.get('Location') == '/en/services/'
+
+
+@pytest.mark.parametrize(
+    'fragment',
+    [
+        'action="/i18n/setlang/"',
+        '<input type="hidden" name="next" value="/ru/contacts/">',
+        '<option value="en">',
+    ],
+)
+def test_header_offers_the_language_form(client: Client, fragment: str) -> None:
+    page = client.get('/ru/contacts/').content.decode()
+
+    assert fragment in page
