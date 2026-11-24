@@ -17,6 +17,7 @@ INSTALLED_APPS: tuple[str, ...] = (
     'server.apps.accounts',
     'server.apps.catalog',
     'server.apps.orders',
+    'server.apps.care',
     'server.common.outbox',
     # Default django apps:
     'django.contrib.auth',
@@ -101,11 +102,14 @@ AUTH_USER_MODEL = 'accounts.User'
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 USE_I18N = True
 
-LANGUAGES = (('en', _('English')),)
+LANGUAGES = (
+    ('ru', _('Russian')),
+    ('en', _('English')),
+)
 
 LOCALE_PATHS = ('locale/',)
 

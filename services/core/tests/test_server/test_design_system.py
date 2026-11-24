@@ -13,7 +13,9 @@ def test_pages_carry_the_theme_of_the_site(
 ) -> None:
     response = client.get(reverse('catalog:home'))
 
-    expected = f'<html lang="en" data-theme="{settings.SITE_THEME}">'
+    expected = (
+        f'<html lang="{settings.LANGUAGE_CODE}" data-theme="{settings.SITE_THEME}">'
+    )
     assert expected in response.content.decode()
 
 

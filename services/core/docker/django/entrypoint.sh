@@ -8,6 +8,8 @@ readonly cmd="$*"
 
 # Here you can place any logic that you want to execute on `entrypoint`.
 
+python /code/manage.py compilemessages --ignore mutants --verbosity 0
+
 echo "Service is up: $cmd"
 
 # Evaluating passed command (do not touch):
