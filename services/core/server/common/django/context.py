@@ -5,9 +5,8 @@ from django.http import HttpRequest
 
 
 def site(_request: HttpRequest) -> dict[str, object]:
-    """Returns the name and the theme of the site and every theme it has."""
+    """Returns the name and the theme of the site for the layout."""
     return {
         'site_name': settings.SITE_NAME,
         'theme': settings.SITE_THEME,
-        'themes': settings.SITE_THEMES,
     }
