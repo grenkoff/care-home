@@ -12,7 +12,7 @@ from server.apps.enquiries.logic.constants import NAME_MAX_LENGTH, PHONE_MAX_LEN
 
 @final
 class Enquiry(models.Model):
-    """Request of a visitor to be called back, sent with consent."""
+    """Request of a visitor to be called back."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid7, editable=False)
     name = models.CharField(_('name'), max_length=NAME_MAX_LENGTH)
