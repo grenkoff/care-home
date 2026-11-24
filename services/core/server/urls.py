@@ -86,6 +86,7 @@ urlpatterns = [
         ),
         name='design',
     ),
+    path('i18n/', include('django.conf.urls.i18n')),
     # Health checks:
     path(
         'health/',
