@@ -19,23 +19,10 @@
     <header class="ds-header">
       <nav class="ds-container flex flex-wrap items-center justify-between gap-4 py-4">
         <a
-          href="{% url 'care:home' %}"
+          href="{% block home %}/{% endblock home %}"
           class="font-heading text-xl font-semibold"
         >{{ site_name }}</a>
-        <ul class="flex flex-wrap gap-4">
-          <li>
-            <a
-              href="{% url 'care:services' %}"
-              class="ds-link"
-            >{% translate "Services and prices" %}</a>
-          </li>
-          <li>
-            <a
-              href="{% url 'care:contacts' %}"
-              class="ds-link"
-            >{% translate "Contacts" %}</a>
-          </li>
-        </ul>
+        {% block navigation %}{% endblock navigation %}
         <form
           action="{% url 'set_language' %}"
           method="post"
@@ -48,15 +35,12 @@
             <select name="language" class="ds-input py-1">
               {% get_language_info_list for LANGUAGES as languages %}
               {% for language in languages %}
-                {% if language.code == LANGUAGE_CODE %}
-                  <option value="{{ language.code }}" selected>
-                    {{ language.name_local }}
-                  </option>
-                {% else %}
-                  <option value="{{ language.code }}">
-                    {{ language.name_local }}
-                  </option>
-                {% endif %}
+                <option
+                  value="{{ language.code }}"
+                  {% if language.code == LANGUAGE_CODE %}selected{% endif %}
+                >
+                  {{ language.name_local }}
+                </option>
               {% endfor %}
             </select>
           </label>
@@ -72,10 +56,7 @@
     <footer class="ds-footer">
       <div class="ds-container flex flex-wrap justify-between gap-4 py-6">
         <p>{{ site_name }}</p>
-        <a
-          href="{% url 'care:privacy' %}"
-          class="ds-link"
-        >{% translate "Privacy policy" %}</a>
+        {% block footer %}{% endblock footer %}
       </div>
     </footer>
   </body>
