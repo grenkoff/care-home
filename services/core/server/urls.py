@@ -1,6 +1,7 @@
 """Root URL configuration of core."""
 
 from django.conf import settings
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import urls as admindocs_urls
@@ -19,6 +20,7 @@ from dmr.plugins.msgspec import MsgspecSerializer
 from dmr.routing import Router, build_404_handler, build_500_handler, path
 from health_check.views import HealthCheckView
 
+from server.apps.care.views import urls as care_page_urls
 from server.apps.catalog.api import urls as catalog_api_urls
 from server.apps.catalog.views import urls as catalog_page_urls
 from server.apps.orders.api import urls as orders_api_urls
@@ -73,6 +75,7 @@ urlpatterns = [
         name='v1_redoc',
     ),
     # Pages:
+    *i18n_patterns(path('', include((care_page_urls.urlpatterns, 'care')))),
     path('', include((catalog_page_urls.urlpatterns, 'catalog'))),
     path('', include((orders_page_urls.urlpatterns, 'orders'))),
     path(

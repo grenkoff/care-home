@@ -1,0 +1,21 @@
+{% extends "layout/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Care services" %}{% endblock title %}
+{% block content %}
+  <h1 class="ds-heading mb-6">{% translate "Care services" %}</h1>
+  {% if services %}
+    <ul class="grid gap-4 sm:grid-cols-2">
+      {% for service, price in services %}
+        <li class="ds-card">
+          <h2 class="ds-subheading">{{ service.name }}</h2>
+          <p class="mt-2">{{ service.description }}</p>
+          <p class="ds-price mt-4">
+            {% blocktranslate %}{{ price }} a month{% endblocktranslate %}
+          </p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="ds-muted">{% translate "Care services will be listed soon." %}</p>
+  {% endif %}
+{% endblock content %}
