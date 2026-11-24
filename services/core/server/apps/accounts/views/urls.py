@@ -3,6 +3,8 @@
 from django.contrib.auth import views
 from django.urls import path
 
+from server.apps.accounts.views import pages
+
 urlpatterns = [
     path(
         'sign-in/',
@@ -13,4 +15,5 @@ urlpatterns = [
         name='sign_in',
     ),
     path('sign-out/', views.LogoutView.as_view(), name='sign_out'),
+    path('invitation/<str:code>/', pages.Accept.as_view(), name='accept'),
 ]
