@@ -24,5 +24,5 @@ class StoredOffers:
                 ),
                 price_cents=stored.price_cents,
             )
-            for stored in models.Service.objects.order_by('position')
+            for stored in models.Service.objects.order_by('position', 'id')
         ]
