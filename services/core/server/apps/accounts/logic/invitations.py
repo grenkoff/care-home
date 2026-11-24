@@ -8,6 +8,27 @@ import attrs
 
 
 @final
+class UnknownInvitationError(LookupError):
+    """Raised for a link that is unknown, already used or expired."""
+
+    __slots__ = ()
+
+
+@final
+@attrs.define(slots=True, frozen=True, kw_only=True)
+class Invitation:
+    """Invitation as the site keeps it: for whom, until when, whether used."""
+
+    email: str
+    _expires_at: datetime
+    _accepted: bool
+
+    def open_at(self, moment: datetime) -> bool:
+        """Tells whether the link still works at the moment."""
+        return False
+
+
+@final
 @attrs.define(slots=True, frozen=True)
 class Digest:
     """Digest of a token: what the site keeps instead of the token."""
@@ -41,3 +62,13 @@ class Tokens(Protocol):
 
     def fresh(self) -> str:
         """Returns a new token for a link."""
+
+
+class Invitations(Protocol):
+    """Invitations that staff made."""
+
+    def found(self, digest: str) -> Invitation:
+        """Returns the invitation of a digest or raises UnknownInvitationError."""
+
+    def accept(self, digest: str, password: str) -> None:
+        """Makes the account of an unused invitation or raises an error."""
