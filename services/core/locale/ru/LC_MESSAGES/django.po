@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: care-home\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-24 21:24+0000\n"
+"POT-Creation-Date: 2026-11-24 22:29+0000\n"
 "PO-Revision-Date: 2026-11-24 08:45+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -11,6 +11,98 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: server/apps/accounts/admin.py
+#, python-format
+msgid "Send this link to the relative, it is shown only once: %(link)s"
+msgstr "Отправьте эту ссылку родственнику, она показывается только один раз: %(link)s"
+
+#: server/apps/accounts/models.py
+msgid "e-mail"
+msgstr "эл. почта"
+
+#: server/apps/accounts/models.py
+msgid "expires"
+msgstr "действует до"
+
+#: server/apps/accounts/models.py
+msgid "accepted"
+msgstr "принято"
+
+#: server/apps/accounts/models.py
+msgid "invitation"
+msgstr "приглашение"
+
+#: server/apps/accounts/models.py
+msgid "invitations"
+msgstr "приглашения"
+
+#: server/apps/accounts/templates/accounts/invitation.html
+#: server/apps/accounts/templates/accounts/invitation_gone.html
+msgid "Invitation"
+msgstr "Приглашение"
+
+#: server/apps/accounts/templates/accounts/invitation.html
+#, python-format
+msgid "Your account will be %(email)s. Choose a password for it."
+msgstr "Ваша учётная запись: %(email)s. Выберите для неё пароль."
+
+#: server/apps/accounts/templates/accounts/invitation.html
+msgid "Rules of watching"
+msgstr "Правила просмотра"
+
+#: server/apps/accounts/templates/accounts/invitation.html
+msgid ""
+"The cameras show the common rooms of the home live. When you watch them, "
+"never record the video, never take pictures of the screen and never pass the "
+"video or your account to anyone."
+msgstr "Камеры показывают общие комнаты дома в прямом эфире. Когда вы их смотрите, никогда не записывайте видео, не фотографируйте экран и никому не передавайте видео или свою учётную запись."
+
+#: server/apps/accounts/templates/accounts/invitation.html
+msgid "Create the account"
+msgstr "Создать учётную запись"
+
+#: server/apps/accounts/templates/accounts/invitation_gone.html
+msgid "This link no longer works"
+msgstr "Ссылка больше не действует"
+
+#: server/apps/accounts/templates/accounts/invitation_gone.html
+msgid ""
+"The invitation was already used or has expired. Ask the staff of the home "
+"for a new one."
+msgstr "Приглашение уже использовано или истекло. Попросите персонал дома прислать новое."
+
+#: server/apps/accounts/templates/accounts/password.html
+#: server/apps/accounts/templates/accounts/password_changed.html
+msgid "Change the password"
+msgstr "Сменить пароль"
+
+#: server/apps/accounts/templates/accounts/password_changed.html
+msgid "Your password has been changed"
+msgstr "Ваш пароль изменён"
+
+#: server/apps/accounts/templates/accounts/sign_in.html
+#: server/templates/site/layout.html
+msgid "Sign in"
+msgstr "Войти"
+
+#: server/apps/accounts/templates/accounts/sign_in.html
+msgid "Please enter a correct e-mail and password."
+msgstr "Введите верные e-mail и пароль."
+
+#: server/apps/accounts/templates/accounts/sign_in.html
+#: server/apps/care/templates/care/contacts.html
+msgid "E-mail"
+msgstr "Эл. почта"
+
+#: server/apps/accounts/templates/accounts/sign_in.html
+#: server/templates/site/layout.html
+msgid "Password"
+msgstr "Пароль"
+
+#: server/apps/accounts/views/forms.py
+msgid "I accept the rules of watching"
+msgstr "Принимаю правила просмотра"
 
 #: server/apps/care/models.py
 msgid "position"
@@ -65,10 +157,6 @@ msgstr "Открыть карту"
 #: server/apps/enquiries/views/forms.py
 msgid "Phone"
 msgstr "Телефон"
-
-#: server/apps/care/templates/care/contacts.html
-msgid "E-mail"
-msgstr "Эл. почта"
 
 #: server/apps/care/templates/care/contacts.html
 msgid "Visiting hours"
@@ -213,6 +301,10 @@ msgstr "English"
 #: server/templates/site/layout.html
 msgid "Services and prices"
 msgstr "Услуги и цены"
+
+#: server/templates/site/layout.html
+msgid "Sign out"
+msgstr "Выйти"
 
 #: server/templates/site/privacy.html
 msgid "This is a demonstration site of an invented care home."
