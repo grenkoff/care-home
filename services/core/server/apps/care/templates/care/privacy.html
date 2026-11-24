@@ -1,0 +1,27 @@
+{% extends "layout/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Privacy policy" %}{% endblock title %}
+{% block content %}
+  <article class="max-w-2xl">
+    <h1 class="ds-heading mb-6">{% translate "Privacy policy" %}</h1>
+    <p class="mb-4">
+      {% translate "This is a demonstration site of an invented care home." %}
+    </p>
+    <h2 class="ds-subheading mb-2">{% translate "What we keep" %}</h2>
+    <ul class="mb-4 list-disc pl-6">
+      <li>
+        {% translate "the name and phone number from an enquiry, to call you back;" %}
+      </li>
+      <li>{% translate "the accounts of relatives whom staff invited;" %}</li>
+      <li>{% translate "which relative opened which camera and when." %}</li>
+    </ul>
+    <h2 class="ds-subheading mb-2">{% translate "Video" %}</h2>
+    <p class="mb-4">
+      {% translate "Video from the cameras is never stored: relatives see only the live picture of the common rooms." %}
+    </p>
+    <h2 class="ds-subheading mb-2">{% translate "Cookies" %}</h2>
+    <p>
+      {% translate "The site sets only the cookies it needs to work: the language, the session and the protection of forms. There is no analytics." %}
+    </p>
+  </article>
+{% endblock content %}

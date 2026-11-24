@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: care-home\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-24 08:44+0000\n"
+"POT-Creation-Date: 2026-11-24 08:46+0000\n"
 "PO-Revision-Date: 2026-11-24 08:45+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -96,6 +96,50 @@ msgstr ""
 #: server/apps/care/templates/care/home.html
 msgid "Care services and prices"
 msgstr "Услуги и цены"
+
+#: server/apps/care/templates/care/privacy.html
+msgid "Privacy policy"
+msgstr "Политика конфиденциальности"
+
+#: server/apps/care/templates/care/privacy.html
+msgid "This is a demonstration site of an invented care home."
+msgstr "Это демонстрационный сайт выдуманного дома для пожилых людей."
+
+#: server/apps/care/templates/care/privacy.html
+msgid "What we keep"
+msgstr "Что мы храним"
+
+#: server/apps/care/templates/care/privacy.html
+msgid "the name and phone number from an enquiry, to call you back;"
+msgstr "имя и телефон из заявки, чтобы перезвонить вам;"
+
+#: server/apps/care/templates/care/privacy.html
+msgid "the accounts of relatives whom staff invited;"
+msgstr "учётные записи родственников, которых пригласил персонал;"
+
+#: server/apps/care/templates/care/privacy.html
+msgid "which relative opened which camera and when."
+msgstr "кто из родственников и когда открывал какую камеру."
+
+#: server/apps/care/templates/care/privacy.html
+msgid "Video"
+msgstr "Видео"
+
+#: server/apps/care/templates/care/privacy.html
+msgid ""
+"Video from the cameras is never stored: relatives see only the live picture "
+"of the common rooms."
+msgstr "Видео с камер никогда не сохраняется: родственники видят только живую картинку общих комнат."
+
+#: server/apps/care/templates/care/privacy.html
+msgid "Cookies"
+msgstr "Cookies"
+
+#: server/apps/care/templates/care/privacy.html
+msgid ""
+"The site sets only the cookies it needs to work: the language, the session "
+"and the protection of forms. There is no analytics."
+msgstr "Сайт ставит только необходимые для работы cookies: язык, сессию и защиту форм. Аналитики нет."
 
 #: server/apps/care/templates/care/services.html
 msgid "Care services"

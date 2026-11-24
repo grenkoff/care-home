@@ -40,6 +40,15 @@ class Contacts(View):
 
 
 @final
+class Privacy(View):
+    """Page that says which data the site keeps and why."""
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        """Renders the privacy policy in the language of the page."""
+        return render(request, 'care/privacy.html')
+
+
+@final
 class Services(HasContainer, View):
     """Page that lists the care services with their monthly prices."""
 
