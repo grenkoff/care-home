@@ -8,18 +8,18 @@ from django.db import models
 
 from scripts.keys import KeyReport
 
-_CATALOG: Final = 'server.apps.catalog'
+_CARE: Final = 'server.apps.care'
 
 
 def _declare(registry: Apps, name: str, **fields: object) -> None:
-    """Declares a model of the catalog in a registry."""
-    meta = type('Meta', (), {'app_label': 'catalog', 'apps': registry})
-    namespace = {'__module__': f'{_CATALOG}.models', 'Meta': meta}
+    """Declares a model of care in a registry."""
+    meta = type('Meta', (), {'app_label': 'care', 'apps': registry})
+    namespace = {'__module__': f'{_CARE}.models', 'Meta': meta}
     type(name, (models.Model,), {**namespace, **fields})
 
 
 def test_reports_primary_key_other_than_uuid7() -> None:
-    registry = Apps([_CATALOG])
+    registry = Apps([_CARE])
     _declare(registry, 'Counter')
     _declare(
         registry,
@@ -35,6 +35,6 @@ def test_reports_primary_key_other_than_uuid7() -> None:
     problems = list(KeyReport(registry).problems())
 
     assert problems == [
-        'catalog.Counter has no UUIDv7 primary key',
-        'catalog.Random has no UUIDv7 primary key',
+        'care.Counter has no UUIDv7 primary key',
+        'care.Random has no UUIDv7 primary key',
     ]

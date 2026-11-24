@@ -13,7 +13,12 @@ from schemathesis.specs.openapi.schemas import OpenApiSchema
 from tracecov import CoverageMap
 from tracecov.schemathesis import helpers
 
-from server.wsgi import application
+from server import urls, wsgi
+
+pytestmark = pytest.mark.skipif(
+    not urls.schema_v1.convert()['paths'],
+    reason='the HTTP API has no operations yet',
+)
 
 
 @pytest.fixture(autouse=True)
@@ -38,7 +43,7 @@ def api_schema(
     """Load OpenAPI schema as a pytest fixture."""
     response = admin_client.get(reverse('v1_openapi_json'))
     schema = st.openapi.from_dict(response.json())
-    schema.app = application
+    schema.app = wsgi.application
     return schema
 
 

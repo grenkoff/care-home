@@ -3,7 +3,6 @@
 import pytest
 from django.conf import LazySettings
 from django.test import Client
-from django.urls import reverse
 
 
 @pytest.mark.django_db
@@ -18,7 +17,7 @@ from django.urls import reverse
     ],
 )
 def test_pages_share_one_layout(client: Client, fragment: str) -> None:
-    response = client.get(reverse('catalog:home'))
+    response = client.get('/ru/')
 
     assert fragment in response.content.decode()
 
@@ -27,6 +26,6 @@ def test_pages_share_one_layout(client: Client, fragment: str) -> None:
 def test_layout_names_the_site(client: Client, settings: LazySettings) -> None:
     settings.SITE_NAME = 'Tea house'
 
-    response = client.get(reverse('catalog:home'))
+    response = client.get('/ru/')
 
     assert '<title>\n      Tea house\n    </title>' in response.content.decode()

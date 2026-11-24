@@ -21,16 +21,10 @@ from dmr.routing import Router, build_404_handler, build_500_handler, path
 from health_check.views import HealthCheckView
 
 from server.apps.care.views import urls as care_page_urls
-from server.apps.catalog.api import urls as catalog_api_urls
-from server.apps.catalog.views import urls as catalog_page_urls
-from server.apps.orders.api import urls as orders_api_urls
-from server.apps.orders.views import urls as orders_page_urls
 
 admin.autodiscover()
 
 router_v1 = Router('v1/')
-router_v1.include(catalog_api_urls.router, namespace='catalog')
-router_v1.include(orders_api_urls.router, namespace='orders')
 
 router = Router('api/')
 router.include(router_v1, namespace='v1')
@@ -76,8 +70,6 @@ urlpatterns = [
     ),
     # Pages:
     *i18n_patterns(path('', include((care_page_urls.urlpatterns, 'care')))),
-    path('', include((catalog_page_urls.urlpatterns, 'catalog'))),
-    path('', include((orders_page_urls.urlpatterns, 'orders'))),
     path(
         'design/',
         TemplateView.as_view(
