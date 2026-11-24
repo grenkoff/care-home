@@ -3,7 +3,6 @@ updates:
   - package-ecosystem: cargo
     directories:
       - /
-      - /services/core/native
     target-branch: develop
     schedule:
       interval: weekly

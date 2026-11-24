@@ -1,7 +1,6 @@
 [workspace]
 resolver = "3"
 members = ["contracts", "services/images", "tools/clones", "tools/commit-lint", "tools/eo-lint"]
-exclude = ["services/core/native"]
 
 [workspace.package]
 edition = "2024"
