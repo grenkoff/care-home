@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING, final
 
 import attrs
 
-from server.apps.accounts.logic.invitations import Issued
+from server.apps.accounts.logic.invitations import Digest, Issued
 
 if TYPE_CHECKING:
+    from datetime import timedelta
+
     from server.apps.accounts.logic.invitations import Clock, Tokens
 
 
@@ -24,4 +25,9 @@ class InviteRelative:
 
     def __call__(self) -> Issued:
         """Returns the code to send and what the site keeps of it."""
-        return Issued(code='', digest='', expires_at=datetime.min.replace(tzinfo=UTC))
+        code = self._tokens.fresh()
+        return Issued(
+            code=code,
+            digest=Digest(code).hexadecimal(),
+            expires_at=self._clock.now() + self._lifetime,
+        )
