@@ -347,8 +347,7 @@ JavaScript; JavaScript only improves them (progressive enhancement).
    its attributes and children, so the page works before it loads and
    without JavaScript. A template loads it with
    `<script type="module" src="{% static 'components/<element>.js' %}">`;
-   no inline scripts, no `on*=` attributes. Examples: `site-theme`
-   (theme switcher, `localStorage`, View Transitions) and `site-total`
+   no inline scripts, no `on*=` attributes. Example: `site-total`
    (live total, `Intl.NumberFormat`, constraint validation).
 3. **One design system.** Every page is built from its components and
    styled only by its tokens (colours, fonts, spacing, radii, shadows) as
