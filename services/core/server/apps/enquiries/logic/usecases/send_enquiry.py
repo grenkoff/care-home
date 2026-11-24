@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING, final
 
 import attrs
 
+from server.apps.enquiries.logic.enquiries import Enquiry
+from server.apps.enquiries.logic.phone import Phone
+
 if TYPE_CHECKING:
     from server.apps.enquiries.logic.enquiries import Enquiries
 
@@ -19,3 +22,6 @@ class SendEnquiry:
 
     def __call__(self, *, name: str, phone: str, message: str) -> None:
         """Keeps the enquiry or raises InvalidPhoneError for a wrong phone."""
+        self._enquiries.add(
+            Enquiry(name=name, phone=Phone(phone).checked(), message=message),
+        )
