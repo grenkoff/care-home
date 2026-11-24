@@ -1,5 +1,5 @@
 {% extends "care/layout.html" %}
-{% load i18n %}
+{% load i18n enquiries %}
 {% block title %}{% translate "Contacts" %}{% endblock title %}
 {% block content %}
   <h1 class="ds-heading mb-6">{% translate "Contacts" %}</h1>
@@ -23,4 +23,5 @@
     <dt class="ds-muted">{% translate "Visiting hours" %}</dt>
     <dd>{% translate "every day from 10:00 to 20:00" %}</dd>
   </dl>
+  <div class="mt-8">{% enquiry_form %}</div>
 {% endblock content %}
