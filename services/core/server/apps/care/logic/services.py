@@ -1,8 +1,10 @@
 """Care services of the home, as staff keep them and pages show them."""
 
-from typing import Protocol, final
+from typing import Final, Protocol, final
 
 import attrs
+
+_ENGLISH: Final = 'en'
 
 
 @final
@@ -15,7 +17,9 @@ class Bilingual:
 
     def said_in(self, language: str) -> str:
         """Returns the text in the language: English for `en`, else Russian."""
-        return ''
+        if language == _ENGLISH:
+            return self._english
+        return self._russian
 
 
 @final
