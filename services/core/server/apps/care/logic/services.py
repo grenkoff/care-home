@@ -8,6 +8,13 @@ _ENGLISH: Final = 'en'
 
 
 @final
+class UnknownLanguageError(LookupError):
+    """Raised when a text is asked for in a language the site does not speak."""
+
+    __slots__ = ()
+
+
+@final
 @attrs.define(slots=True, frozen=True)
 class Bilingual:
     """Text written in Russian and in English."""
