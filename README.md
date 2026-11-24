@@ -28,7 +28,7 @@ make doctor   # lists the tools that are missing
 make setup    # installs the Rust toolchain and the core venv
 make env      # creates services/core/config/.env
 make up       # starts the site on http://localhost:8000
-make e2e      # checks that an order reaches the catalog through the outbox
+make e2e      # checks the pages of the running site in Russian and English
 ```
 
 Then tell your AI agent what to build, in any form: one sentence, a
@@ -45,8 +45,7 @@ the site. It reads
 proto/               gRPC contracts of extracted services (images/v1)
 contracts/           Rust crate generated from proto/
 services/core/       the Django monolith (pages, public HTTP API, admin, database)
-services/core/native the Rust extension module of the monolith (PyO3, maturin)
-services/images/     the example Rust service: thumbnails over gRPC
+services/images/     the example Rust service: thumbnails over gRPC, kept until the video service replaces it
 tools/eo-lint/       Elegant Objects linter for Rust
 tools/commit-lint/   commit message checker
 tools/clones/        finder of repeated code
@@ -56,17 +55,10 @@ docs/                architecture, coding rules, cookbook, patterns registry
 compose.yml          the whole system
 ```
 
-The example flow: two modules inside `core`.
-
-```
-POST /api/v1/orders/ ─▶ orders ─facade─▶ catalog                     (one process)
-                        orders ─outbox─▶ core-relay ─▶ catalog sales  (after commit)
-```
-
-Keep `catalog` and `orders` as a reference until your own modules exist,
-then delete them. The Rust workspace, `eo-lint`, the `contracts` crate and
-buf stay ready and checked in CI for the day a module has to leave the
-monolith.
+Modules of `core`: `care` (public pages, care services and prices) and
+`accounts` (users). The Rust workspace, `eo-lint`, the `contracts` crate
+and buf stay ready and checked in CI for the day a module has to leave
+the monolith.
 
 ## Checks
 
@@ -81,7 +73,7 @@ monolith.
 | rust-mutants | mutation testing with cargo-mutants: no mutant may survive |
 | core | the full wemake-django-template pipeline: ruff, wemake-python-styleguide, import-linter, mypy, pytest with coverage of 80% overall and 100% in `logic/`, schemathesis + tracecov, Django deploy checks, migration linters, deptry, codespell, typos, yamllint; mutation testing with mutmut; plus [ty](https://github.com/astral-sh/ty) as a second, non-blocking type checker |
 | tooling | lint, types and tests of the agent hooks; `clones` (duplicated Python and Rust code) |
-| e2e | `docker compose up` and an order through the outbox to the catalog |
+| e2e | `docker compose up`, the pages of the running site and a browser test of the language form |
 
 ## Test-driven development
 
