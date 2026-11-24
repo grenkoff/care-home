@@ -1,0 +1,35 @@
+{% extends "site/layout.html" %}
+{% load i18n %}
+{% block title %}{% translate "Invitation" %}{% endblock title %}
+{% block content %}
+  <h1 class="ds-heading mb-6">{% translate "Invitation" %}</h1>
+  <form method="post" class="ds-card grid max-w-2xl gap-4">
+    {% csrf_token %}
+    <p>
+      {% blocktranslate %}Your account will be {{ email }}. Choose a password for it.{% endblocktranslate %}
+    </p>
+    {% for field in password %}
+      <label class="ds-field">
+        {{ field.label }}
+        {{ field }}
+      </label>
+      {% for error in field.errors %}
+        <p class="text-sm text-danger">{{ error }}</p>
+      {% endfor %}
+    {% endfor %}
+    <h2 class="ds-subheading">{% translate "Rules of watching" %}</h2>
+    <p>
+      {% translate "The cameras show the common rooms of the home live. When you watch them, never record the video, never take pictures of the screen and never pass the video or your account to anyone." %}
+    </p>
+    <label class="flex items-start gap-2 text-sm">
+      {{ rules.consent }}
+      <span>{{ rules.consent.label }}</span>
+    </label>
+    {% for error in rules.consent.errors %}
+      <p class="text-sm text-danger">{{ error }}</p>
+    {% endfor %}
+    <button type="submit" class="ds-button justify-self-start">
+      {% translate "Create the account" %}
+    </button>
+  </form>
+{% endblock content %}
