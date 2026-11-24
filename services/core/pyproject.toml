@@ -452,4 +452,5 @@ ignore_names = [
   "consent",
   "actions",
   "enquiry_form",
+  "has_change_permission",
 ]
