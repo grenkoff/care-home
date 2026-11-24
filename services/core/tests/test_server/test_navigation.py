@@ -1,4 +1,4 @@
-"""Tests of the links and the language form every page carries."""
+"""Tests of the links and the language form of the site layout."""
 
 import pytest
 from django.test import Client

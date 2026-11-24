@@ -73,6 +73,11 @@ urlpatterns = [
     *i18n_patterns(
         path('', include((care_page_urls.urlpatterns, 'care'))),
         path('', include((enquiry_page_urls.urlpatterns, 'enquiries'))),
+        path(
+            'privacy/',
+            TemplateView.as_view(template_name='site/privacy.html'),
+            name='privacy',
+        ),
     ),
     path(
         'design/',

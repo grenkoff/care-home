@@ -9,9 +9,4 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='care/home.html'), name='home'),
     path('services/', pages.Services.as_view(), name='services'),
     path('contacts/', pages.Contacts.as_view(), name='contacts'),
-    path(
-        'privacy/',
-        TemplateView.as_view(template_name='care/privacy.html'),
-        name='privacy',
-    ),
 ]
