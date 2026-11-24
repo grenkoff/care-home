@@ -1,0 +1,87 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: care-home\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-24 08:41+0000\n"
+"PO-Revision-Date: 2026-11-24 08:45+0000\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: server/apps/care/models.py
+msgid "position"
+msgstr "позиция"
+
+#: server/apps/care/models.py
+msgid "name in Russian"
+msgstr "название на русском"
+
+#: server/apps/care/models.py
+msgid "name in English"
+msgstr "название на английском"
+
+#: server/apps/care/models.py
+msgid "description in Russian"
+msgstr "описание на русском"
+
+#: server/apps/care/models.py
+msgid "description in English"
+msgstr "описание на английском"
+
+#: server/apps/care/models.py
+msgid "monthly price in cents"
+msgstr "цена в месяц в копейках"
+
+#: server/apps/care/models.py
+msgid "care service"
+msgstr "услуга"
+
+#: server/apps/care/models.py
+msgid "care services"
+msgstr "услуги"
+
+#: server/apps/care/templates/care/home.html
+msgid ""
+"A small private care home with a garden, where older people live in comfort "
+"and in good company."
+msgstr ""
+"Небольшой частный дом с садом, где пожилые люди живут в уюте и хорошей "
+"компании."
+
+#: server/apps/care/templates/care/home.html
+msgid ""
+"Nurses look after the residents day and night, cooks prepare fresh meals, "
+"and relatives can visit at any time or see the common rooms online."
+msgstr ""
+"Медсёстры заботятся о жильцах днём и ночью, повара готовят свежую еду, а "
+"родственники могут навестить близких в любое время или посмотреть общие "
+"комнаты онлайн."
+
+#: server/apps/care/templates/care/home.html
+msgid "Care services and prices"
+msgstr "Услуги и цены"
+
+#: server/apps/care/templates/care/services.html
+msgid "Care services"
+msgstr "Услуги"
+
+#: server/apps/care/templates/care/services.html
+#, python-format
+msgid "%(price)s a month"
+msgstr "%(price)s в месяц"
+
+#: server/apps/care/templates/care/services.html
+msgid "Care services will be listed soon."
+msgstr "Список услуг скоро появится."
+
+#: server/settings/components/common.py
+msgid "Russian"
+msgstr "Русский"
+
+#: server/settings/components/common.py
+msgid "English"
+msgstr "English"
