@@ -1,0 +1,39 @@
+{% load i18n %}
+<form
+  method="post"
+  action="{% url 'enquiries:send' %}"
+  class="ds-card grid max-w-2xl gap-4"
+>
+  {% csrf_token %}
+  <h2 class="ds-subheading">{% translate "Ask us to call you back" %}</h2>
+  {% if form.errors %}
+    <p class="ds-alert" role="alert">
+      {% translate "Please correct the fields below." %}
+    </p>
+  {% endif %}
+  {% for field in form %}
+    {% if field.widget_type == "checkbox" %}
+      <label class="flex items-start gap-2 text-sm">
+        {{ field }}
+        <span>
+          {{ field.label }}
+          <a
+            href="{% url 'care:privacy' %}"
+            class="ds-link"
+          >{% translate "Privacy policy" %}</a>
+        </span>
+      </label>
+    {% else %}
+      <label class="ds-field">
+        {{ field.label }}
+        {{ field }}
+      </label>
+    {% endif %}
+    {% for error in field.errors %}
+      <p class="text-sm text-danger">{{ error }}</p>
+    {% endfor %}
+  {% endfor %}
+  <button type="submit" class="ds-button justify-self-start">
+    {% translate "Send" %}
+  </button>
+</form>

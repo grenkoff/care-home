@@ -21,6 +21,7 @@ from dmr.routing import Router, build_404_handler, build_500_handler, path
 from health_check.views import HealthCheckView
 
 from server.apps.care.views import urls as care_page_urls
+from server.apps.enquiries.views import urls as enquiry_page_urls
 
 admin.autodiscover()
 
@@ -69,7 +70,10 @@ urlpatterns = [
         name='v1_redoc',
     ),
     # Pages:
-    *i18n_patterns(path('', include((care_page_urls.urlpatterns, 'care')))),
+    *i18n_patterns(
+        path('', include((care_page_urls.urlpatterns, 'care'))),
+        path('', include((enquiry_page_urls.urlpatterns, 'enquiries'))),
+    ),
     path(
         'design/',
         TemplateView.as_view(
