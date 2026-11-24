@@ -4,7 +4,6 @@ from html.parser import HTMLParser
 from typing import override
 
 import pytest
-from django.conf import LazySettings
 from django.test import Client
 from django.urls import reverse
 
@@ -38,37 +37,7 @@ def _tags(client: Client, url: str) -> list[_Tag]:
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    'tag',
-    [
-        ('site-theme', (('hidden', None),)),
-        ('option', (('value', 'classic'), ('selected', None))),
-        ('option', (('value', 'warm'),)),
-        ('option', (('value', 'bold'),)),
-        (
-            'script',
-            (('type', 'module'), ('src', '/static/components/site-theme.js')),
-        ),
-    ],
-)
-def test_header_offers_the_themes(
-    client: Client,
-    settings: LazySettings,
-    tag: _Tag,
-) -> None:
-    settings.SITE_THEME = 'classic'
-    settings.SITE_THEME_SWITCHER = True
-
-    assert tag in _tags(client, reverse('catalog:home'))
-
-
-@pytest.mark.django_db
-def test_switcher_is_left_out_when_turned_off(
-    client: Client,
-    settings: LazySettings,
-) -> None:
-    settings.SITE_THEME_SWITCHER = False
-
+def test_pages_leave_out_the_theme_switcher(client: Client) -> None:
     response = client.get(reverse('catalog:home'))
 
     assert 'site-theme' not in response.content.decode()
