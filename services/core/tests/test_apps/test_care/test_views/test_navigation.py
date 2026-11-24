@@ -40,3 +40,14 @@ def test_layout_links_the_pages(client: Client, link: str) -> None:
     page = client.get('/en/contacts/').content.decode()
 
     assert link in page
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'address',
+    ['/en/', '/en/services/', '/en/contacts/', '/en/privacy/'],
+)
+def test_pages_return_to_themselves(client: Client, address: str) -> None:
+    page = client.get(address).content.decode()
+
+    assert f'name="next" value="{address}"' in page
