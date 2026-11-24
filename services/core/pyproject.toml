@@ -447,4 +447,10 @@ ignore_names = [
   "position",
   "Meta",
   "envelope",
+  "sent_at",
+  "handled",
+  "consent",
+  "actions",
+  "mark_handled",
+  "enquiry_form",
 ]
