@@ -8,7 +8,10 @@ readonly cmd="$*"
 
 # Here you can place any logic that you want to execute on `entrypoint`.
 
-python /code/manage.py compilemessages --ignore mutants --verbosity 0
+stale=$(find /code/locale -name '*.po' -exec sh -c 'test "$1" -nt "${1%.po}.mo"' _ {} \; -print)
+if [ -n "$stale" ]; then
+  python /code/manage.py compilemessages --ignore mutants --verbosity 0
+fi
 
 echo "Service is up: $cmd"
 
