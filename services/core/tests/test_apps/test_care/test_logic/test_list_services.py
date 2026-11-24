@@ -10,13 +10,13 @@ from server.apps.care.logic.usecases.list_services import ListServices
 
 _OFFERS = (
     Offer(
-        name=Bilingual('Уход', 'Care'),
-        description=Bilingual('Днём и ночью', 'Day and night'),
+        name=Bilingual(russian='Уход', english='Care'),
+        description=Bilingual(russian='Днём и ночью', english='Day and night'),
         price_cents=4_500_000,
     ),
     Offer(
-        name=Bilingual('Прогулки', 'Walks'),
-        description=Bilingual('Под липами', 'In the garden'),
+        name=Bilingual(russian='Прогулки', english='Walks'),
+        description=Bilingual(russian='Под липами', english='In the garden'),
         price_cents=300_000,
     ),
 )
