@@ -141,8 +141,6 @@ SITE_THEME = config(
     cast=Choices(SITE_THEMES),
 )
 
-SITE_THEME_SWITCHER = config('DJANGO_THEME_SWITCHER', default=True, cast=bool)
-
 
 # Templates
 # https://docs.djangoproject.com/en/6.1/ref/templates/api

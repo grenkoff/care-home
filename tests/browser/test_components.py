@@ -46,16 +46,6 @@ def product(playwright: Playwright) -> str:
     return identifier
 
 
-def test_switcher_restyles_the_page_and_remembers(page: Page) -> None:
-    page.goto('/')
-    page.get_by_label('Theme').select_option('bold')
-    expect(page.locator('html')).to_have_attribute('data-theme', 'bold')
-
-    page.reload()
-
-    expect(page.locator('html')).to_have_attribute('data-theme', 'bold')
-
-
 def test_total_follows_the_quantity(page: Page, product: str) -> None:
     page.goto(f'/products/{product}/')
 
