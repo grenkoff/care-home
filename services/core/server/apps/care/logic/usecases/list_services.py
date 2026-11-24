@@ -6,8 +6,10 @@ from typing import TYPE_CHECKING, final
 
 import attrs
 
+from server.apps.care.logic.services import CareService
+
 if TYPE_CHECKING:
-    from server.apps.care.logic.services import CareService, Offers
+    from server.apps.care.logic.services import Offers
 
 
 @final
@@ -19,4 +21,11 @@ class ListServices:
 
     def __call__(self, language: str) -> list[CareService]:
         """Returns the care services with their texts in the language."""
-        return []
+        return [
+            CareService(
+                name=offer.name.said_in(language),
+                description=offer.description.said_in(language),
+                price_cents=offer.price_cents,
+            )
+            for offer in self._offers.listed()
+        ]
