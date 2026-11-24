@@ -39,6 +39,13 @@ def test_sent_enquiry_leads_to_the_received_page(client: Client) -> None:
     assert response['Location'] == '/en/enquiry/received/'
 
 
+def test_enquiry_page_offers_a_blank_form(client: Client) -> None:
+    response = client.get(_PAGE)
+
+    assert response.status_code == HTTPStatus.OK
+    assert 'name="consent"' in response.content.decode()
+
+
 def test_received_page_promises_a_call(client: Client) -> None:
     response = client.get('/en/enquiry/received/')
 
