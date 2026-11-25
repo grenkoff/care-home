@@ -7,7 +7,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from server.apps.accounts import models
-from server.apps.accounts.logic.errors import UnknownInvitationError
+from server.apps.accounts.logic.errors import TakenEmailError, UnknownInvitationError
 from server.apps.accounts.logic.invitations import Invitation
 
 
@@ -43,6 +43,8 @@ class StoredInvitations:
             )
             if stored is None:
                 raise UnknownInvitationError(digest)
+            if models.User.objects.filter(username__iexact=stored.email).exists():
+                raise TakenEmailError(digest)
             models.User.objects.create_user(
                 username=stored.email,
                 email=stored.email,
