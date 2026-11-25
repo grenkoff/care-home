@@ -33,15 +33,18 @@ def test_sign_in_page_asks_for_email_and_password(
 @pytest.mark.django_db
 @pytest.mark.usefixtures('relative')
 @pytest.mark.parametrize('email', [_EMAIL, 'Anna@Example.TEST'])
-def test_relative_signs_in(client: Client, email: str) -> None:
+def test_password_leads_to_the_second_factor(client: Client, email: str) -> None:
     response = client.post(
         _PAGE,
         {'username': email, 'password': _CHOSEN},
         follow=True,
     )
 
-    assert response.redirect_chain == [('/en/', HTTPStatus.FOUND)]
-    assert 'Sign out' in response.content.decode()
+    assert response.redirect_chain == [
+        ('/en/second-factor/', HTTPStatus.FOUND),
+        ('/en/second-factor/connect/', HTTPStatus.FOUND),
+    ]
+    assert 'Sign out' not in response.content.decode()
 
 
 @pytest.mark.django_db
