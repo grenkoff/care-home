@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import urls as admindocs_urls
 from django.urls import include
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView, TemplateView
 from dmr.openapi import build_schema
 from dmr.openapi.views import (
     OpenAPIJsonView,
@@ -103,6 +103,10 @@ urlpatterns = [
         name='health_check',
     ),
     # django-admin:
+    path(
+        'admin/login/',
+        RedirectView.as_view(pattern_name='accounts:sign_in', query_string=True),
+    ),
     path('admin/doc/', include(admindocs_urls)),
     path('admin/', admin.site.urls),
     # Text and xml static files:
