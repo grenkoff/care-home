@@ -8,13 +8,6 @@ import attrs
 
 
 @final
-class UnknownInvitationError(LookupError):
-    """Raised for a link that is unknown, already used or expired."""
-
-    __slots__ = ()
-
-
-@final
 @attrs.define(slots=True, frozen=True, kw_only=True)
 class Invitation:
     """Invitation as the site keeps it: for whom, until when, whether used."""

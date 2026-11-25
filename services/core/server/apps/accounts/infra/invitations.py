@@ -7,7 +7,8 @@ from django.db import transaction
 from django.utils import timezone
 
 from server.apps.accounts import models
-from server.apps.accounts.logic.invitations import Invitation, UnknownInvitationError
+from server.apps.accounts.logic.errors import UnknownInvitationError
+from server.apps.accounts.logic.invitations import Invitation
 
 
 @final

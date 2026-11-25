@@ -8,7 +8,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views import View
 
-from server.apps.accounts.logic.invitations import UnknownInvitationError
+from server.apps.accounts.logic.errors import UnknownInvitationError
 from server.apps.accounts.logic.usecases import accept_invitation
 from server.apps.accounts.models import User
 from server.apps.accounts.views.forms import RulesForm
