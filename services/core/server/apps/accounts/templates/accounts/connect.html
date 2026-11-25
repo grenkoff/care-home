@@ -8,7 +8,7 @@
       {% translate "Scan the picture with an authenticator app on your phone, or enter the key in it by hand. Then enter the six-digit code that the app shows." %}
     </p>
     <img
-      src="{{ enrolment.picture }}"
+      src="{{ picture }}"
       alt="{% translate 'QR code of the key' %}"
       class="justify-self-start"
     >
@@ -16,7 +16,7 @@
       {% translate "Key" %}: <code>{{ key }}</code>
     </p>
     <p>
-      <a href="{{ enrolment.link }}" class="ds-link">{% translate "Open in the authenticator app" %}</a>
+      <a href="{{ link }}" class="ds-link">{% translate "Open in the authenticator app" %}</a>
     </p>
     {% include "accounts/code_form.html" %}
   </div>

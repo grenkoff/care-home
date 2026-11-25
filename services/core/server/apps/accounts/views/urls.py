@@ -6,7 +6,14 @@ from django.urls import path, reverse_lazy
 from server.apps.accounts.views import pages, second_factor, sign_in
 
 urlpatterns = [
-    path('sign-in/', sign_in.SignIn.as_view(), name='sign_in'),
+    path(
+        'sign-in/',
+        sign_in.SignIn.as_view(
+            template_name='accounts/sign_in.html',
+            redirect_authenticated_user=True,
+        ),
+        name='sign_in',
+    ),
     path('second-factor/', second_factor.Code.as_view(), name='code'),
     path(
         'second-factor/connect/',
