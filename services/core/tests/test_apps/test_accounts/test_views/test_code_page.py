@@ -65,3 +65,23 @@ def test_code_needs_the_password_first(client: Client) -> None:
 
     assert response.status_code == HTTPStatus.FOUND
     assert response['Location'] == '/en/sign-in/'
+
+
+@pytest.mark.django_db
+def test_codes_lock_after_five_wrong_ones(
+    pending: Client,
+    connected_key: str,
+) -> None:
+    wrong = _code(connected_key, 5)
+    [pending.post(_PAGE, {_FIELD: wrong}) for _ in range(5)]
+    pending.post(
+        '/en/sign-in/',
+        {'username': 'anna@example.test', 'password': 'a long secret'},
+    )
+
+    response = pending.post(_PAGE, {_FIELD: _code(connected_key)})
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert 'Too many wrong codes. Try again in 15 minutes.' in (
+        response.content.decode()
+    )
