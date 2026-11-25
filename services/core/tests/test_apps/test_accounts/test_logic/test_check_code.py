@@ -15,11 +15,13 @@ _USER: Final = uuid.UUID(int=1)
 @final
 @attrs.define(slots=True, frozen=True)
 class _Stopped:
-    """Fake: a clock that always shows the same moment."""
+    """Fake: a clock stopped at a moment."""
+
+    _moment: datetime
 
     def now(self) -> datetime:
-        """Returns the moment."""
-        return _NOW
+        """Returns the moment where the clock stopped."""
+        return self._moment
 
 
 @final
@@ -37,6 +39,6 @@ class _Kept:
 def test_code_is_used_at_the_current_moment() -> None:
     kept = _Kept()
 
-    CheckCode(kept, _Stopped())(_USER, '287082')
+    CheckCode(kept, _Stopped(_NOW))(_USER, '287082')
 
     assert kept.used == [(_USER, '287082', _NOW)]
