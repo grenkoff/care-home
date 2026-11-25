@@ -38,6 +38,7 @@ class InvitationAdmin(HasContainer, admin.ModelAdmin[Invitation]):
     ) -> None:
         """Issues a fresh link of the invitation and shows it to staff once."""
         issued = self.resolve(invite_relative.InviteRelative)()
+        invitation.email = invitation.email.lower()
         invitation.digest = issued.digest
         invitation.expires_at = issued.expires_at
         super().save_model(request, invitation, form, change)
