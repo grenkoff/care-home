@@ -11,6 +11,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseBase
 from django.shortcuts import redirect
 from django.views import View
 
+from server.apps.accounts.logic.constants import CODE_ATTEMPTS
 from server.apps.accounts.models import User
 
 _USER: Final = 'accounts.pending.user'
@@ -18,7 +19,6 @@ _BACKEND: Final = 'accounts.pending.backend'
 _NEXT: Final = 'accounts.pending.next'
 _KEY: Final = 'accounts.pending.key'
 _FAILURES: Final = 'accounts.pending.failures'
-_ATTEMPTS: Final = 5
 
 
 @final
@@ -67,7 +67,7 @@ class Pending:
         """Counts a wrong code and signs out after too many of them in a row."""
         session = self._request.session
         session[_FAILURES] = session.get(_FAILURES, 0) + 1
-        if session[_FAILURES] < _ATTEMPTS:
+        if session[_FAILURES] < CODE_ATTEMPTS:
             return page
         logout(self._request)
         return redirect('accounts:sign_in')
