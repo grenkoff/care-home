@@ -10,13 +10,13 @@ from django.shortcuts import redirect, render
 
 from server.apps.accounts.logic.errors import LockedCodesError, WrongCodeError
 from server.apps.accounts.logic.usecases import check_code, connect_authenticator
-from server.apps.accounts.views.enrolment import Enrolment
-from server.apps.accounts.views.forms import CodeForm
-from server.apps.accounts.views.pending import Pending, PendingOnly
+from server.apps.accounts.views import enrolment, forms
+from server.apps.accounts.views.pending import Pending
+from server.apps.accounts.views.pending_only import PendingOnly
 from server.common.di import HasContainer
 
 type _Check = Callable[[Pending, str], None]
-type _Page = Callable[[HttpRequest, CodeForm, HTTPStatus], HttpResponse]
+type _Page = Callable[[HttpRequest, forms.CodeForm, HTTPStatus], HttpResponse]
 
 
 class _Factor(HasContainer, PendingOnly):
@@ -31,12 +31,12 @@ class _Factor(HasContainer, PendingOnly):
     def _answer(self, request: HttpRequest, check: _Check, page: _Page) -> HttpResponse:
         """Signs in with a valid code, or shows the page again with the error."""
         pending = Pending(request)
-        form = CodeForm(request.POST)
+        form = forms.CodeForm(request.POST)
         if form.is_valid() and self._proved(pending, form, check):
             return pending.signed_in(pending.user())
         return pending.failed(page(request, form, HTTPStatus.BAD_REQUEST))
 
-    def _proved(self, pending: Pending, form: CodeForm, check: _Check) -> bool:
+    def _proved(self, pending: Pending, form: forms.CodeForm, check: _Check) -> bool:
         """Checks the code of a valid form or marks the code as wrong."""
         try:
             check(pending, form.cleaned_data['code'])
@@ -57,7 +57,7 @@ class Code(_Factor):
         """Asks for the code, or leads a user without an app to connect one."""
         if not self._has_app(request):
             return redirect('accounts:connect')
-        return self._page(request, CodeForm(), HTTPStatus.OK)
+        return self._page(request, forms.CodeForm(), HTTPStatus.OK)
 
     def post(self, request: HttpRequest) -> HttpResponse:
         """Signs in with a valid code, or shows the error."""
@@ -73,7 +73,7 @@ class Code(_Factor):
     def _page(
         self,
         request: HttpRequest,
-        form: CodeForm,
+        form: forms.CodeForm,
         status: HTTPStatus,
     ) -> HttpResponse:
         """Renders the form of the code."""
@@ -88,7 +88,7 @@ class Connect(_Factor):
         """Shows the key of a new authenticator app."""
         if self._has_app(request):
             return redirect('accounts:code')
-        return self._page(request, CodeForm(), HTTPStatus.OK)
+        return self._page(request, forms.CodeForm(), HTTPStatus.OK)
 
     def post(self, request: HttpRequest) -> HttpResponse:
         """Connects the app of a valid code and signs in, or shows the error."""
@@ -109,20 +109,20 @@ class Connect(_Factor):
     def _page(
         self,
         request: HttpRequest,
-        form: CodeForm,
+        form: forms.CodeForm,
         status: HTTPStatus,
     ) -> HttpResponse:
         """Renders the key of the app with the form of the code."""
         pending = Pending(request)
         key = pending.offered(self.resolve(connect_authenticator.OfferKey))
-        enrolment = Enrolment(key, pending.user().email, settings.SITE_NAME)
+        offer = enrolment.Enrolment(key, pending.user().email, settings.SITE_NAME)
         return render(
             request,
             'accounts/connect.html',
             {
                 'key': key,
-                'link': enrolment.link(),
-                'picture': enrolment.picture(),
+                'link': offer.link(),
+                'picture': offer.picture(),
                 'form': form,
             },
             status=status,

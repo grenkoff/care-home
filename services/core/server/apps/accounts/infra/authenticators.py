@@ -22,8 +22,13 @@ class StoredAuthenticators:
         return models.Authenticator.objects.filter(user_id=user).exists()
 
     def connect(self, user: uuid.UUID, key: str, step: int) -> None:
-        """Adds the row of the user."""
-        models.Authenticator.objects.create(user_id=user, key=key, used_step=step)
+        """Adds the row of the user, or raises WrongCodeError if there is one."""
+        _, created = models.Authenticator.objects.get_or_create(
+            user_id=user,
+            defaults={'key': key, 'used_step': step},
+        )
+        if not created:
+            raise WrongCodeError
 
     def use(self, user: uuid.UUID, code: str, moment: datetime) -> None:
         """Checks a code under the lock of the row and keeps what it changed."""
