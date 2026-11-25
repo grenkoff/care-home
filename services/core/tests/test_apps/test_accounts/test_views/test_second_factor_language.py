@@ -1,7 +1,12 @@
 """Tests of the pages of the second factor in Russian."""
 
+from datetime import timedelta
+
 import pytest
 from django.test import Client
+from django.utils import timezone
+
+from server.apps.accounts.models import Authenticator
 
 
 @pytest.mark.django_db
@@ -30,3 +35,14 @@ def test_wrong_code_speaks_russian(pending: Client) -> None:
     page = pending.post('/ru/second-factor/', {'code': '12345'}).content.decode()
 
     assert 'Введите шесть цифр' in page
+
+
+@pytest.mark.django_db
+def test_locked_codes_speak_russian(pending: Client, connected_key: str) -> None:
+    Authenticator.objects.filter(key=connected_key).update(
+        locked_until=timezone.now() + timedelta(minutes=15),
+    )
+
+    page = pending.post('/ru/second-factor/', {'code': '123456'}).content.decode()
+
+    assert 'Слишком много неверных кодов. Попробуйте снова через 15 минут.' in page
