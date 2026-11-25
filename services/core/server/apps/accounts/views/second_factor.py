@@ -8,7 +8,7 @@ from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 
-from server.apps.accounts.logic.errors import WrongCodeError
+from server.apps.accounts.logic.errors import LockedCodesError, WrongCodeError
 from server.apps.accounts.logic.usecases import check_code, connect_authenticator
 from server.apps.accounts.views.enrolment import Enrolment
 from server.apps.accounts.views.forms import CodeForm
@@ -42,6 +42,9 @@ class _Factor(HasContainer, PendingOnly):
             check(pending, form.cleaned_data['code'])
         except WrongCodeError:
             form.refuse()
+            return False
+        except LockedCodesError:
+            form.lock()
             return False
         return True
 

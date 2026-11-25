@@ -8,7 +8,8 @@ import attrs
 from django.db import transaction
 
 from server.apps.accounts import models
-from server.apps.accounts.logic.codes import Key, Totp
+from server.apps.accounts.logic.attempts import Attempt, Ledger, Verdict
+from server.apps.accounts.logic.errors import LockedCodesError, WrongCodeError
 
 
 @final
@@ -25,11 +26,37 @@ class StoredAuthenticators:
         models.Authenticator.objects.create(user_id=user, key=key, used_step=step)
 
     def use(self, user: uuid.UUID, code: str, moment: datetime) -> None:
-        """Keeps the step of a fresh valid code under the lock of the row."""
+        """Checks a code under the lock of the row and keeps what it changed."""
         with transaction.atomic():
-            stored = models.Authenticator.objects.select_for_update().get(user_id=user)
-            stored.used_step = Totp(
-                Key(stored.key),
-                stored.used_step,
-            ).accepted(code, moment)
-            stored.save(update_fields=['used_step'])
+            stored = (
+                models.Authenticator.objects
+                .select_for_update()
+                .filter(user_id=user)
+                .first()
+            )
+            if stored is None:
+                raise WrongCodeError
+            verdict = self._kept(stored, Attempt(code, moment))
+        match verdict:
+            case Verdict.wrong:
+                raise WrongCodeError
+            case Verdict.locked:
+                raise LockedCodesError
+            case Verdict.accepted:
+                return
+
+    def _kept(self, stored: models.Authenticator, attempt: Attempt) -> Verdict:
+        """Saves the row after an attempt and returns the verdict on it."""
+        outcome = attempt.outcome(
+            Ledger(
+                key=stored.key,
+                used_step=stored.used_step,
+                failures=stored.failures,
+                locked_until=stored.locked_until,
+            ),
+        )
+        stored.used_step = outcome.ledger.used_step
+        stored.failures = outcome.ledger.failures
+        stored.locked_until = outcome.ledger.locked_until
+        stored.save(update_fields=['used_step', 'failures', 'locked_until'])
+        return outcome.verdict

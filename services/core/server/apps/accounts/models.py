@@ -8,7 +8,7 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from server.apps.accounts.logic.constants import DIGEST_LENGTH, KEY_LENGTH
+from server.apps.accounts.logic.constants import DIGEST_LENGTH, KEY_LENGTH, UNLOCKED
 
 
 @final
@@ -71,6 +71,8 @@ class Authenticator(models.Model):
     )
     key = models.CharField(max_length=KEY_LENGTH, editable=False)
     used_step = models.BigIntegerField(editable=False)
+    failures = models.PositiveSmallIntegerField(default=0, editable=False)
+    locked_until = models.DateTimeField(default=UNLOCKED, editable=False)
 
     class Meta:
         """Names of authenticators for staff."""

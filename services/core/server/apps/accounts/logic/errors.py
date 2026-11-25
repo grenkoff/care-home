@@ -22,3 +22,10 @@ class WrongCodeError(ValueError):
     """Raised for a code of an authenticator that is wrong, stale or used."""
 
     __slots__ = ()
+
+
+@final
+class LockedCodesError(PermissionError):
+    """Raised for any code of an app while its codes are locked."""
+
+    __slots__ = ()
