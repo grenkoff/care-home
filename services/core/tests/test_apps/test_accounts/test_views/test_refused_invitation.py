@@ -14,14 +14,19 @@ _CHOSEN: Final = 'a long secret of anna'
 _GONE: Final = 'This link no longer works'
 
 
+def _sent(first: str, second: str, consent: str = 'on') -> dict[str, str]:
+    """Returns the form of an invitation as a relative fills it in."""
+    return {'new_password1': first, 'new_password2': second, 'consent': consent}
+
+
 @pytest.mark.django_db
 @pytest.mark.usefixtures('invitation')
 @pytest.mark.parametrize(
     'sent',
     [
-        {'new_password1': _CHOSEN, 'new_password2': _CHOSEN},
-        {'new_password1': _CHOSEN, 'new_password2': 'another', 'consent': 'on'},
-        {'new_password1': 'short', 'new_password2': 'short', 'consent': 'on'},
+        _sent(_CHOSEN, _CHOSEN, consent=''),
+        _sent(_CHOSEN, 'another'),
+        _sent('short', 'short'),
     ],
 )
 def test_incomplete_acceptance_is_refused(
@@ -38,6 +43,23 @@ def test_incomplete_acceptance_is_refused(
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert not User.objects.exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures('invitation')
+def test_existing_account_is_not_invited_again(
+    client: Client,
+    invitation_page: str,
+) -> None:
+    User.objects.create_user(username='anna@example.test', password=_CHOSEN)
+
+    response = client.post(
+        invitation_page,
+        _sent(_CHOSEN, _CHOSEN),
+    )
+
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert 'already has an account' in response.content.decode()
 
 
 @pytest.mark.django_db

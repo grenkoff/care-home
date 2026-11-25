@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING, final
 
 import attrs
 
-from server.apps.accounts.logic.invitations import Digest, UnknownInvitationError
+from server.apps.accounts.logic.errors import UnknownInvitationError
+from server.apps.accounts.logic.invitations import Digest
 
 if TYPE_CHECKING:
     from server.apps.accounts.logic.invitations import Clock, Invitations

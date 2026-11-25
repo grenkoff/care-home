@@ -6,11 +6,8 @@ from typing import Final, final
 import attrs
 import pytest
 
-from server.apps.accounts.logic.invitations import (
-    Digest,
-    Invitation,
-    UnknownInvitationError,
-)
+from server.apps.accounts.logic.errors import UnknownInvitationError
+from server.apps.accounts.logic.invitations import Digest, Invitation
 from server.apps.accounts.logic.usecases.accept_invitation import (
     AcceptInvitation,
     OpenInvitation,
