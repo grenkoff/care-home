@@ -8,7 +8,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views import View
 
-from server.apps.accounts.logic.errors import UnknownInvitationError
+from server.apps.accounts.logic.errors import TakenEmailError, UnknownInvitationError
 from server.apps.accounts.logic.usecases import accept_invitation
 from server.apps.accounts.models import User
 from server.apps.accounts.views.forms import RulesForm
@@ -39,6 +39,12 @@ class Accept(HasContainer, View):
             return self._accepted(request, code)
         except UnknownInvitationError:
             return self._gone(request)
+        except TakenEmailError:
+            return render(
+                request,
+                'accounts/invitation_taken.html',
+                status=HTTPStatus.CONFLICT,
+            )
 
     def _accepted(self, request: HttpRequest, code: str) -> HttpResponse:
         """Makes the account of valid forms or shows them again with errors."""

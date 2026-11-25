@@ -1,0 +1,14 @@
+{% extends "site/layout.html" %}
+{% load i18n %}
+{% block title %}{% translate "Invitation" %}{% endblock title %}
+{% block content %}
+  <h1 class="ds-heading mb-6">
+    {% translate "This e-mail already has an account" %}
+  </h1>
+  <p class="max-w-2xl">
+    <a
+      href="{% url 'accounts:sign_in' %}"
+      class="ds-link"
+    >{% translate "Sign in" %}</a>
+  </p>
+{% endblock content %}
