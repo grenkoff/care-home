@@ -1,12 +1,15 @@
 """Use cases that connect an authenticator app as the second factor."""
 
 import uuid
-from typing import final
+from typing import Final, final
 
 import attrs
 
 from server.apps.accounts.logic.authenticators import Authenticators, Keys
+from server.apps.accounts.logic.codes import Authenticator, Key
 from server.apps.accounts.logic.invitations import Clock
+
+_NEVER: Final = -1
 
 
 @final
@@ -18,7 +21,7 @@ class OfferKey:
 
     def __call__(self) -> str:
         """Returns a fresh key."""
-        return ''
+        return self._keys.fresh()
 
 
 @final
@@ -30,7 +33,7 @@ class HasAuthenticator:
 
     def __call__(self, user: uuid.UUID) -> bool:
         """Returns whether the app of the user is connected."""
-        return False
+        return self._authenticators.connected(user)
 
 
 @final
@@ -43,3 +46,6 @@ class ConnectAuthenticator:
 
     def __call__(self, user: uuid.UUID, key: str, code: str) -> None:
         """Keeps the key of a valid code or raises WrongCodeError."""
+        moment = self._clock.now()
+        step = Authenticator(Key(key), _NEVER).accepted(code, moment)
+        self._authenticators.connect(user, key, step)

@@ -3,11 +3,12 @@
 import uuid
 from typing import ClassVar, final, override
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from server.apps.accounts.logic.constants import DIGEST_LENGTH
+from server.apps.accounts.logic.constants import DIGEST_LENGTH, KEY_LENGTH
 
 
 @final
@@ -55,3 +56,29 @@ class Invitation(models.Model):
     def __str__(self) -> str:
         """Returns the e-mail invited."""
         return self.email
+
+
+@final
+class Authenticator(models.Model):
+    """Authenticator app that a user connected as the second factor."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid7, editable=False)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='authenticator',
+        editable=False,
+    )
+    key = models.CharField(max_length=KEY_LENGTH, editable=False)
+    used_step = models.BigIntegerField(editable=False)
+
+    class Meta:
+        """Names of authenticators for staff."""
+
+        verbose_name = _('authenticator')
+        verbose_name_plural = _('authenticators')
+
+    @override
+    def __str__(self) -> str:
+        """Returns the user of the authenticator."""
+        return str(self.user)

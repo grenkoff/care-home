@@ -1,5 +1,6 @@
-"""Clock and tokens of the system that the use cases of accounts read."""
+"""Clock, tokens and keys of the system that the use cases of accounts read."""
 
+import base64
 import secrets
 from datetime import datetime
 from typing import Final, final
@@ -8,6 +9,7 @@ import attrs
 from django.utils import timezone
 
 _TOKEN_BYTES: Final = 32
+_KEY_BYTES: Final = 20
 
 
 @final
@@ -28,3 +30,13 @@ class SystemTokens:
     def fresh(self) -> str:
         """Returns a new token that is safe to put in a link."""
         return secrets.token_urlsafe(_TOKEN_BYTES)
+
+
+@final
+@attrs.define(slots=True, frozen=True)
+class SystemKeys:
+    """Keys of authenticator apps from the random source of the operating system."""
+
+    def fresh(self) -> str:
+        """Returns a new key of 160 bits in base32."""
+        return base64.b32encode(secrets.token_bytes(_KEY_BYTES)).decode()
