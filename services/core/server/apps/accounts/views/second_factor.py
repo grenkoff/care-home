@@ -1,5 +1,6 @@
 """Pages of the second factor of signing in: the code of an authenticator app."""
 
+from collections.abc import Callable
 from http import HTTPStatus
 from typing import final
 
@@ -14,6 +15,9 @@ from server.apps.accounts.views.forms import CodeForm
 from server.apps.accounts.views.pending import Pending, PendingOnly
 from server.common.di import HasContainer
 
+type _Check = Callable[[Pending, str], None]
+type _Page = Callable[[HttpRequest, CodeForm, HTTPStatus], HttpResponse]
+
 
 class _Factor(HasContainer, PendingOnly):
     """Page of the second factor that knows whether the user has an app."""
@@ -23,6 +27,23 @@ class _Factor(HasContainer, PendingOnly):
         return self.resolve(connect_authenticator.HasAuthenticator)(
             Pending(request).identifier(),
         )
+
+    def _answer(self, request: HttpRequest, check: _Check, page: _Page) -> HttpResponse:
+        """Signs in with a valid code, or shows the page again with the error."""
+        pending = Pending(request)
+        form = CodeForm(request.POST)
+        if form.is_valid() and self._proved(pending, form, check):
+            return pending.signed_in(pending.user())
+        return pending.failed(page(request, form, HTTPStatus.BAD_REQUEST))
+
+    def _proved(self, pending: Pending, form: CodeForm, check: _Check) -> bool:
+        """Checks the code of a valid form or marks the code as wrong."""
+        try:
+            check(pending, form.cleaned_data['code'])
+        except WrongCodeError:
+            form.refuse()
+            return False
+        return True
 
 
 @final
@@ -39,23 +60,12 @@ class Code(_Factor):
         """Signs in with a valid code, or shows the error."""
         if not self._has_app(request):
             return redirect('accounts:connect')
-        pending = Pending(request)
-        form = CodeForm(request.POST)
-        if form.is_valid() and self._checked(pending, form):
-            return pending.signed_in(pending.user())
-        return pending.failed(self._page(request, form, HTTPStatus.BAD_REQUEST))
-
-    def _checked(self, pending: Pending, form: CodeForm) -> bool:
-        """Checks a code or marks it as wrong."""
-        try:
-            self.resolve(check_code.CheckCode)(
-                pending.identifier(),
-                form.cleaned_data['code'],
-            )
-        except WrongCodeError:
-            form.refuse()
-            return False
-        return True
+        checked = self.resolve(check_code.CheckCode)
+        return self._answer(
+            request,
+            lambda pending, code: checked(pending.identifier(), code),
+            self._page,
+        )
 
     def _page(
         self,
@@ -81,24 +91,17 @@ class Connect(_Factor):
         """Connects the app of a valid code and signs in, or shows the error."""
         if self._has_app(request):
             return redirect('accounts:code')
-        pending = Pending(request)
-        form = CodeForm(request.POST)
-        if form.is_valid() and self._connected(pending, form):
-            return pending.signed_in(pending.user())
-        return pending.failed(self._page(request, form, HTTPStatus.BAD_REQUEST))
-
-    def _connected(self, pending: Pending, form: CodeForm) -> bool:
-        """Connects the app of a valid code or marks the code as wrong."""
-        try:
-            self.resolve(connect_authenticator.ConnectAuthenticator)(
+        connected = self.resolve(connect_authenticator.ConnectAuthenticator)
+        offered = self.resolve(connect_authenticator.OfferKey)
+        return self._answer(
+            request,
+            lambda pending, code: connected(
                 pending.identifier(),
-                pending.key(self.resolve(connect_authenticator.OfferKey)),
-                form.cleaned_data['code'],
-            )
-        except WrongCodeError:
-            form.refuse()
-            return False
-        return True
+                pending.key(offered),
+                code,
+            ),
+            self._page,
+        )
 
     def _page(
         self,
