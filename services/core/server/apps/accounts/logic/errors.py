@@ -1,4 +1,4 @@
-"""Errors of the invitations of relatives."""
+"""Errors of the accounts of relatives."""
 
 from typing import final
 
@@ -13,5 +13,12 @@ class UnknownInvitationError(LookupError):
 @final
 class TakenEmailError(ValueError):
     """Raised for an invitation to an e-mail that already has an account."""
+
+    __slots__ = ()
+
+
+@final
+class WrongCodeError(ValueError):
+    """Raised for a code of an authenticator that is wrong, stale or used."""
 
     __slots__ = ()
