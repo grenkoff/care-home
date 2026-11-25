@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: care-home\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-25 13:48+0000\n"
+"POT-Creation-Date: 2026-11-25 14:16+0000\n"
 "PO-Revision-Date: 2026-11-24 08:45+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -58,7 +58,9 @@ msgstr "Введите шестизначный код из приложения
 msgid ""
 "Lost the phone with the app? Ask the staff of the home to reset the second "
 "factor."
-msgstr "Потеряли телефон с приложением? Попросите персонал дома сбросить второй фактор."
+msgstr ""
+"Потеряли телефон с приложением? Попросите персонал дома сбросить второй "
+"фактор."
 
 #: server/apps/accounts/templates/accounts/code_form.html
 msgid "Confirm"
@@ -72,7 +74,10 @@ msgstr "Подключите приложение-аутентификатор"
 msgid ""
 "Scan the picture with an authenticator app on your phone, or enter the key "
 "in it by hand. Then enter the six-digit code that the app shows."
-msgstr "Отсканируйте картинку приложением-аутентификатором на телефоне или введите в него ключ вручную. Затем введите шестизначный код, который покажет приложение."
+msgstr ""
+"Отсканируйте картинку приложением-аутентификатором на телефоне или введите в "
+"него ключ вручную. Затем введите шестизначный код, который покажет "
+"приложение."
 
 #: server/apps/accounts/templates/accounts/connect.html
 msgid "QR code of the key"
@@ -175,6 +180,15 @@ msgstr "Введите шесть цифр, которые показывает 
 #: server/apps/accounts/views/forms.py
 msgid "This code is wrong or no longer valid."
 msgstr "Код неверен или уже не действует."
+
+#: server/apps/accounts/views/forms.py
+#, python-format
+msgid "Too many wrong codes. Try again in %(minutes)d minute."
+msgid_plural "Too many wrong codes. Try again in %(minutes)d minutes."
+msgstr[0] "Слишком много неверных кодов. Попробуйте снова через %(minutes)d минуту."
+msgstr[1] "Слишком много неверных кодов. Попробуйте снова через %(minutes)d минуты."
+msgstr[2] "Слишком много неверных кодов. Попробуйте снова через %(minutes)d минут."
+msgstr[3] "Слишком много неверных кодов. Попробуйте снова через %(minutes)d минуты."
 
 #: server/apps/care/models.py
 msgid "position"
