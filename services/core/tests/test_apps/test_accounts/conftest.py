@@ -10,11 +10,12 @@ import pytest
 from django.test import Client
 from django.utils import timezone
 
-from server.apps.accounts.models import Invitation, User
+from server.apps.accounts.models import Authenticator, Invitation, User
 
 _CODE: Final = 'code-of-anna'
 _EMAIL: Final = 'anna@example.test'
 _CHOSEN: Final = 'a long secret'
+_KEY: Final = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ'
 
 
 @pytest.fixture
@@ -49,3 +50,14 @@ def shown_key(pending: Client) -> str:
     found = re.search(r'secret=([A-Z2-7]+)', page.content.decode())
     assert found
     return found[1]
+
+
+@pytest.fixture
+def connected_key(pending: Client) -> str:
+    """Key of the authenticator app that the relative connected earlier."""
+    Authenticator.objects.create(
+        user=User.objects.get(username=_EMAIL),
+        key=_KEY,
+        used_step=0,
+    )
+    return _KEY

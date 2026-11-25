@@ -1,6 +1,7 @@
 """Authenticator apps that users connect as the second factor."""
 
 import uuid
+from datetime import datetime
 from typing import Protocol
 
 
@@ -19,3 +20,10 @@ class Keys(Protocol):
 
     def fresh(self) -> str:
         """Returns a new key in base32."""
+
+
+class Codes(Protocol):
+    """Codes of the authenticator apps that users connected."""
+
+    def use(self, user: uuid.UUID, code: str, moment: datetime) -> None:
+        """Uses a fresh valid code of the app of the user or raises WrongCodeError."""
