@@ -109,12 +109,14 @@ class Connect(_Factor):
         """Renders the key of the app with the form of the code."""
         pending = Pending(request)
         key = pending.key(self.resolve(connect_authenticator.OfferKey))
+        enrolment = Enrolment(key, pending.user().email, settings.SITE_NAME)
         return render(
             request,
             'accounts/connect.html',
             {
                 'key': key,
-                'enrolment': Enrolment(key, pending.user().email, settings.SITE_NAME),
+                'link': enrolment.link(),
+                'picture': enrolment.picture(),
                 'form': form,
             },
             status=status,

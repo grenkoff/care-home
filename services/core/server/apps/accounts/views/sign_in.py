@@ -14,9 +14,6 @@ from server.apps.accounts.views.pending import Pending
 class SignIn(LoginView):
     """Page of the password, the first of the two factors."""
 
-    template_name = 'accounts/sign_in.html'
-    redirect_authenticated_user = True
-
     @override
     def form_valid(self, form: AuthenticationForm) -> HttpResponse:
         """Remembers who gave the password and asks for the second factor."""
