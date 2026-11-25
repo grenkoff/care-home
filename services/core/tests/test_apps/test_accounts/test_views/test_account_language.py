@@ -3,6 +3,8 @@
 import pytest
 from django.test import Client
 
+from server.apps.accounts.models import User
+
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures('invitation')
@@ -37,3 +39,17 @@ def test_invitation_link_speaks_russian(admin_client: Client) -> None:
     ).content.decode()
 
     assert 'Отправьте эту ссылку родственнику' in page
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures('invitation')
+def test_taken_email_speaks_russian(client: Client) -> None:
+    chosen = 'a long secret of anna'
+    User.objects.create_user(username='anna@example.test', password=chosen)
+
+    page = client.post(
+        '/ru/invitation/code-of-anna/',
+        {'new_password1': chosen, 'new_password2': chosen, 'consent': 'on'},
+    ).content.decode()
+
+    assert 'уже есть учётная запись' in page
