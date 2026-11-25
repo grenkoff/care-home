@@ -63,5 +63,5 @@ class Invitations(Protocol):
     def found(self, digest: str) -> Invitation:
         """Returns the invitation of a digest or raises UnknownInvitationError."""
 
-    def accept(self, digest: str, password: str) -> None:
+    def accept(self, digest: str, password: str, moment: datetime) -> None:
         """Makes the account of an unused invitation or raises an error."""

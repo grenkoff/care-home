@@ -24,5 +24,5 @@ def inject(container: punq.Container) -> None:
     container.register(accept_invitation.OpenInvitation, instance=opened)
     container.register(
         accept_invitation.AcceptInvitation,
-        instance=accept_invitation.AcceptInvitation(opened, stored),
+        instance=accept_invitation.AcceptInvitation(stored, sources.SystemClock()),
     )

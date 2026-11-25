@@ -1,5 +1,6 @@
 """Invitations kept in the database of accounts."""
 
+from datetime import datetime
 from typing import final
 
 import attrs
@@ -32,7 +33,7 @@ class StoredInvitations:
             accepted=stored.accepted_at is not None,
         )
 
-    def accept(self, digest: str, password: str) -> None:
+    def accept(self, digest: str, password: str, moment: datetime) -> None:
         """Makes the account of an unused invitation or raises an error."""
         with transaction.atomic():
             stored = (
