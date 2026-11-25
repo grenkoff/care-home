@@ -2,9 +2,13 @@
 {% load i18n %}
 {% block title %}{% translate "Code of the authenticator app" %}{% endblock title %}
 {% block content %}
-  <h1 class="ds-heading mb-6">{% translate "Code of the authenticator app" %}</h1>
+  <h1 class="ds-heading mb-6">
+    {% translate "Code of the authenticator app" %}
+  </h1>
   <div class="ds-card grid max-w-md gap-4">
-    <p>{% translate "Enter the six-digit code that your authenticator app shows." %}</p>
+    <p>
+      {% translate "Enter the six-digit code that your authenticator app shows." %}
+    </p>
     {% include "accounts/code_form.html" %}
     <p class="ds-muted text-sm">
       {% translate "Lost the phone with the app? Ask the staff of the home to reset the second factor." %}
