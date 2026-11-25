@@ -47,13 +47,6 @@ class Issued:
     expires_at: datetime
 
 
-class Clock(Protocol):
-    """Source of the current moment."""
-
-    def now(self) -> datetime:
-        """Returns the current moment with its time zone."""
-
-
 class Tokens(Protocol):
     """Source of tokens nobody can guess."""
 

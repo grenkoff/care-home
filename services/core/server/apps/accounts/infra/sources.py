@@ -8,8 +8,9 @@ from typing import Final, final
 import attrs
 from django.utils import timezone
 
+from server.apps.accounts.logic.constants import KEY_BYTES
+
 _TOKEN_BYTES: Final = 32
-_KEY_BYTES: Final = 20
 
 
 @final
@@ -39,4 +40,4 @@ class SystemKeys:
 
     def fresh(self) -> str:
         """Returns a new key of 160 bits in base32."""
-        return base64.b32encode(secrets.token_bytes(_KEY_BYTES)).decode()
+        return base64.b32encode(secrets.token_bytes(KEY_BYTES)).decode()

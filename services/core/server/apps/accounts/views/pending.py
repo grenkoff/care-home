@@ -47,7 +47,7 @@ class Pending:
         """Returns the user who gave the password."""
         return User.objects.get(pk=self.identifier())
 
-    def key(self, fresh: Callable[[], str]) -> str:
+    def offered(self, fresh: Callable[[], str]) -> str:
         """Returns the key of the app being connected, made once per session."""
         session = self._request.session
         if _KEY not in session:

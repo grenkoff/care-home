@@ -6,8 +6,8 @@ from typing import Final, final
 import attrs
 
 from server.apps.accounts.logic.authenticators import Authenticators, Keys
-from server.apps.accounts.logic.codes import Authenticator, Key
-from server.apps.accounts.logic.invitations import Clock
+from server.apps.accounts.logic.clock import Clock
+from server.apps.accounts.logic.codes import Key, Totp
 
 _NEVER: Final = -1
 
@@ -47,5 +47,5 @@ class ConnectAuthenticator:
     def __call__(self, user: uuid.UUID, key: str, code: str) -> None:
         """Keeps the key of a valid code or raises WrongCodeError."""
         moment = self._clock.now()
-        step = Authenticator(Key(key), _NEVER).accepted(code, moment)
+        step = Totp(Key(key), _NEVER).accepted(code, moment)
         self._authenticators.connect(user, key, step)

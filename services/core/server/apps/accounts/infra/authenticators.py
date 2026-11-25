@@ -8,7 +8,7 @@ import attrs
 from django.db import transaction
 
 from server.apps.accounts import models
-from server.apps.accounts.logic.codes import Authenticator, Key
+from server.apps.accounts.logic.codes import Key, Totp
 
 
 @final
@@ -28,7 +28,7 @@ class StoredAuthenticators:
         """Keeps the step of a fresh valid code under the lock of the row."""
         with transaction.atomic():
             stored = models.Authenticator.objects.select_for_update().get(user_id=user)
-            stored.used_step = Authenticator(
+            stored.used_step = Totp(
                 Key(stored.key),
                 stored.used_step,
             ).accepted(code, moment)

@@ -97,7 +97,7 @@ class Connect(_Factor):
             request,
             lambda pending, code: connected(
                 pending.identifier(),
-                pending.key(offered),
+                pending.offered(offered),
                 code,
             ),
             self._page,
@@ -111,7 +111,7 @@ class Connect(_Factor):
     ) -> HttpResponse:
         """Renders the key of the app with the form of the code."""
         pending = Pending(request)
-        key = pending.key(self.resolve(connect_authenticator.OfferKey))
+        key = pending.offered(self.resolve(connect_authenticator.OfferKey))
         enrolment = Enrolment(key, pending.user().email, settings.SITE_NAME)
         return render(
             request,
