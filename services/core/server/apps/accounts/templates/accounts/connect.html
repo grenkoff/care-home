@@ -1,0 +1,23 @@
+{% extends "site/layout.html" %}
+{% load i18n %}
+{% block title %}{% translate "Connect an authenticator app" %}{% endblock title %}
+{% block content %}
+  <h1 class="ds-heading mb-6">{% translate "Connect an authenticator app" %}</h1>
+  <div class="ds-card grid max-w-md gap-4">
+    <p>
+      {% translate "Scan the picture with an authenticator app on your phone, or enter the key in it by hand. Then enter the six-digit code that the app shows." %}
+    </p>
+    <img
+      src="{{ enrolment.picture }}"
+      alt="{% translate 'QR code of the key' %}"
+      class="justify-self-start"
+    >
+    <p>
+      {% translate "Key" %}: <code>{{ key }}</code>
+    </p>
+    <p>
+      <a href="{{ enrolment.link }}" class="ds-link">{% translate "Open in the authenticator app" %}</a>
+    </p>
+    {% include "accounts/code_form.html" %}
+  </div>
+{% endblock content %}

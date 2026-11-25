@@ -37,6 +37,7 @@ structlog = "^26.1"
 punq = "^0.9"
 grpcio = "^1.85"
 protobuf = "^7.36"
+segno = "^1.6.6"
 
 
 [tool.poetry.group.dev.dependencies]

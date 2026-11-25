@@ -667,7 +667,7 @@ files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
-markers = {dev = "sys_platform == \"win32\" or platform_system == \"Windows\"", docs = "sys_platform == \"win32\""}
+markers = {dev = "platform_system == \"Windows\" or sys_platform == \"win32\"", docs = "sys_platform == \"win32\""}
 
 [[package]]
 name = "covdefaults"
@@ -4711,6 +4711,18 @@ scripts = ["seaborn (>=0.13)", "tracecov (>=0.26)"]
 tests = ["allure-pytest (>=2.13.0)", "allure-python-commons (>=2.13.0)", "coverage (>=6,<7.13.3)", "django (>=5.2,<6)", "fastapi (>=0.86.0)", "flask (>=2.1.1,<4.0)", "httpx (>=0.22.0,<1.0)", "httpx2 (>=2.12.0,<3.0)", "protobuf (>=6.31.0)", "pydantic (>=1.10.2)", "pytest-asyncio (>=1.0,<2.0)", "pytest-rerunfailures (>=15.0,<17.0)", "pytest-timeout (>=2.3,<3.0)", "pytest-trio (>=0.8,<1.0)", "pytest-xdist (>=3,<4.0)", "strawberry-graphql[fastapi] (>=0.109.0)", "syrupy (>=5.4,<5.5)", "tomli-w (>=1.2.0)", "trustme (>=0.9.0,<2.0)", "uvicorn (>=0.20,<1.0)", "webfuzzing-commons (==0.13.0)"]
 
 [[package]]
+name = "segno"
+version = "1.6.6"
+description = "QR Code and Micro QR Code generator for Python"
+optional = false
+python-versions = ">=3.5"
+groups = ["main"]
+files = [
+    {file = "segno-1.6.6-py3-none-any.whl", hash = "sha256:28c7d081ed0cf935e0411293a465efd4d500704072cdb039778a2ab8736190c7"},
+    {file = "segno-1.6.6.tar.gz", hash = "sha256:e60933afc4b52137d323a4434c8340e0ce1e58cec71439e46680d4db188f11b3"},
+]
+
+[[package]]
 name = "setproctitle"
 version = "1.3.8"
 description = "A Python module to customize the process title"
@@ -5697,4 +5709,4 @@ dev = ["doc8", "flake8", "flake8-import-order", "rstcheck[sphinx]", "ruff", "sph
 [metadata]
 lock-version = "2.1"
 python-versions = "==3.14.10"
-content-hash = "2d96f61ac42c0c81565d1ac229297043af812c94995f54acb4cb35d4e8476d95"
+content-hash = "ac3b643452cc0731926500ce36c1143355c64cda1c9e90ea50919b4110d024e4"

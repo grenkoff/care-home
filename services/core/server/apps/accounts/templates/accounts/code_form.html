@@ -1,0 +1,24 @@
+{% load i18n %}
+<form method="post" class="grid gap-4">
+  {% csrf_token %}
+  {% for error in form.code.errors %}
+    <p class="ds-alert" role="alert">{{ error }}</p>
+  {% endfor %}
+  <label class="ds-field">
+    {{ form.code.label }}
+    <input
+      type="text"
+      name="code"
+      class="ds-input"
+      inputmode="numeric"
+      pattern="[0-9]{6}"
+      maxlength="6"
+      autocomplete="one-time-code"
+      required
+      autofocus
+    >
+  </label>
+  <button type="submit" class="ds-button justify-self-start">
+    {% translate "Confirm" %}
+  </button>
+</form>
