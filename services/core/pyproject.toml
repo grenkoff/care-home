@@ -454,5 +454,6 @@ ignore_names = [
   "actions",
   "enquiry_form",
   "has_change_permission",
+  "has_add_permission",
   "get_by_natural_key",
 ]

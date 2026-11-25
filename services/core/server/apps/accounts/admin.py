@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.translation import gettext
 
 from server.apps.accounts.logic.usecases import invite_relative
-from server.apps.accounts.models import Invitation, User
+from server.apps.accounts.models import Authenticator, Invitation, User
 from server.common.di import HasContainer
 
 
@@ -53,5 +53,27 @@ class InvitationAdmin(HasContainer, admin.ModelAdmin[Invitation]):
         )
 
 
+@final
+class AuthenticatorAdmin(admin.ModelAdmin[Authenticator]):
+    """Apps that users connected, which staff only delete to reset the factor."""
+
+    list_display = ('user',)
+
+    @override
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        """Forbids adding, since only the user connects an app."""
+        return False
+
+    @override
+    def has_change_permission(
+        self,
+        request: HttpRequest,
+        _authenticator: Authenticator | None = None,
+    ) -> bool:
+        """Forbids changes, so the key is never shown or replaced."""
+        return False
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Invitation, InvitationAdmin)
+admin.site.register(Authenticator, AuthenticatorAdmin)
