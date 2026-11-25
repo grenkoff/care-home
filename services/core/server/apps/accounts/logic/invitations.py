@@ -6,19 +6,23 @@ from typing import Protocol, final
 
 import attrs
 
+from server.apps.accounts.logic.errors import UnknownInvitationError
+
 
 @final
 @attrs.define(slots=True, frozen=True, kw_only=True)
 class Invitation:
     """Invitation as the site keeps it: for whom, until when, whether used."""
 
-    email: str
+    _email: str
     _expires_at: datetime
     _accepted: bool
 
-    def open_at(self, moment: datetime) -> bool:
-        """Tells whether the link still works at the moment."""
-        return not self._accepted and moment < self._expires_at
+    def opened_at(self, moment: datetime) -> str:
+        """Returns the e-mail while the link works or raises UnknownInvitationError."""
+        if self._accepted or moment >= self._expires_at:
+            raise UnknownInvitationError
+        return self._email
 
 
 @final
