@@ -35,7 +35,7 @@ class _Kept:
     """Fake: one invitation for a token, and the accepted ones in a list."""
 
     accepted: bool = False
-    passwords: list[tuple[str, str]] = attrs.field(factory=list)
+    passwords: list[tuple[str, str, datetime]] = attrs.field(factory=list)
 
     def found(self, digest: str) -> Invitation:
         """Returns the invitation of the token or raises UnknownInvitationError."""
@@ -47,9 +47,9 @@ class _Kept:
             accepted=self.accepted,
         )
 
-    def accept(self, digest: str, password: str) -> None:
-        """Keeps the digest and the password."""
-        self.passwords.append((digest, password))
+    def accept(self, digest: str, password: str, moment: datetime) -> None:
+        """Keeps the digest, the password and the moment."""
+        self.passwords.append((digest, password, moment))
 
 
 def _opened(kept: _Kept, moment: datetime) -> OpenInvitation:
@@ -81,21 +81,11 @@ def test_closed_invitation_is_refused(
         _opened(kept, moment)(code)
 
 
-def test_accepted_invitation_sets_the_password() -> None:
+def test_invitation_sets_the_password_now() -> None:
     kept = _Kept()
 
-    AcceptInvitation(_opened(kept, _EXPIRY - timedelta(days=1)), kept)(
-        _CODE,
-        'a long secret',
-    )
+    AcceptInvitation(kept, _Stopped(_EXPIRY))(_CODE, 'a long secret')
 
-    assert kept.passwords == [(Digest(_CODE).hexadecimal(), 'a long secret')]
-
-
-def test_expired_invitation_sets_no_password() -> None:
-    kept = _Kept()
-
-    with pytest.raises(UnknownInvitationError):
-        AcceptInvitation(_opened(kept, _EXPIRY), kept)(_CODE, 'a long secret')
-
-    assert not kept.passwords
+    assert kept.passwords == [
+        (Digest(_CODE).hexadecimal(), 'a long secret', _EXPIRY),
+    ]

@@ -35,10 +35,10 @@ class OpenInvitation:
 class AcceptInvitation:
     """Makes the account of an open invitation with the password chosen."""
 
-    _opened: OpenInvitation
     _invitations: Invitations
+    _clock: Clock
 
     def __call__(self, token: str, password: str) -> None:
         """Makes the account or raises UnknownInvitationError."""
-        self._opened(token)
-        self._invitations.accept(Digest(token).hexadecimal(), password)
+        digest = Digest(token).hexadecimal()
+        self._invitations.accept(digest, password, self._clock.now())
