@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: care-home\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-25 01:05+0000\n"
+"POT-Creation-Date: 2026-11-25 13:48+0000\n"
 "PO-Revision-Date: 2026-11-24 08:45+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -37,6 +37,54 @@ msgstr "приглашение"
 #: server/apps/accounts/models.py
 msgid "invitations"
 msgstr "приглашения"
+
+#: server/apps/accounts/models.py
+msgid "authenticator"
+msgstr "аутентификатор"
+
+#: server/apps/accounts/models.py
+msgid "authenticators"
+msgstr "аутентификаторы"
+
+#: server/apps/accounts/templates/accounts/code.html
+msgid "Code of the authenticator app"
+msgstr "Код приложения-аутентификатора"
+
+#: server/apps/accounts/templates/accounts/code.html
+msgid "Enter the six-digit code that your authenticator app shows."
+msgstr "Введите шестизначный код из приложения-аутентификатора."
+
+#: server/apps/accounts/templates/accounts/code.html
+msgid ""
+"Lost the phone with the app? Ask the staff of the home to reset the second "
+"factor."
+msgstr "Потеряли телефон с приложением? Попросите персонал дома сбросить второй фактор."
+
+#: server/apps/accounts/templates/accounts/code_form.html
+msgid "Confirm"
+msgstr "Подтвердить"
+
+#: server/apps/accounts/templates/accounts/connect.html
+msgid "Connect an authenticator app"
+msgstr "Подключите приложение-аутентификатор"
+
+#: server/apps/accounts/templates/accounts/connect.html
+msgid ""
+"Scan the picture with an authenticator app on your phone, or enter the key "
+"in it by hand. Then enter the six-digit code that the app shows."
+msgstr "Отсканируйте картинку приложением-аутентификатором на телефоне или введите в него ключ вручную. Затем введите шестизначный код, который покажет приложение."
+
+#: server/apps/accounts/templates/accounts/connect.html
+msgid "QR code of the key"
+msgstr "QR-код ключа"
+
+#: server/apps/accounts/templates/accounts/connect.html
+msgid "Key"
+msgstr "Ключ"
+
+#: server/apps/accounts/templates/accounts/connect.html
+msgid "Open in the authenticator app"
+msgstr "Открыть в приложении-аутентификаторе"
 
 #: server/apps/accounts/templates/accounts/invitation.html
 #: server/apps/accounts/templates/accounts/invitation_gone.html
@@ -115,6 +163,18 @@ msgstr "Пароль"
 #: server/apps/accounts/views/forms.py
 msgid "I accept the rules of watching"
 msgstr "Принимаю правила просмотра"
+
+#: server/apps/accounts/views/forms.py
+msgid "Code"
+msgstr "Код"
+
+#: server/apps/accounts/views/forms.py
+msgid "Enter the six digits that the app shows."
+msgstr "Введите шесть цифр, которые показывает приложение."
+
+#: server/apps/accounts/views/forms.py
+msgid "This code is wrong or no longer valid."
+msgstr "Код неверен или уже не действует."
 
 #: server/apps/care/models.py
 msgid "position"
