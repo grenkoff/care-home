@@ -39,7 +39,11 @@ class StoredInvitations:
             stored = (
                 models.Invitation.objects
                 .select_for_update()
-                .filter(digest=digest, accepted_at__isnull=True)
+                .filter(
+                    digest=digest,
+                    accepted_at__isnull=True,
+                    expires_at__gt=moment,
+                )
                 .first()
             )
             if stored is None:
