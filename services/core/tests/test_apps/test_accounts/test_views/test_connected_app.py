@@ -1,5 +1,6 @@
 """Tests of connecting an authenticator app by its code."""
 
+import logging
 from http import HTTPStatus
 from typing import Final
 
@@ -52,3 +53,18 @@ def test_code_of_six_digits_is_required(pending: Client, code: str) -> None:
     response = pending.post(_PAGE, {_FIELD: code})
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test_key_is_never_logged(
+    pending: Client,
+    shown_key: str,
+    caplog: pytest.LogCaptureFixture,
+    capfd: pytest.CaptureFixture[str],
+) -> None:
+    with caplog.at_level(logging.DEBUG):
+        pending.post(_PAGE, {_FIELD: _code(shown_key, 5)})
+        pending.post(_PAGE, {_FIELD: _code(shown_key)})
+
+    printed = capfd.readouterr()
+    assert shown_key not in caplog.text + printed.out + printed.err
