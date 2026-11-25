@@ -5,7 +5,7 @@ from typing import Final
 
 import pytest
 
-from server.apps.accounts.logic.codes import Authenticator, Key
+from server.apps.accounts.logic.codes import Key, Totp
 from server.apps.accounts.logic.errors import WrongCodeError
 
 _KEY: Final = Key('GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ')
@@ -30,27 +30,27 @@ def test_key_gives_the_codes_of_the_rfc(seconds: int, code: str) -> None:
 
 @pytest.mark.parametrize('step', [_STEP - 1, _STEP, _STEP + 1])
 def test_code_of_a_near_step_is_accepted(step: int) -> None:
-    assert Authenticator(_KEY, 0).accepted(_KEY.code(step), _MOMENT) == step
+    assert Totp(_KEY, 0).accepted(_KEY.code(step), _MOMENT) == step
 
 
 @pytest.mark.parametrize('step', [_STEP - 2, _STEP + 2])
 def test_code_of_a_far_step_is_refused(step: int) -> None:
     with pytest.raises(WrongCodeError):
-        Authenticator(_KEY, 0).accepted(_KEY.code(step), _MOMENT)
+        Totp(_KEY, 0).accepted(_KEY.code(step), _MOMENT)
 
 
 def test_wrong_code_is_refused() -> None:
     with pytest.raises(WrongCodeError):
-        Authenticator(_KEY, 0).accepted('000000', _MOMENT)
+        Totp(_KEY, 0).accepted('000000', _MOMENT)
 
 
 @pytest.mark.parametrize('used', [_STEP, _STEP + 1])
 def test_code_already_used_is_refused(used: int) -> None:
     with pytest.raises(WrongCodeError):
-        Authenticator(_KEY, used).accepted(_KEY.code(_STEP), _MOMENT)
+        Totp(_KEY, used).accepted(_KEY.code(_STEP), _MOMENT)
 
 
 def test_code_after_the_used_one_is_accepted() -> None:
-    authenticator = Authenticator(_KEY, _STEP - 1)
+    totp = Totp(_KEY, _STEP - 1)
 
-    assert authenticator.accepted(_KEY.code(_STEP), _MOMENT) == _STEP
+    assert totp.accepted(_KEY.code(_STEP), _MOMENT) == _STEP

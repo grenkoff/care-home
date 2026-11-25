@@ -11,7 +11,8 @@ from server.apps.accounts.logic.invitations import Digest, Issued
 if TYPE_CHECKING:
     from datetime import timedelta
 
-    from server.apps.accounts.logic.invitations import Clock, Tokens
+    from server.apps.accounts.logic.clock import Clock
+    from server.apps.accounts.logic.invitations import Tokens
 
 
 @final

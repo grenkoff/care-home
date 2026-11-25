@@ -37,8 +37,8 @@ class Key:
 
 @final
 @attrs.define(slots=True, frozen=True)
-class Authenticator:
-    """Authenticator of a user: its key and the last step whose code was used."""
+class Totp:
+    """Time-based codes of a key that were not used before a step."""
 
     _key: Key
     _used: int

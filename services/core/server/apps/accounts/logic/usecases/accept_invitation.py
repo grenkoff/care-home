@@ -9,7 +9,8 @@ import attrs
 from server.apps.accounts.logic.invitations import Digest
 
 if TYPE_CHECKING:
-    from server.apps.accounts.logic.invitations import Clock, Invitations
+    from server.apps.accounts.logic.clock import Clock
+    from server.apps.accounts.logic.invitations import Invitations
 
 
 @final

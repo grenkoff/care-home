@@ -6,7 +6,7 @@ from typing import final
 import attrs
 
 from server.apps.accounts.logic.authenticators import Codes
-from server.apps.accounts.logic.invitations import Clock
+from server.apps.accounts.logic.clock import Clock
 
 
 @final
