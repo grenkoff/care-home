@@ -1,10 +1,11 @@
 """Session of a user between the password and the second factor."""
 
+import uuid
 from collections.abc import Callable
 from typing import Any, Final, final, override
 
 import attrs
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.http import HttpRequest, HttpResponse, HttpResponseBase
 from django.shortcuts import redirect
@@ -16,6 +17,8 @@ _USER: Final = 'accounts.pending.user'
 _BACKEND: Final = 'accounts.pending.backend'
 _NEXT: Final = 'accounts.pending.next'
 _KEY: Final = 'accounts.pending.key'
+_FAILURES: Final = 'accounts.pending.failures'
+_ATTEMPTS: Final = 5
 
 
 @final
@@ -36,9 +39,13 @@ class Pending:
         """Tells whether somebody gave the password in this session."""
         return _USER in self._request.session
 
+    def identifier(self) -> uuid.UUID:
+        """Returns the id of the user who gave the password."""
+        return uuid.UUID(self._request.session[_USER])
+
     def user(self) -> User:
         """Returns the user who gave the password."""
-        return User.objects.get(pk=self._request.session[_USER])
+        return User.objects.get(pk=self.identifier())
 
     def key(self, fresh: Callable[[], str]) -> str:
         """Returns the key of the app being connected, made once per session."""
@@ -52,9 +59,18 @@ class Pending:
         session = self._request.session
         after = session[_NEXT]
         login(self._request, user, session[_BACKEND])
-        for name in (_USER, _BACKEND, _NEXT, _KEY):
+        for name in (_USER, _BACKEND, _NEXT, _KEY, _FAILURES):
             session.pop(name, None)
         return redirect(after)
+
+    def failed(self, page: HttpResponse) -> HttpResponse:
+        """Counts a wrong code and signs out after too many of them in a row."""
+        session = self._request.session
+        session[_FAILURES] = session.get(_FAILURES, 0) + 1
+        if session[_FAILURES] < _ATTEMPTS:
+            return page
+        logout(self._request)
+        return redirect('accounts:sign_in')
 
 
 class PendingOnly(View):

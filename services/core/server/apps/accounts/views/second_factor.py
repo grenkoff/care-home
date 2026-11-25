@@ -8,45 +8,48 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 
 from server.apps.accounts.logic.errors import WrongCodeError
-from server.apps.accounts.logic.usecases import connect_authenticator
-from server.apps.accounts.models import User
+from server.apps.accounts.logic.usecases import check_code, connect_authenticator
 from server.apps.accounts.views.enrolment import Enrolment
 from server.apps.accounts.views.forms import CodeForm
 from server.apps.accounts.views.pending import Pending, PendingOnly
 from server.common.di import HasContainer
 
 
+class _Factor(HasContainer, PendingOnly):
+    """Page of the second factor that knows whether the user has an app."""
+
+    def _has_app(self, request: HttpRequest) -> bool:
+        """Tells whether the user who gave the password connected an app."""
+        return self.resolve(connect_authenticator.HasAuthenticator)(
+            Pending(request).identifier(),
+        )
+
+
 @final
-class Code(PendingOnly):
+class Code(_Factor):
     """Page where a user gives the code of the authenticator app."""
 
     def get(self, request: HttpRequest) -> HttpResponse:
-        """Leads a user without an app to connect one."""
-        return redirect('accounts:connect')
-
-
-@final
-class Connect(HasContainer, PendingOnly):
-    """Page where a user connects an authenticator app after the password."""
-
-    def get(self, request: HttpRequest) -> HttpResponse:
-        """Shows the key of a new authenticator app."""
-        return self._page(request, Pending(request).user(), CodeForm(), HTTPStatus.OK)
+        """Asks for the code, or leads a user without an app to connect one."""
+        if not self._has_app(request):
+            return redirect('accounts:connect')
+        return self._page(request, CodeForm(), HTTPStatus.OK)
 
     def post(self, request: HttpRequest) -> HttpResponse:
-        """Connects the app of a valid code and signs in, or shows the error."""
-        user = Pending(request).user()
+        """Signs in with a valid code, or shows the error."""
+        if not self._has_app(request):
+            return redirect('accounts:connect')
+        pending = Pending(request)
         form = CodeForm(request.POST)
-        if form.is_valid() and self._connected(request, user, form):
-            return Pending(request).signed_in(user)
-        return self._page(request, user, form, HTTPStatus.BAD_REQUEST)
+        if form.is_valid() and self._checked(pending, form):
+            return pending.signed_in(pending.user())
+        return pending.failed(self._page(request, form, HTTPStatus.BAD_REQUEST))
 
-    def _connected(self, request: HttpRequest, user: User, form: CodeForm) -> bool:
-        """Connects the app of a valid code or marks the code as wrong."""
+    def _checked(self, pending: Pending, form: CodeForm) -> bool:
+        """Checks a code or marks it as wrong."""
         try:
-            self.resolve(connect_authenticator.ConnectAuthenticator)(
-                user.pk,
-                Pending(request).key(self.resolve(connect_authenticator.OfferKey)),
+            self.resolve(check_code.CheckCode)(
+                pending.identifier(),
                 form.cleaned_data['code'],
             )
         except WrongCodeError:
@@ -57,18 +60,61 @@ class Connect(HasContainer, PendingOnly):
     def _page(
         self,
         request: HttpRequest,
-        user: User,
+        form: CodeForm,
+        status: HTTPStatus,
+    ) -> HttpResponse:
+        """Renders the form of the code."""
+        return render(request, 'accounts/code.html', {'form': form}, status=status)
+
+
+@final
+class Connect(_Factor):
+    """Page where a user connects an authenticator app after the password."""
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        """Shows the key of a new authenticator app."""
+        if self._has_app(request):
+            return redirect('accounts:code')
+        return self._page(request, CodeForm(), HTTPStatus.OK)
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        """Connects the app of a valid code and signs in, or shows the error."""
+        if self._has_app(request):
+            return redirect('accounts:code')
+        pending = Pending(request)
+        form = CodeForm(request.POST)
+        if form.is_valid() and self._connected(pending, form):
+            return pending.signed_in(pending.user())
+        return pending.failed(self._page(request, form, HTTPStatus.BAD_REQUEST))
+
+    def _connected(self, pending: Pending, form: CodeForm) -> bool:
+        """Connects the app of a valid code or marks the code as wrong."""
+        try:
+            self.resolve(connect_authenticator.ConnectAuthenticator)(
+                pending.identifier(),
+                pending.key(self.resolve(connect_authenticator.OfferKey)),
+                form.cleaned_data['code'],
+            )
+        except WrongCodeError:
+            form.refuse()
+            return False
+        return True
+
+    def _page(
+        self,
+        request: HttpRequest,
         form: CodeForm,
         status: HTTPStatus,
     ) -> HttpResponse:
         """Renders the key of the app with the form of the code."""
-        key = Pending(request).key(self.resolve(connect_authenticator.OfferKey))
+        pending = Pending(request)
+        key = pending.key(self.resolve(connect_authenticator.OfferKey))
         return render(
             request,
             'accounts/connect.html',
             {
                 'key': key,
-                'enrolment': Enrolment(key, user.email, settings.SITE_NAME),
+                'enrolment': Enrolment(key, pending.user().email, settings.SITE_NAME),
                 'form': form,
             },
             status=status,

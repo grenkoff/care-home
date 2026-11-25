@@ -19,3 +19,4 @@ class CheckCode:
 
     def __call__(self, user: uuid.UUID, code: str) -> None:
         """Uses a fresh valid code or raises WrongCodeError."""
+        self._codes.use(user, code, self._clock.now())

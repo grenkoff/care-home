@@ -8,6 +8,7 @@ from django.conf import settings
 from server.apps.accounts.infra import authenticators, invitations, sources
 from server.apps.accounts.logic.usecases import (
     accept_invitation,
+    check_code,
     connect_authenticator,
     invite_relative,
 )
@@ -50,4 +51,8 @@ def _inject_authenticators(container: punq.Container) -> None:
             stored,
             sources.SystemClock(),
         ),
+    )
+    container.register(
+        check_code.CheckCode,
+        instance=check_code.CheckCode(stored, sources.SystemClock()),
     )
