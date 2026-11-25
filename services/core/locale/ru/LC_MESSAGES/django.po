@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: care-home\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-24 22:29+0000\n"
+"POT-Creation-Date: 2026-11-25 01:05+0000\n"
 "PO-Revision-Date: 2026-11-24 08:45+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,8 @@ msgstr ""
 #: server/apps/accounts/admin.py
 #, python-format
 msgid "Send this link to the relative, it is shown only once: %(link)s"
-msgstr "Отправьте эту ссылку родственнику, она показывается только один раз: %(link)s"
+msgstr ""
+"Отправьте эту ссылку родственнику, она показывается только один раз: %(link)s"
 
 #: server/apps/accounts/models.py
 msgid "e-mail"
@@ -39,6 +40,7 @@ msgstr "приглашения"
 
 #: server/apps/accounts/templates/accounts/invitation.html
 #: server/apps/accounts/templates/accounts/invitation_gone.html
+#: server/apps/accounts/templates/accounts/invitation_taken.html
 msgid "Invitation"
 msgstr "Приглашение"
 
@@ -56,7 +58,10 @@ msgid ""
 "The cameras show the common rooms of the home live. When you watch them, "
 "never record the video, never take pictures of the screen and never pass the "
 "video or your account to anyone."
-msgstr "Камеры показывают общие комнаты дома в прямом эфире. Когда вы их смотрите, никогда не записывайте видео, не фотографируйте экран и никому не передавайте видео или свою учётную запись."
+msgstr ""
+"Камеры показывают общие комнаты дома в прямом эфире. Когда вы их смотрите, "
+"никогда не записывайте видео, не фотографируйте экран и никому не "
+"передавайте видео или свою учётную запись."
 
 #: server/apps/accounts/templates/accounts/invitation.html
 msgid "Create the account"
@@ -70,7 +75,19 @@ msgstr "Ссылка больше не действует"
 msgid ""
 "The invitation was already used or has expired. Ask the staff of the home "
 "for a new one."
-msgstr "Приглашение уже использовано или истекло. Попросите персонал дома прислать новое."
+msgstr ""
+"Приглашение уже использовано или истекло. Попросите персонал дома прислать "
+"новое."
+
+#: server/apps/accounts/templates/accounts/invitation_taken.html
+msgid "This e-mail already has an account"
+msgstr "У этого e-mail уже есть учётная запись"
+
+#: server/apps/accounts/templates/accounts/invitation_taken.html
+#: server/apps/accounts/templates/accounts/sign_in.html
+#: server/templates/site/layout.html
+msgid "Sign in"
+msgstr "Войти"
 
 #: server/apps/accounts/templates/accounts/password.html
 #: server/apps/accounts/templates/accounts/password_changed.html
@@ -80,11 +97,6 @@ msgstr "Сменить пароль"
 #: server/apps/accounts/templates/accounts/password_changed.html
 msgid "Your password has been changed"
 msgstr "Ваш пароль изменён"
-
-#: server/apps/accounts/templates/accounts/sign_in.html
-#: server/templates/site/layout.html
-msgid "Sign in"
-msgstr "Войти"
 
 #: server/apps/accounts/templates/accounts/sign_in.html
 msgid "Please enter a correct e-mail and password."
