@@ -5,12 +5,22 @@ from typing import final
 
 import attrs
 
+from server.apps.accounts import models
+from server.apps.accounts.public.accounts import UnknownAccountError
+
 
 @final
 @attrs.define(slots=True, frozen=True)
 class StoredAccounts:
-    """Accounts found in the table of users by their e-mail."""
+    """Facade: accounts found in the table of users by their e-mail."""
 
     def identified(self, email: str) -> uuid.UUID:
         """Returns the id of the account of the e-mail, regardless of case."""
-        return uuid.UUID(int=0)
+        found = (
+            models.User.objects.filter(username__iexact=email)
+            .values_list('pk', flat=True)
+            .first()
+        )
+        if found is None:
+            raise UnknownAccountError
+        return found
