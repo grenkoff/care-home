@@ -1,7 +1,7 @@
 """Database models of residents."""
 
 import uuid
-from typing import final, override
+from typing import Final, final, override
 
 from django.db import models
 from django.utils import timezone
@@ -28,6 +28,16 @@ class Resident(models.Model):
         ordering = ('full_name',)
         verbose_name = _('resident')
         verbose_name_plural = _('residents')
+        constraints = (
+            models.CheckConstraint(
+                condition=models.Q(moved_out_on__isnull=True)
+                | models.Q(moved_out_on__gte=models.F('moved_in_on')),
+                name='%(app_label)s_%(class)s_moves_out_after_moving_in',
+                violation_error_message=_(
+                    'A resident cannot move out before moving in.',
+                ),
+            ),
+        )
 
     @override
     def __str__(self) -> str:
@@ -35,15 +45,13 @@ class Resident(models.Model):
         return self.full_name
 
 
-@final
-class Kind(models.TextChoices):
-    """Kinship of a relative to a resident."""
-
-    spouse = 'spouse', _('spouse')
-    child = 'child', _('child')
-    grandchild = 'grandchild', _('grandchild')
-    sibling = 'sibling', _('sibling')
-    other = 'other', _('other relative')
+KINDS: Final = (
+    ('spouse', _('spouse')),
+    ('child', _('child')),
+    ('grandchild', _('grandchild')),
+    ('sibling', _('sibling')),
+    ('other', _('other relative')),
+)
 
 
 @final
@@ -60,7 +68,7 @@ class Kinship(models.Model):
     kind = models.CharField(
         _('kinship'),
         max_length=KIND_MAX_LENGTH,
-        choices=Kind.choices,
+        choices=KINDS,
     )
     relative = models.UUIDField(_('relative'))
     granted_by = models.UUIDField(_('granted by'), editable=False)
@@ -82,6 +90,12 @@ class Kinship(models.Model):
         ordering = ('-granted_at',)
         verbose_name = _('kinship')
         verbose_name_plural = _('kinships')
+        constraints = (
+            models.CheckConstraint(
+                condition=models.Q(kind__in=[code for code, _label in KINDS]),
+                name='%(app_label)s_%(class)s_kind_valid',
+            ),
+        )
 
     @override
     def __str__(self) -> str:

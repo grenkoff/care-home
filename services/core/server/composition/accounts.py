@@ -5,17 +5,18 @@ from datetime import timedelta
 import punq
 from django.conf import settings
 
-from server.apps.accounts.infra import authenticators, invitations, sources
+from server.apps.accounts.infra import accounts, authenticators, invitations, sources
 from server.apps.accounts.logic.usecases import (
     accept_invitation,
     check_code,
     connect_authenticator,
     invite_relative,
 )
+from server.apps.accounts.public.accounts import Accounts
 
 
-def inject(container: punq.Container) -> None:
-    """Registers the objects of accounts."""
+def inject(container: punq.Container) -> Accounts:
+    """Registers the objects of accounts and returns their facade."""
     stored = invitations.StoredInvitations()
     opened = accept_invitation.OpenInvitation(stored, sources.SystemClock())
     container.register(
@@ -32,6 +33,7 @@ def inject(container: punq.Container) -> None:
         instance=accept_invitation.AcceptInvitation(stored, sources.SystemClock()),
     )
     _inject_authenticators(container)
+    return accounts.StoredAccounts()
 
 
 def _inject_authenticators(container: punq.Container) -> None:
