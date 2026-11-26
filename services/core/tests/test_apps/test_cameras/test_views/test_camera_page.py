@@ -17,7 +17,7 @@ def test_the_list_leads_to_the_camera(watcher: Client, camera_page: str) -> None
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     ('language', 'shown'),
-    [('en', 'Garden'), ('ru', 'Сад'), ('ru', 'Все камеры')],
+    [('en', 'Garden'), ('ru', 'Сад'), ('ru', 'живое изображение')],
 )
 def test_relative_sees_the_camera(
     watcher: Client,
