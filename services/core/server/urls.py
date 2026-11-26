@@ -23,6 +23,7 @@ from health_check.views import HealthCheckView
 from server.apps.accounts.views import urls as account_page_urls
 from server.apps.care.views import urls as care_page_urls
 from server.apps.enquiries.views import urls as enquiry_page_urls
+from server.apps.residents.views import urls as resident_page_urls
 
 admin.autodiscover()
 
@@ -75,6 +76,7 @@ urlpatterns = [
         path('', include((care_page_urls.urlpatterns, 'care'))),
         path('', include((enquiry_page_urls.urlpatterns, 'enquiries'))),
         path('', include((account_page_urls.urlpatterns, 'accounts'))),
+        path('', include((resident_page_urls.urlpatterns, 'residents'))),
         path(
             'privacy/',
             TemplateView.as_view(template_name='site/privacy.html'),
