@@ -21,4 +21,4 @@ class CopiedRelatives:
                 email__iexact=email,
             )
         except models.Relative.DoesNotExist as error:
-            raise UnknownRelativeError(email) from error
+            raise UnknownRelativeError from error
