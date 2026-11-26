@@ -17,7 +17,8 @@ class StoredAccounts:
     def identified(self, email: str) -> uuid.UUID:
         """Returns the id of the account of the e-mail, regardless of case."""
         found = (
-            models.User.objects.filter(username__iexact=email)
+            models.User.objects
+            .filter(username__iexact=email)
             .values_list('pk', flat=True)
             .first()
         )
