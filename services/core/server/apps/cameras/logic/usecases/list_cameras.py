@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, final
 import attrs
 
 from server.apps.cameras.logic.cameras import Screen
+from server.apps.cameras.logic.errors import NotAdmittedError
 
 if TYPE_CHECKING:
     from server.apps.cameras.logic.cameras import Cameras
@@ -24,4 +25,9 @@ class ListCameras:
 
     def __call__(self, viewer: uuid.UUID, language: str) -> list[Screen]:
         """Returns the active cameras or raises NotAdmittedError."""
-        return []
+        if not self._viewers.admitted(viewer):
+            raise NotAdmittedError(viewer)
+        return [
+            Screen(id=camera.id, name=camera.name.said_in(language))
+            for camera in self._cameras.active()
+        ]
