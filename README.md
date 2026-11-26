@@ -56,9 +56,11 @@ compose.yml          the whole system
 ```
 
 Modules of `core`: `care` (public pages, care services and prices),
-`enquiries` (the enquiry form of visitors, read by staff in the admin)
-and `accounts` (users, invitations from staff, sign in with the e-mail,
-the password and the code of an authenticator app). The Rust workspace, `eo-lint`, the `contracts` crate
+`enquiries` (the enquiry form of visitors, read by staff in the admin),
+`accounts` (users, invitations from staff, sign in with the e-mail,
+the password and the code of an authenticator app) and `residents`
+(residents and their links to relatives, kept by staff in the admin; the
+page "My family" of a relative). The Rust workspace, `eo-lint`, the `contracts` crate
 and buf stay ready and checked in CI for the day a module has to leave
 the monolith.
 
