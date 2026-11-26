@@ -457,4 +457,10 @@ ignore_names = [
   "has_add_permission",
   "form_valid",
   "get_by_natural_key",
+  "moved_in_on",
+  "moved_out_on",
+  "kind",
+  "granted_at",
+  "revoked_at",
+  "has_delete_permission",
 ]
