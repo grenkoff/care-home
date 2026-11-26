@@ -21,4 +21,4 @@ class ListFamily:
 
     def __call__(self, relative: uuid.UUID) -> tuple[Member, ...]:
         """Returns the residents of the links of the relative that work."""
-        return ()
+        return self._families.members(relative)

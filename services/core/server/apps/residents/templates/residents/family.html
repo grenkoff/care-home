@@ -3,4 +3,18 @@
 {% block title %}{% translate "My family" %}{% endblock title %}
 {% block content %}
   <h1 class="ds-heading mb-6">{% translate "My family" %}</h1>
+  {% if members %}
+    <ul class="grid gap-4 sm:grid-cols-2">
+      {% for full_name, kind in members %}
+        <li class="ds-card">
+          <h2 class="ds-subheading">{{ full_name }}</h2>
+          <p class="ds-muted mt-2">{{ kind }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="ds-muted">
+      {% translate "No resident is linked to your account yet. Ask the staff of the home to link you." %}
+    </p>
+  {% endif %}
 {% endblock content %}

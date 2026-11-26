@@ -5,6 +5,7 @@ from typing import final
 
 import attrs
 
+from server.apps.residents import models
 from server.apps.residents.logic.family import Member
 
 
@@ -15,4 +16,15 @@ class StoredFamilies:
 
     def members(self, relative: uuid.UUID) -> tuple[Member, ...]:
         """Returns the residents in the home whom the relative follows."""
-        return ()
+        rows = (
+            models.Kinship.objects
+            .filter(
+                relative=relative,
+                revoked_at__isnull=True,
+                resident__moved_out_on__isnull=True,
+            )
+            .order_by('resident__full_name', 'kind')
+            .values_list('resident__full_name', 'kind')
+            .distinct()
+        )
+        return tuple(Member(full_name=name, kind=kind) for name, kind in rows)
