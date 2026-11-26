@@ -50,9 +50,9 @@ class _Home:
 def test_lists_the_active_cameras_in_the_language() -> None:
     home = _Home()
 
-    assert ListCameras(home, home)(_VIEWER, 'ru') == [
+    assert ListCameras(home, home)(_VIEWER, 'ru') == (
         Screen(id=_GARDEN.id, name='Сад'),
-    ]
+    )
 
 
 def test_lists_nothing_to_a_stranger() -> None:
