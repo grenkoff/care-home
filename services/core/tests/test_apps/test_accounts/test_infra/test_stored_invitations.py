@@ -15,11 +15,12 @@ from server.common.outbox.models import Event
 from server.common.outbox.outbox import StoredOutbox
 
 _STORED: Final = StoredInvitations(StoredOutbox())
+_CHOSEN: Final = 'a long secret'
 
 
 @pytest.mark.django_db
 def test_invitation_is_accepted_only_once(invitation: Invitation) -> None:
-    _STORED.accept(invitation.digest, 'a long secret', timezone.now())
+    _STORED.accept(invitation.digest, _CHOSEN, timezone.now())
 
     with pytest.raises(UnknownInvitationError):
         _STORED.accept(invitation.digest, 'another', timezone.now())
@@ -53,7 +54,7 @@ def test_taken_email_keeps_the_invitation_open(invitation: Invitation) -> None:
     User.objects.create_user(username=invitation.email)
 
     with pytest.raises(TakenEmailError):
-        _STORED.accept(invitation.digest, 'a long secret', timezone.now())
+        _STORED.accept(invitation.digest, _CHOSEN, timezone.now())
 
     invitation.refresh_from_db()
     assert invitation.accepted_at is None
@@ -61,7 +62,7 @@ def test_taken_email_keeps_the_invitation_open(invitation: Invitation) -> None:
 
 @pytest.mark.django_db
 def test_accepting_publishes_the_opened_account(invitation: Invitation) -> None:
-    _STORED.accept(invitation.digest, 'a long secret', timezone.now())
+    _STORED.accept(invitation.digest, _CHOSEN, timezone.now())
 
     assert list(
         Event.objects.values_list('topic', 'payload__account', 'payload__email'),
@@ -71,7 +72,7 @@ def test_accepting_publishes_the_opened_account(invitation: Invitation) -> None:
 @pytest.mark.django_db
 def test_a_refused_invitation_publishes_nothing(invitation: Invitation) -> None:
     with pytest.raises(UnknownInvitationError):
-        _STORED.accept(invitation.digest, 'a long secret', invitation.expires_at)
+        _STORED.accept(invitation.digest, _CHOSEN, invitation.expires_at)
 
     assert not Event.objects.exists()
 
