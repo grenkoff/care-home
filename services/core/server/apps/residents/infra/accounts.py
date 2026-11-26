@@ -16,9 +16,9 @@ class CopiedAccounts:
     """Observer: copies each opened account, once however often it comes."""
 
     def receive(self, envelope: Envelope) -> None:
-        """Keeps the account under the id of its fact."""
+        """Keeps the account once, whichever of its facts comes first."""
         opened = msgspec.convert(envelope.payload, AccountOpened)
         models.Relative.objects.get_or_create(
-            id=opened.id,
-            defaults={'account': opened.account, 'email': opened.email},
+            account=opened.account,
+            defaults={'email': opened.email},
         )
