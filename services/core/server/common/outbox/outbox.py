@@ -5,6 +5,7 @@ from uuid import UUID
 
 import attrs
 import msgspec
+from django.db import transaction
 
 from server.common.outbox.models import Event
 
@@ -37,7 +38,9 @@ class StoredOutbox:
     """Outbox kept in the database next to the data it reports."""
 
     def add(self, topic: str, fact: Fact) -> None:
-        """Writes the fact as a pending event."""
+        """Writes the fact as a pending event or raises OutsideTransactionError."""
+        if not transaction.get_connection().in_atomic_block:
+            raise OutsideTransactionError(topic)
         Event.objects.create(
             id=fact.id,
             topic=topic,
