@@ -30,7 +30,7 @@ class ViewingAdmin(admin.ModelAdmin[Viewing]):
     def has_change_permission(
         self,
         request: HttpRequest,
-        viewing: Viewing | None = None,
+        _viewing: Viewing | None = None,
     ) -> bool:
         """Forbids changing, so the journal stays as it was written."""
         return False
@@ -39,7 +39,7 @@ class ViewingAdmin(admin.ModelAdmin[Viewing]):
     def has_delete_permission(
         self,
         request: HttpRequest,
-        viewing: Viewing | None = None,
+        _viewing: Viewing | None = None,
     ) -> bool:
         """Forbids deleting, so no viewing disappears from the journal."""
         return False

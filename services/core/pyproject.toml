@@ -463,6 +463,5 @@ ignore_names = [
   "granted_at",
   "revoked_at",
   "has_delete_permission",
-  "viewing",
   "stream",
 ]
