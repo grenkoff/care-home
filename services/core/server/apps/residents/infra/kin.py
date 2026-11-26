@@ -15,8 +15,4 @@ class StoredKin:
 
     def related(self, relative: uuid.UUID) -> bool:
         """Tells whether the account has a working link to a resident in the home."""
-        return models.Kinship.objects.filter(
-            relative=relative,
-            revoked_at__isnull=True,
-            resident__moved_out_on__isnull=True,
-        ).exists()
+        return models.Kinship.objects.working(relative).exists()

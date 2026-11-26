@@ -1,6 +1,7 @@
 """Tests of the facade that tells relatives of residents in the home."""
 
 import datetime as dt
+from typing import Final
 
 import pytest
 from django.utils import timezone
@@ -8,6 +9,8 @@ from django.utils import timezone
 from server.apps.accounts.models import User
 from server.apps.residents.infra.kin import StoredKin
 from server.apps.residents.models import Kinship, Resident
+
+_MOVED_OUT: Final = dt.date(2026, 3, 1)
 
 
 @pytest.mark.django_db
@@ -35,6 +38,6 @@ def test_a_resident_who_moved_out_does_not_relate(
     resident: Resident,
     relative: User,
 ) -> None:
-    Resident.objects.filter(pk=resident.pk).update(moved_out_on=dt.date(2026, 3, 1))
+    Resident.objects.filter(pk=resident.pk).update(moved_out_on=_MOVED_OUT)
 
     assert not StoredKin().related(relative.pk)

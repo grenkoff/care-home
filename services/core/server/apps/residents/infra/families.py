@@ -18,11 +18,7 @@ class StoredFamilies:
         """Returns the residents in the home whom the relative follows."""
         rows = (
             models.Kinship.objects
-            .filter(
-                relative=relative,
-                revoked_at__isnull=True,
-                resident__moved_out_on__isnull=True,
-            )
+            .working(relative)
             .order_by('resident__full_name', 'kind')
             .values_list('resident__full_name', 'kind')
         )
