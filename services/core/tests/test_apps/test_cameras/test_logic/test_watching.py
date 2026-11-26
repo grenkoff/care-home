@@ -14,23 +14,23 @@ from server.common.bilingual import Bilingual
 
 _VIEWER: Final = uuid.uuid7()
 _STRANGER: Final = uuid.uuid7()
-_GARDEN: Final = Camera(id=uuid.uuid7(), name=Bilingual(russian='Сад', english='Garden'))
+_ENGLISH: Final = 'en'
+_GARDEN: Final = Camera(
+    id=uuid.uuid7(),
+    name=Bilingual(russian='Сад', english='Garden'),
+)
 
 
 @final
 @attrs.define(slots=True, frozen=True)
-class _Viewers:
-    """Fake viewers: only the one viewer of the tests is admitted."""
+class _Home:
+    """Fake home: one admitted viewer, the garden and a journal in a list."""
+
+    opened: list[tuple[uuid.UUID, uuid.UUID]] = attrs.field(factory=list)
 
     def admitted(self, viewer: uuid.UUID) -> bool:
         """Tells whether the viewer is the viewer of the tests."""
         return viewer == _VIEWER
-
-
-@final
-@attrs.define(slots=True, frozen=True)
-class _Cameras:
-    """Fake cameras: the garden is the only active one."""
 
     def active(self) -> tuple[Camera, ...]:
         """Returns the garden."""
@@ -42,55 +42,53 @@ class _Cameras:
             raise UnknownCameraError(camera)
         return _GARDEN
 
-
-@final
-@attrs.define(slots=True, frozen=True)
-class _Journal:
-    """Fake journal that keeps the viewings in a list."""
-
-    opened: list[tuple[uuid.UUID, uuid.UUID]] = attrs.field(factory=list)
-
     def record(self, viewer: uuid.UUID, camera: uuid.UUID) -> None:
         """Appends the viewing to the list."""
         self.opened.append((viewer, camera))
 
 
 def test_lists_the_active_cameras_in_the_language() -> None:
-    screens = ListCameras(_Viewers(), _Cameras())(_VIEWER, 'ru')
+    home = _Home()
 
-    assert screens == [Screen(id=_GARDEN.id, name='Сад')]
+    assert ListCameras(home, home)(_VIEWER, 'ru') == [
+        Screen(id=_GARDEN.id, name='Сад'),
+    ]
 
 
-def test_lists_no_camera_to_a_viewer_who_is_not_admitted() -> None:
+def test_lists_nothing_to_a_stranger() -> None:
+    home = _Home()
+
     with pytest.raises(NotAdmittedError):
-        ListCameras(_Viewers(), _Cameras())(_STRANGER, 'en')
+        ListCameras(home, home)(_STRANGER, _ENGLISH)
 
 
 def test_opens_a_camera_in_the_language() -> None:
-    screen = OpenCamera(_Viewers(), _Cameras(), _Journal())(_VIEWER, _GARDEN.id, 'en')
+    home = _Home()
+
+    screen = OpenCamera(home, home, home)(_VIEWER, _GARDEN.id, _ENGLISH)
 
     assert screen == Screen(id=_GARDEN.id, name='Garden')
 
 
 def test_records_who_opened_the_camera() -> None:
-    journal = _Journal()
+    home = _Home()
 
-    OpenCamera(_Viewers(), _Cameras(), journal)(_VIEWER, _GARDEN.id, 'en')
+    OpenCamera(home, home, home)(_VIEWER, _GARDEN.id, _ENGLISH)
 
-    assert journal.opened == [(_VIEWER, _GARDEN.id)]
+    assert home.opened == [(_VIEWER, _GARDEN.id)]
 
 
-def test_opens_no_camera_to_a_viewer_who_is_not_admitted() -> None:
-    journal = _Journal()
+def test_opens_nothing_to_a_stranger() -> None:
+    home = _Home()
 
     with pytest.raises(NotAdmittedError):
-        OpenCamera(_Viewers(), _Cameras(), journal)(_STRANGER, _GARDEN.id, 'en')
-    assert not journal.opened
+        OpenCamera(home, home, home)(_STRANGER, _GARDEN.id, _ENGLISH)
+    assert not home.opened
 
 
 def test_opens_no_unknown_camera() -> None:
-    journal = _Journal()
+    home = _Home()
 
     with pytest.raises(UnknownCameraError):
-        OpenCamera(_Viewers(), _Cameras(), journal)(_VIEWER, uuid.uuid7(), 'en')
-    assert not journal.opened
+        OpenCamera(home, home, home)(_VIEWER, uuid.uuid7(), _ENGLISH)
+    assert not home.opened
