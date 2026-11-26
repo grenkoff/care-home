@@ -12,6 +12,7 @@ from server.apps.residents.models import Kinship, Resident
 
 _ADD: Final = '/admin/residents/kinship/add/'
 _LIST: Final = '/admin/residents/kinship/'
+_CHILD: Final = 'child'
 
 
 @pytest.fixture
@@ -33,22 +34,22 @@ def test_staff_link_a_relative_by_email(
 
     admin_client.post(
         _ADD,
-        {'resident': resident.pk, 'kind': 'child', 'relative': 'Anna@Example.test'},
+        {'resident': resident.pk, 'kind': _CHILD, 'relative': 'Anna@Example.test'},
     )
 
     assert list(
         Kinship.objects.values_list('resident', 'kind', 'relative', 'granted_by'),
-    ) == [(resident.pk, 'child', anna.pk, admin_user.pk)]
+    ) == [(resident.pk, _CHILD, anna.pk, admin_user.pk)]
 
 
 @pytest.mark.django_db
-def test_refuses_a_link_to_an_email_without_an_account(
+def test_refuses_an_email_without_an_account(
     admin_client: Client,
     resident: Resident,
 ) -> None:
     response = admin_client.post(
         _ADD,
-        {'resident': resident.pk, 'kind': 'child', 'relative': 'boris@example.test'},
+        {'resident': resident.pk, 'kind': _CHILD, 'relative': 'boris@example.test'},
         headers={'Accept-Language': 'en'},
     )
 
@@ -64,7 +65,7 @@ def test_staff_revoke_a_link(
 ) -> None:
     kinship = Kinship.objects.create(
         resident=resident,
-        kind='child',
+        kind=_CHILD,
         relative=admin_user.pk,
         granted_by=admin_user.pk,
     )
@@ -86,7 +87,7 @@ def test_staff_cannot_delete_a_link(
 ) -> None:
     kinship = Kinship.objects.create(
         resident=resident,
-        kind='child',
+        kind=_CHILD,
         relative=admin_user.pk,
         granted_by=admin_user.pk,
     )
