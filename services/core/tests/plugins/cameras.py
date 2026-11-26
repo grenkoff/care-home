@@ -15,6 +15,12 @@ def camera() -> Camera:
 
 
 @pytest.fixture
+def camera_page(camera: Camera) -> str:
+    """Address of the page of the camera of the garden in English."""
+    return f'/en/cameras/{camera.pk}/'
+
+
+@pytest.fixture
 def watcher(client: Client, kinship: Kinship, relative: User) -> Client:
     """Browser of the relative of a resident in the home, signed in."""
     client.force_login(relative)

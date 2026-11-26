@@ -67,4 +67,5 @@ class Viewing(models.Model):
     @override
     def __str__(self) -> str:
         """Returns the camera and the time it was opened."""
-        return f'{self.camera}: {self.opened_at:%Y-%m-%d %H:%M}'
+        opened = self.opened_at.isoformat(timespec='minutes')
+        return f'{self.camera}: {opened}'
