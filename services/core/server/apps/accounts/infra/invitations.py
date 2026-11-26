@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from typing import final
+from uuid import uuid7
 
 import attrs
 from django.db import transaction
@@ -10,6 +11,7 @@ from django.utils import timezone
 from server.apps.accounts import models
 from server.apps.accounts.logic.errors import TakenEmailError, UnknownInvitationError
 from server.apps.accounts.logic.invitations import Invitation
+from server.apps.accounts.public.events import ACCOUNT_OPENED, AccountOpened
 from server.common.outbox.outbox import Outbox
 
 
@@ -53,10 +55,14 @@ class StoredInvitations:
                 raise UnknownInvitationError(digest)
             if models.User.objects.filter(username__iexact=stored.email).exists():
                 raise TakenEmailError(digest)
-            models.User.objects.create_user(
+            account = models.User.objects.create_user(
                 username=stored.email,
                 email=stored.email,
                 password=password,
             )
             stored.accepted_at = timezone.now()
             stored.save(update_fields=['accepted_at'])
+            self._outbox.add(
+                ACCOUNT_OPENED,
+                AccountOpened(id=uuid7(), account=account.pk, email=stored.email),
+            )
