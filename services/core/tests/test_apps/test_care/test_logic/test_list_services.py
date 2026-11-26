@@ -5,8 +5,9 @@ from typing import final
 import attrs
 import pytest
 
-from server.apps.care.logic.services import Bilingual, CareService, Offer
+from server.apps.care.logic.services import CareService, Offer
 from server.apps.care.logic.usecases.list_services import ListServices
+from server.common.bilingual import Bilingual
 
 _OFFERS = (
     Offer(

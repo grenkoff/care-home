@@ -5,7 +5,8 @@ from typing import final
 import attrs
 
 from server.apps.care import models
-from server.apps.care.logic.services import Bilingual, Offer
+from server.apps.care.logic.services import Offer
+from server.common.bilingual import Bilingual
 
 
 @final

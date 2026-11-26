@@ -2,7 +2,7 @@
 
 import pytest
 
-from server.apps.care.logic.services import Bilingual, UnknownLanguageError
+from server.common.bilingual import Bilingual, UnknownLanguageError
 
 
 def test_text_refuses_a_language_the_site_lacks() -> None:
