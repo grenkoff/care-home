@@ -1,0 +1,17 @@
+{% extends "site/layout.html" %}
+{% load i18n %}
+{% block title %}{% translate "Cameras" %}{% endblock title %}
+{% block content %}
+  <h1 class="ds-heading mb-6">{% translate "Cameras" %}</h1>
+  {% if screens %}
+    <ul class="grid gap-4 sm:grid-cols-2">
+      {% for screen in screens %}
+        <li class="ds-card">
+          <h2 class="ds-subheading">{{ screen.name }}</h2>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="ds-muted">{% translate "No camera is on now." %}</p>
+  {% endif %}
+{% endblock content %}

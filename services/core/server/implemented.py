@@ -2,7 +2,14 @@
 
 import punq
 
-from server.composition import accounts, care, enquiries, outbox, residents
+from server.composition import (
+    accounts,
+    cameras,
+    care,
+    enquiries,
+    outbox,
+    residents,
+)
 
 
 def populate_dependencies(container: punq.Container) -> punq.Container:
@@ -10,6 +17,7 @@ def populate_dependencies(container: punq.Container) -> punq.Container:
     accounts.inject(container)
     care.inject(container)
     enquiries.inject(container)
-    residents.inject(container)
+    facade_of_residents = residents.inject(container)
+    cameras.inject(container, facade_of_residents)
     outbox.inject(container)
     return container
