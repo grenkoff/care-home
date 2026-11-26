@@ -11,7 +11,7 @@ def inject(container: punq.Container, accounts: Accounts) -> None:
     """Registers the objects of residents with the facade of accounts."""
     container.register(
         find_relative.FindRelative,
-        instance=find_relative.FindRelative(relatives.AccountRelatives(accounts)),
+        instance=find_relative.FindRelative(relatives.CopiedRelatives()),
     )
     container.register(
         list_family.ListFamily,

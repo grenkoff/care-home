@@ -6,6 +6,7 @@ from typing import final
 import attrs
 
 from server.apps.accounts.public.accounts import Accounts, UnknownAccountError
+from server.apps.residents import models
 from server.apps.residents.logic.errors import UnknownRelativeError
 
 
@@ -31,4 +32,9 @@ class CopiedRelatives:
 
     def identified(self, email: str) -> uuid.UUID:
         """Returns the account of the e-mail or raises UnknownRelativeError."""
-        return uuid.UUID(int=0)
+        try:
+            return models.Relative.objects.values_list('account', flat=True).get(
+                email__iexact=email,
+            )
+        except models.Relative.DoesNotExist as error:
+            raise UnknownRelativeError(email) from error
