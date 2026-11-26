@@ -49,3 +49,9 @@ def test_staff_cannot_delete_a_viewing(
     response = admin_client.get(f'{_JOURNAL}{viewing.pk}/delete/')
 
     assert response.status_code == HTTPStatus.FORBIDDEN
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('shown', ['Камеры', 'Журнал просмотров'])
+def test_the_admin_of_cameras_speaks_russian(admin_client: Client, shown: str) -> None:
+    assert shown in admin_client.get('/admin/cameras/').content.decode()

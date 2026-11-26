@@ -29,9 +29,10 @@ def test_hides_the_cameras_that_are_off(watcher: Client) -> None:
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize('shown', ['Сад', 'Камеры'])
 @pytest.mark.usefixtures('camera')
-def test_names_the_cameras_in_russian(watcher: Client) -> None:
-    assert 'Сад' in watcher.get('/ru/cameras/').content.decode()
+def test_cameras_speak_russian(watcher: Client, shown: str) -> None:
+    assert shown in watcher.get('/ru/cameras/').content.decode()
 
 
 @pytest.mark.django_db
