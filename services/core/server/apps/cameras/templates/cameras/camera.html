@@ -1,0 +1,10 @@
+{% extends "site/layout.html" %}
+{% load i18n %}
+{% block title %}{{ screen.name }}{% endblock title %}
+{% block content %}
+  <h1 class="ds-heading mb-6">{{ screen.name }}</h1>
+  <p class="ds-muted">{% translate "The live picture of this camera comes here soon." %}</p>
+  <p class="mt-6">
+    <a class="ds-link" href="{% url 'cameras:cameras' %}">{% translate "All cameras" %}</a>
+  </p>
+{% endblock content %}
