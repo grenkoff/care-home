@@ -17,6 +17,6 @@ def test_finds_the_relative_regardless_of_case() -> None:
 
 
 @pytest.mark.django_db
-def test_refuses_an_email_without_a_copied_account() -> None:
+def test_refuses_an_email_that_was_not_copied() -> None:
     with pytest.raises(UnknownRelativeError):
         CopiedRelatives().identified('boris@example.test')
