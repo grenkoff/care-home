@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from server.apps.residents.logic.errors import UnknownRelativeError
 from server.apps.residents.logic.usecases import find_relative
+from server.apps.residents.models import Kinship
 
 
 @final
@@ -30,3 +31,16 @@ class RelativeField(forms.EmailField):
                 _('No account has this e-mail. Invite the relative first.'),
                 code='unknown',
             ) from error
+
+
+class KinshipForm(forms.ModelForm[Kinship]):
+    """Link that staff grant, checked against every constraint of the table."""
+
+    @override
+    def validate_unique(self) -> None:
+        """Refuses a second working link, which the form alone does not see."""
+        super().validate_unique()
+        try:
+            self.instance.validate_constraints()
+        except ValidationError as error:
+            self.add_error(None, error)

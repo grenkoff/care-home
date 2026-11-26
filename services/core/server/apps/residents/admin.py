@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 
 from server.apps.residents.logic.usecases import find_relative
 from server.apps.residents.models import Kinship, Resident
-from server.apps.residents.views.forms import RelativeField
+from server.apps.residents.views.forms import KinshipForm, RelativeField
 from server.common.di import HasContainer
 
 
@@ -27,9 +27,10 @@ class ResidentAdmin(admin.ModelAdmin[Resident]):
 class KinshipAdmin(HasContainer, admin.ModelAdmin[Kinship]):
     """Links of residents to relatives, revoked but never changed or deleted."""
 
+    form = KinshipForm
     list_display = ('resident', 'kind', 'granted_at', 'revoked_at')
 
-    @admin.action(description=_('Revoke'))
+    @admin.action(description=_('Revoke'), permissions=('change',))
     def revoke(self, request: HttpRequest, chosen: QuerySet[Kinship]) -> None:
         """Revokes the chosen links that still work and keeps them."""
         chosen.filter(revoked_at__isnull=True).update(revoked_at=timezone.now())

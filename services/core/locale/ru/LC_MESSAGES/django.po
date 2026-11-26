@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: care-home\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-26 03:54+0000\n"
+"POT-Creation-Date: 2026-11-26 04:04+0000\n"
 "PO-Revision-Date: 2026-11-24 08:45+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -448,6 +448,10 @@ msgstr "отозвана"
 msgid "kinships"
 msgstr "родственные связи"
 
+#: server/apps/residents/models.py
+msgid "This relative is already linked to this resident."
+msgstr "Этот родственник уже привязан к этому жильцу."
+
 #: server/apps/residents/templates/residents/family.html
 msgid "My family"
 msgstr "Мои близкие"
@@ -456,7 +460,9 @@ msgstr "Мои близкие"
 msgid ""
 "No resident is linked to your account yet. Ask the staff of the home to link "
 "you."
-msgstr "К вашей учётной записи пока не привязан ни один жилец. Попросите персонал дома привязать вас."
+msgstr ""
+"К вашей учётной записи пока не привязан ни один жилец. Попросите персонал "
+"дома привязать вас."
 
 #: server/apps/residents/views/forms.py
 msgid "No account has this e-mail. Invite the relative first."

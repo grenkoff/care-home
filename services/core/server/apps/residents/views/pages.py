@@ -5,7 +5,9 @@ from typing import final
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.cache import never_cache
 
 from server.apps.residents.logic.usecases import list_family
 from server.apps.residents.models import KINDS
@@ -16,6 +18,7 @@ from server.common.di import HasContainer
 class Family(HasContainer, View):
     """Page where a relative sees the residents they follow."""
 
+    @method_decorator(never_cache)
     def get(self, request: HttpRequest) -> HttpResponse:
         """Shows the residents of the relative or sends a visitor to sign in."""
         relative = request.user.pk
