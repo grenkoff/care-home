@@ -1,6 +1,5 @@
 """Tests of the admin where staff link residents to their relatives."""
 
-import datetime as dt
 from http import HTTPStatus
 from typing import Final
 
@@ -13,15 +12,6 @@ from server.apps.residents.models import Kinship, Resident
 _ADD: Final = '/admin/residents/kinship/add/'
 _LIST: Final = '/admin/residents/kinship/'
 _CHILD: Final = 'child'
-
-
-@pytest.fixture
-def resident() -> Resident:
-    """Resident who lives in the home."""
-    return Resident.objects.create(
-        full_name='Maria Ivanova',
-        moved_in_on=dt.date(2026, 1, 10),
-    )
 
 
 @pytest.mark.django_db
