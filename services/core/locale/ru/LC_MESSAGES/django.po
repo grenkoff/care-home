@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: care-home\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-25 14:16+0000\n"
+"POT-Creation-Date: 2026-11-26 03:54+0000\n"
 "PO-Revision-Date: 2026-11-24 08:45+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -185,10 +185,14 @@ msgstr "Код неверен или уже не действует."
 #, python-format
 msgid "Too many wrong codes. Try again in %(minutes)d minute."
 msgid_plural "Too many wrong codes. Try again in %(minutes)d minutes."
-msgstr[0] "Слишком много неверных кодов. Попробуйте снова через %(minutes)d минуту."
-msgstr[1] "Слишком много неверных кодов. Попробуйте снова через %(minutes)d минуты."
-msgstr[2] "Слишком много неверных кодов. Попробуйте снова через %(minutes)d минут."
-msgstr[3] "Слишком много неверных кодов. Попробуйте снова через %(minutes)d минуты."
+msgstr[0] ""
+"Слишком много неверных кодов. Попробуйте снова через %(minutes)d минуту."
+msgstr[1] ""
+"Слишком много неверных кодов. Попробуйте снова через %(minutes)d минуты."
+msgstr[2] ""
+"Слишком много неверных кодов. Попробуйте снова через %(minutes)d минут."
+msgstr[3] ""
+"Слишком много неверных кодов. Попробуйте снова через %(minutes)d минуты."
 
 #: server/apps/care/models.py
 msgid "position"
@@ -367,6 +371,96 @@ msgstr "Даю согласие на обработку моих персона�
 #: server/apps/enquiries/views/pages.py
 msgid "Enter a phone number, for example +7 495 123-45-67."
 msgstr "Укажите номер телефона, например +7 495 123-45-67."
+
+#: server/apps/residents/admin.py
+msgid "Revoke"
+msgstr "Отозвать"
+
+#: server/apps/residents/admin.py
+msgid "e-mail of the relative"
+msgstr "e-mail родственника"
+
+#: server/apps/residents/models.py
+msgid "full name"
+msgstr "ФИО"
+
+#: server/apps/residents/models.py
+msgid "moved in"
+msgstr "дата заезда"
+
+#: server/apps/residents/models.py
+msgid "moved out"
+msgstr "дата выезда"
+
+#: server/apps/residents/models.py
+msgid "resident"
+msgstr "жилец"
+
+#: server/apps/residents/models.py
+msgid "residents"
+msgstr "жильцы"
+
+#: server/apps/residents/models.py
+msgid "A resident cannot move out before moving in."
+msgstr "Жилец не может выехать раньше, чем заехал."
+
+#: server/apps/residents/models.py
+msgid "spouse"
+msgstr "супруг или супруга"
+
+#: server/apps/residents/models.py
+msgid "child"
+msgstr "сын или дочь"
+
+#: server/apps/residents/models.py
+msgid "grandchild"
+msgstr "внук или внучка"
+
+#: server/apps/residents/models.py
+msgid "sibling"
+msgstr "брат или сестра"
+
+#: server/apps/residents/models.py
+msgid "other relative"
+msgstr "другой родственник"
+
+#: server/apps/residents/models.py
+msgid "kinship"
+msgstr "родство"
+
+#: server/apps/residents/models.py
+msgid "relative"
+msgstr "родственник"
+
+#: server/apps/residents/models.py
+msgid "granted by"
+msgstr "кто выдал"
+
+#: server/apps/residents/models.py
+msgid "granted"
+msgstr "выдана"
+
+#: server/apps/residents/models.py
+msgid "revoked"
+msgstr "отозвана"
+
+#: server/apps/residents/models.py
+msgid "kinships"
+msgstr "родственные связи"
+
+#: server/apps/residents/templates/residents/family.html
+msgid "My family"
+msgstr "Мои близкие"
+
+#: server/apps/residents/templates/residents/family.html
+msgid ""
+"No resident is linked to your account yet. Ask the staff of the home to link "
+"you."
+msgstr "К вашей учётной записи пока не привязан ни один жилец. Попросите персонал дома привязать вас."
+
+#: server/apps/residents/views/forms.py
+msgid "No account has this e-mail. Invite the relative first."
+msgstr "Учётной записи с таким e-mail нет. Сначала пригласите родственника."
 
 #: server/common/django/templates/layout/base.html
 msgid "Language"
