@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: care-home\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-26 04:04+0000\n"
+"POT-Creation-Date: 2026-11-26 13:36+0000\n"
 "PO-Revision-Date: 2026-11-24 08:45+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -194,17 +194,69 @@ msgstr[2] ""
 msgstr[3] ""
 "Слишком много неверных кодов. Попробуйте снова через %(minutes)d минуты."
 
-#: server/apps/care/models.py
-msgid "position"
-msgstr "позиция"
-
-#: server/apps/care/models.py
+#: server/apps/cameras/models.py server/apps/care/models.py
 msgid "name in Russian"
 msgstr "название на русском"
 
-#: server/apps/care/models.py
+#: server/apps/cameras/models.py server/apps/care/models.py
 msgid "name in English"
 msgstr "название на английском"
+
+#: server/apps/cameras/models.py
+msgid "key of the stream"
+msgstr "ключ потока"
+
+#: server/apps/cameras/models.py
+msgid "The key under which the video service knows the camera."
+msgstr "Ключ, под которым камеру знает видеосервис."
+
+#: server/apps/cameras/models.py
+msgid "active"
+msgstr "включена"
+
+#: server/apps/cameras/models.py
+msgid "camera"
+msgstr "камера"
+
+#: server/apps/cameras/models.py
+msgid "cameras"
+msgstr "камеры"
+
+#: server/apps/cameras/models.py
+msgid "viewer"
+msgstr "зритель"
+
+#: server/apps/cameras/models.py
+msgid "opened"
+msgstr "открыта"
+
+#: server/apps/cameras/models.py
+msgid "viewing"
+msgstr "просмотр"
+
+#: server/apps/cameras/models.py
+msgid "journal of viewings"
+msgstr "журнал просмотров"
+
+#: server/apps/cameras/templates/cameras/camera.html
+msgid "The live picture of this camera comes here soon."
+msgstr "Скоро здесь появится живое изображение с этой камеры."
+
+#: server/apps/cameras/templates/cameras/camera.html
+msgid "All cameras"
+msgstr "Все камеры"
+
+#: server/apps/cameras/templates/cameras/cameras.html
+msgid "Cameras"
+msgstr "Камеры"
+
+#: server/apps/cameras/templates/cameras/cameras.html
+msgid "No camera is on now."
+msgstr "Сейчас ни одна камера не включена."
+
+#: server/apps/care/models.py
+msgid "position"
+msgstr "позиция"
 
 #: server/apps/care/models.py
 msgid "description in Russian"
