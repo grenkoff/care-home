@@ -16,12 +16,9 @@ class StoredAccounts:
 
     def identified(self, email: str) -> uuid.UUID:
         """Returns the id of the account of the e-mail, regardless of case."""
-        found = (
-            models.User.objects
-            .filter(username__iexact=email)
-            .values_list('pk', flat=True)
-            .first()
-        )
-        if found is None:
-            raise UnknownAccountError
-        return found
+        try:
+            return models.User.objects.values_list('pk', flat=True).get(
+                username__iexact=email,
+            )
+        except models.User.DoesNotExist as error:
+            raise UnknownAccountError from error

@@ -25,6 +25,5 @@ class StoredFamilies:
             )
             .order_by('resident__full_name', 'kind')
             .values_list('resident__full_name', 'kind')
-            .distinct()
         )
         return tuple(Member(full_name=name, kind=kind) for name, kind in rows)

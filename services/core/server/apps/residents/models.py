@@ -64,6 +64,7 @@ class Kinship(models.Model):
         on_delete=models.PROTECT,
         related_name='kinships',
         verbose_name=_('resident'),
+        db_index=True,
     )
     kind = models.CharField(
         _('kinship'),
@@ -94,6 +95,14 @@ class Kinship(models.Model):
             models.CheckConstraint(
                 condition=models.Q(kind__in=[code for code, _label in KINDS]),
                 name='%(app_label)s_%(class)s_kind_valid',
+            ),
+            models.UniqueConstraint(
+                fields=('relative', 'resident'),
+                condition=models.Q(revoked_at__isnull=True),
+                name='%(app_label)s_%(class)s_one_working_link',
+                violation_error_message=_(
+                    'This relative is already linked to this resident.',
+                ),
             ),
         )
 
