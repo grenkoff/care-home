@@ -58,11 +58,13 @@ compose.yml          the whole system
 Modules of `core`: `care` (public pages, care services and prices),
 `enquiries` (the enquiry form of visitors, read by staff in the admin),
 `accounts` (users, invitations from staff, sign in with the e-mail,
-the password and the code of an authenticator app) and `residents`
+the password and the code of an authenticator app), `residents`
 (residents and their links to relatives, kept by staff in the admin; the
-page "My family" of a relative). The Rust workspace, `eo-lint`, the `contracts` crate
-and buf stay ready and checked in CI for the day a module has to leave
-the monolith.
+page "My family" of a relative) and `cameras` (the cameras of the common
+areas, kept by staff; the pages "Cameras" for relatives of residents in
+the home and the journal of viewings, read by staff in the admin). The
+Rust workspace, `eo-lint`, the `contracts` crate and buf stay ready and
+checked in CI for the day a module has to leave the monolith.
 
 ## Checks
 
