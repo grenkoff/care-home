@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from server.apps.residents.logic.constants import (
+    EMAIL_MAX_LENGTH,
     FULL_NAME_MAX_LENGTH,
     KIND_MAX_LENGTH,
 )
@@ -110,3 +111,24 @@ class Kinship(models.Model):
     def __str__(self) -> str:
         """Returns the resident and the kinship."""
         return f'{self.resident}: {self.get_kind_display()}'
+
+
+@final
+class Relative(models.Model):
+    """Account that staff may link to residents, copied from accounts by its fact."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid7, editable=False)
+    account = models.UUIDField(_('account'), unique=True)
+    email = models.EmailField(_('e-mail'), max_length=EMAIL_MAX_LENGTH, unique=True)
+
+    class Meta:
+        """Order of copied accounts: by e-mail."""
+
+        ordering = ('email',)
+        verbose_name = _('relative')
+        verbose_name_plural = _('relatives')
+
+    @override
+    def __str__(self) -> str:
+        """Returns the e-mail of the account."""
+        return self.email
