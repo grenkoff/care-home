@@ -9,6 +9,13 @@ import msgspec
 from server.common.outbox.models import Event
 
 
+@final
+class OutsideTransactionError(RuntimeError):
+    """Raised for a fact written outside the transaction of its change."""
+
+    __slots__ = ()
+
+
 class Fact(Protocol):
     """Fact with its own UUIDv7 id."""
 
