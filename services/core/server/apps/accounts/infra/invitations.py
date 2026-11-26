@@ -10,12 +10,15 @@ from django.utils import timezone
 from server.apps.accounts import models
 from server.apps.accounts.logic.errors import TakenEmailError, UnknownInvitationError
 from server.apps.accounts.logic.invitations import Invitation
+from server.common.outbox.outbox import Outbox
 
 
 @final
 @attrs.define(slots=True, frozen=True)
 class StoredInvitations:
     """Invitations kept in the table of accounts."""
+
+    _outbox: Outbox
 
     def found(self, digest: str) -> Invitation:
         """Returns the invitation of a digest or raises UnknownInvitationError."""

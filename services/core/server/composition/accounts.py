@@ -13,11 +13,12 @@ from server.apps.accounts.logic.usecases import (
     invite_relative,
 )
 from server.apps.accounts.public.accounts import Accounts
+from server.common.outbox import outbox
 
 
 def inject(container: punq.Container) -> Accounts:
     """Registers the objects of accounts and returns their facade."""
-    stored = invitations.StoredInvitations()
+    stored = invitations.StoredInvitations(outbox.StoredOutbox())
     opened = accept_invitation.OpenInvitation(stored, sources.SystemClock())
     container.register(
         invite_relative.InviteRelative,
