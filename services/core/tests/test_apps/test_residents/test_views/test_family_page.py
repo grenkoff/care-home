@@ -1,11 +1,14 @@
 """Tests of the page where a relative sees the residents they follow."""
 
 from http import HTTPStatus
+from typing import Final
 
 import pytest
 from django.test import Client
 
 from server.apps.accounts.models import User
+
+_PAGE: Final = '/en/family/'
 
 
 @pytest.mark.django_db
@@ -18,7 +21,7 @@ def test_relative_sees_their_residents(
 ) -> None:
     client.force_login(relative)
 
-    assert shown in client.get('/en/family/').content.decode()
+    assert shown in client.get(_PAGE).content.decode()
 
 
 @pytest.mark.django_db
@@ -26,12 +29,12 @@ def test_relative_sees_their_residents(
 def test_hides_residents_of_others(client: Client) -> None:
     client.force_login(User.objects.create_user(username='boris@example.test'))
 
-    assert 'Maria Ivanova' not in client.get('/en/family/').content.decode()
+    assert 'Maria Ivanova' not in client.get(_PAGE).content.decode()
 
 
 @pytest.mark.django_db
 def test_sends_a_visitor_to_sign_in(client: Client) -> None:
-    response = client.get('/en/family/')
+    response = client.get(_PAGE)
 
     assert (response.status_code, response.headers.get('Location')) == (
         HTTPStatus.FOUND,
@@ -52,6 +55,6 @@ def test_family_speaks_russian(client: Client, relative: User, shown: str) -> No
 def test_family_is_never_cached(client: Client, relative: User) -> None:
     client.force_login(relative)
 
-    response = client.get('/en/family/')
+    response = client.get(_PAGE)
 
     assert 'no-store' in response.headers.get('Cache-Control', '')
