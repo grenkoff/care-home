@@ -20,4 +20,4 @@ class FindRelative:
 
     def __call__(self, email: str) -> uuid.UUID:
         """Returns the account of the e-mail or raises UnknownRelativeError."""
-        return uuid.UUID(int=0)
+        return self._relatives.identified(email)
