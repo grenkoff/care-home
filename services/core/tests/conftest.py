@@ -7,5 +7,6 @@ pytest_plugins = [
     'plugins.hypothesis_profiles',
     'plugins.images_server',
     'plugins.residents',
+    'plugins.cameras',
     # TODO: add your own plugins here!
 ]
