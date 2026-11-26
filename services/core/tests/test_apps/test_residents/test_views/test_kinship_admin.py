@@ -24,14 +24,13 @@ def test_staff_link_a_relative_by_email(
     admin_client: Client,
     admin_user: User,
     resident: Resident,
+    relative: User,
 ) -> None:
-    anna = User.objects.create_user(username='anna@example.test')
-
     admin_client.post(_ADD, _granted(resident.pk, 'Anna@Example.test'))
 
     assert list(
         Kinship.objects.values_list('resident', 'kind', 'relative', 'granted_by'),
-    ) == [(resident.pk, _CHILD, anna.pk, admin_user.pk)]
+    ) == [(resident.pk, _CHILD, relative.pk, admin_user.pk)]
 
 
 @pytest.mark.django_db
@@ -46,6 +45,18 @@ def test_refuses_an_email_without_an_account(
     )
 
     assert 'No account has this e-mail' in response.content.decode()
+    assert not Kinship.objects.exists()
+
+
+@pytest.mark.django_db
+def test_refuses_an_account_not_copied_yet(
+    admin_client: Client,
+    resident: Resident,
+) -> None:
+    User.objects.create_user(username='boris@example.test')
+
+    admin_client.post(_ADD, _granted(resident.pk, 'boris@example.test'))
+
     assert not Kinship.objects.exists()
 
 
