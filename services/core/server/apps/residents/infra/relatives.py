@@ -5,7 +5,8 @@ from typing import final
 
 import attrs
 
-from server.apps.accounts.public.accounts import Accounts
+from server.apps.accounts.public.accounts import Accounts, UnknownAccountError
+from server.apps.residents.logic.errors import UnknownRelativeError
 
 
 @final
@@ -17,4 +18,7 @@ class AccountRelatives:
 
     def identified(self, email: str) -> uuid.UUID:
         """Returns the account of the e-mail or raises UnknownRelativeError."""
-        return uuid.UUID(int=0)
+        try:
+            return self._accounts.identified(email)
+        except UnknownAccountError as error:
+            raise UnknownRelativeError from error
