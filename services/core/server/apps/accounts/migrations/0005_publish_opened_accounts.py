@@ -16,9 +16,17 @@ def _opened(event, account, email):
 
 
 def _publish(apps, schema_editor):
-    """Writes the fact of each account opened before the facts existed."""
+    """Writes the fact of each account that an invitation opened before."""
     event = apps.get_model('outbox', 'Event')
-    accounts = apps.get_model('accounts', 'User').objects.order_by('pk')
+    accepted = apps.get_model('accounts', 'Invitation').objects.filter(
+        accepted_at__isnull=False,
+    )
+    accounts = (
+        apps
+        .get_model('accounts', 'User')
+        .objects.filter(username__in=accepted.values('email'))
+        .order_by('pk')
+    )
     event.objects.bulk_create(
         _opened(event, account, email)
         for account, email in accounts.values_list('pk', 'username')
