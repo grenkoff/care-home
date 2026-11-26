@@ -33,7 +33,7 @@ def test_a_second_delivery_keeps_one_copy() -> None:
 
 
 @pytest.mark.django_db
-def test_another_fact_of_the_same_account_keeps_one_copy() -> None:
+def test_a_repeated_account_keeps_one_copy() -> None:
     again = AccountOpened(id=uuid7(), account=_OPENED.account, email=_OPENED.email)
     CopiedAccounts().receive(_ENVELOPE)
 
