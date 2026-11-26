@@ -50,16 +50,8 @@ def test_refuses_an_email_without_an_account(
 @pytest.mark.django_db
 def test_staff_revoke_a_link(
     admin_client: Client,
-    admin_user: User,
-    resident: Resident,
+    kinship: Kinship,
 ) -> None:
-    kinship = Kinship.objects.create(
-        resident=resident,
-        kind=_CHILD,
-        relative=admin_user.pk,
-        granted_by=admin_user.pk,
-    )
-
     admin_client.post(
         _LIST,
         {'action': 'revoke', '_selected_action': [str(kinship.pk)]},
@@ -72,16 +64,8 @@ def test_staff_revoke_a_link(
 @pytest.mark.django_db
 def test_staff_cannot_delete_a_link(
     admin_client: Client,
-    admin_user: User,
-    resident: Resident,
+    kinship: Kinship,
 ) -> None:
-    kinship = Kinship.objects.create(
-        resident=resident,
-        kind=_CHILD,
-        relative=admin_user.pk,
-        granted_by=admin_user.pk,
-    )
-
     response = admin_client.get(f'{_LIST}{kinship.pk}/delete/')
 
     assert response.status_code == HTTPStatus.FORBIDDEN

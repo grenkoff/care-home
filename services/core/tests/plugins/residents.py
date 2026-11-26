@@ -5,7 +5,7 @@ import datetime as dt
 import pytest
 
 from server.apps.accounts.models import User
-from server.apps.residents.models import Resident
+from server.apps.residents.models import Kinship, Resident
 
 
 @pytest.fixture
@@ -21,3 +21,14 @@ def resident() -> Resident:
 def relative() -> User:
     """Relative of residents with an account."""
     return User.objects.create_user(username='anna@example.test')
+
+
+@pytest.fixture
+def kinship(resident: Resident, relative: User) -> Kinship:
+    """Link of the relative to the resident as a child."""
+    return Kinship.objects.create(
+        resident=resident,
+        kind='child',
+        relative=relative.pk,
+        granted_by=relative.pk,
+    )
