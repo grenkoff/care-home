@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from server.apps.residents.logic.usecases import find_relative
-from server.apps.residents.models import Kinship, Resident
+from server.apps.residents.models import Kinship, Relative, Resident
 from server.apps.residents.views.forms import KinshipForm, RelativeField
 from server.common.di import HasContainer
 
@@ -86,5 +86,36 @@ class KinshipAdmin(HasContainer, admin.ModelAdmin[Kinship]):
         super().save_model(request, kinship, form, change)
 
 
+@final
+class RelativeAdmin(admin.ModelAdmin[Relative]):
+    """Accounts copied from accounts, which staff read but never rewrite."""
+
+    list_display = ('email',)
+
+    @override
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        """Forbids adding, since only the facts of accounts fill the copy."""
+        return False
+
+    @override
+    def has_change_permission(
+        self,
+        request: HttpRequest,
+        _relative: Relative | None = None,
+    ) -> bool:
+        """Forbids changes, so the copy stays as accounts reported it."""
+        return False
+
+    @override
+    def has_delete_permission(
+        self,
+        request: HttpRequest,
+        _relative: Relative | None = None,
+    ) -> bool:
+        """Forbids deleting, so a copied account stays linkable."""
+        return False
+
+
 admin.site.register(Resident, ResidentAdmin)
 admin.site.register(Kinship, KinshipAdmin)
+admin.site.register(Relative, RelativeAdmin)
