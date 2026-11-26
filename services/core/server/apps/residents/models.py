@@ -56,8 +56,23 @@ KINDS: Final = (
 
 
 @final
+class KinshipQuerySet(models.QuerySet['Kinship']):
+    """Links of residents to relatives, narrowed to those that work."""
+
+    def working(self, relative: uuid.UUID) -> KinshipQuerySet:
+        """Keeps the links of the relative that work to residents in the home."""
+        return self.filter(
+            relative=relative,
+            revoked_at__isnull=True,
+            resident__moved_out_on__isnull=True,
+        )
+
+
+@final
 class Kinship(models.Model):
     """Link through which a relative may follow a resident."""
+
+    objects = KinshipQuerySet.as_manager()
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid7, editable=False)
     resident = models.ForeignKey(
