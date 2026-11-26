@@ -9,7 +9,7 @@ from server.apps.accounts.models import User
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('shown', ['Maria Ivanova', 'child'])
+@pytest.mark.parametrize('shown', ['Maria Ivanova', '>child<'])
 @pytest.mark.usefixtures('kinship')
 def test_relative_sees_their_residents(
     client: Client,
@@ -46,3 +46,12 @@ def test_family_speaks_russian(client: Client, relative: User, shown: str) -> No
     client.force_login(relative)
 
     assert shown in client.get('/ru/family/').content.decode()
+
+
+@pytest.mark.django_db
+def test_family_is_never_cached(client: Client, relative: User) -> None:
+    client.force_login(relative)
+
+    response = client.get('/en/family/')
+
+    assert 'no-store' in response.headers.get('Cache-Control', '')

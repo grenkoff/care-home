@@ -56,3 +56,18 @@ def test_hides_residents_of_other_relatives(
     _linked(resident, User.objects.create_user(username='boris@example.test'))
 
     assert StoredFamilies().members(relative.pk) == ()
+
+
+@pytest.mark.django_db
+def test_lists_residents_who_share_a_name(
+    resident: Resident,
+    relative: User,
+) -> None:
+    namesake = Resident.objects.create(
+        full_name=resident.full_name,
+        moved_in_on=dt.date(2026, 2, 1),
+    )
+    _linked(resident, relative)
+    _linked(namesake, relative)
+
+    assert len(StoredFamilies().members(relative.pk)) == 2
