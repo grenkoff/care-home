@@ -30,3 +30,13 @@ def test_a_second_delivery_keeps_one_copy() -> None:
     CopiedAccounts().receive(_ENVELOPE)
 
     assert Relative.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_another_fact_of_the_same_account_keeps_one_copy() -> None:
+    again = AccountOpened(id=uuid7(), account=_OPENED.account, email=_OPENED.email)
+    CopiedAccounts().receive(_ENVELOPE)
+
+    CopiedAccounts().receive(Envelope(again.id, msgspec.to_builtins(again)))
+
+    assert Relative.objects.count() == 1
