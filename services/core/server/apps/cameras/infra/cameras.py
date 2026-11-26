@@ -7,6 +7,7 @@ import attrs
 
 from server.apps.cameras import models
 from server.apps.cameras.logic.cameras import Camera
+from server.apps.cameras.logic.errors import UnknownCameraError
 from server.common.bilingual import Bilingual
 
 
@@ -27,4 +28,11 @@ class StoredCameras:
 
     def found(self, camera: uuid.UUID) -> Camera:
         """Returns the active camera of the id or raises UnknownCameraError."""
-        raise NotImplementedError(camera)
+        try:
+            russian, english = models.Camera.objects.values_list(
+                'name_ru',
+                'name_en',
+            ).get(pk=camera, active=True)
+        except models.Camera.DoesNotExist as error:
+            raise UnknownCameraError(camera) from error
+        return Camera(id=camera, name=Bilingual(russian=russian, english=english))

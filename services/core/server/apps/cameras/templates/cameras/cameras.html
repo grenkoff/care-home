@@ -7,7 +7,9 @@
     <ul class="grid gap-4 sm:grid-cols-2">
       {% for screen in screens %}
         <li class="ds-card">
-          <h2 class="ds-subheading">{{ screen.name }}</h2>
+          <h2 class="ds-subheading">
+            <a class="ds-link" href="{% url 'cameras:camera' screen.id %}">{{ screen.name }}</a>
+          </h2>
         </li>
       {% endfor %}
     </ul>
