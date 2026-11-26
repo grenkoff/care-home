@@ -55,6 +55,7 @@ class Viewing(models.Model):
         _('opened'),
         default=timezone.now,
         editable=False,
+        db_index=True,
     )
 
     class Meta:

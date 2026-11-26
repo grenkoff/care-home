@@ -23,11 +23,11 @@ class ListCameras:
     _viewers: Viewers
     _cameras: Cameras
 
-    def __call__(self, viewer: uuid.UUID, language: str) -> list[Screen]:
+    def __call__(self, viewer: uuid.UUID, language: str) -> tuple[Screen, ...]:
         """Returns the active cameras or raises NotAdmittedError."""
         if not self._viewers.admitted(viewer):
             raise NotAdmittedError(viewer)
-        return [
+        return tuple(
             Screen(id=camera.id, name=camera.name.said_in(language))
             for camera in self._cameras.active()
-        ]
+        )
