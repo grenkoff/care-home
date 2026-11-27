@@ -68,7 +68,7 @@ def test_header_offers_staff_russian_labels(
     admin_client: Client,
     label: str,
 ) -> None:
-    response = admin_client.get(reverse(_HOME))
+    response = admin_client.get('/ru/')
 
     assert label in response.content.decode()
 
