@@ -145,7 +145,11 @@ impl Growing for Window {
 
 impl Restarting for Window {
     fn restarted(self) -> Self {
-        self
+        Self {
+            start: self.start + u64::from(self.elapsed),
+            sequence: self.sequence + 1,
+            ..Self::new(self.capacity, self.target)
+        }
     }
 }
 

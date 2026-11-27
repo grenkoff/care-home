@@ -5,7 +5,7 @@ use std::sync::{PoisonError, RwLock};
 
 use crate::domain::frames::Frame;
 use crate::domain::sps::Unreadable;
-use crate::domain::window::{Growing, Live, Missing, Window};
+use crate::domain::window::{Growing, Live, Missing, Restarting, Window};
 
 /// Why a stream cannot give what a viewer asked.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
@@ -114,10 +114,15 @@ impl Recorded for Streams {
 
 impl Restarted for Streams {
     fn restart(&self, stream: &str) -> Result<(), Unrecorded> {
-        self.windows
+        let mut window = self
+            .windows
             .get(stream)
-            .map(|_| ())
-            .ok_or_else(|| Unrecorded::Unknown(stream.to_owned()))
+            .ok_or_else(|| Unrecorded::Unknown(stream.to_owned()))?
+            .write()
+            .unwrap_or_else(PoisonError::into_inner);
+        *window = window.clone().restarted();
+        drop(window);
+        Ok(())
     }
 }
 
