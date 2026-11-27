@@ -8,6 +8,9 @@ from django.test import Client
 
 from server.apps.accounts.models import User
 
+pytestmark = pytest.mark.django_db
+
+
 _EMAIL: Final = 'anna@example.test'
 _CHOSEN: Final = 'a long secret'
 _PAGE: Final = '/en/sign-in/'

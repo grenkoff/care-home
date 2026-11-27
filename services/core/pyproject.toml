@@ -464,4 +464,5 @@ ignore_names = [
   "revoked_at",
   "has_delete_permission",
   "stream",
+  "theme_context",
 ]

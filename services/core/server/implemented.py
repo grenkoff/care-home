@@ -4,6 +4,7 @@ import punq
 
 from server.composition import (
     accounts,
+    appearance,
     cameras,
     care,
     enquiries,
@@ -15,6 +16,7 @@ from server.composition import (
 def populate_dependencies(container: punq.Container) -> punq.Container:
     """Registers the objects of every module in the container."""
     accounts.inject(container)
+    appearance.inject(container)
     care.inject(container)
     enquiries.inject(container)
     facade_of_residents = residents.inject(container)
