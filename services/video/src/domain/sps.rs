@@ -41,19 +41,13 @@ impl Size {
 
 /// Sides of a picture.
 pub trait Sides {
-    /// Returns the width in pixels.
-    fn width(&self) -> u32;
-    /// Returns the height in pixels.
-    fn height(&self) -> u32;
+    /// Returns the width and the height in pixels.
+    fn sides(&self) -> (u32, u32);
 }
 
 impl Sides for Size {
-    fn width(&self) -> u32 {
-        self.width
-    }
-
-    fn height(&self) -> u32 {
-        self.height
+    fn sides(&self) -> (u32, u32) {
+        (self.width, self.height)
     }
 }
 
@@ -468,7 +462,6 @@ mod tests {
 
     #[test]
     fn tells_its_sides() {
-        let size = Size::new(640, 360);
-        assert_eq!((size.width(), size.height()), (640, 360));
+        assert_eq!(Size::new(640, 360).sides(), (640, 360));
     }
 }
