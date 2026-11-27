@@ -1,5 +1,6 @@
 //! Streams of the cameras, with no I/O.
 
+pub mod clock;
 pub mod frames;
 pub mod mp4;
 pub mod nal;
