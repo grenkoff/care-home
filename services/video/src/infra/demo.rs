@@ -139,6 +139,32 @@ mod tests {
     }
 
     #[tokio::test(start_paused = true)]
+    async fn keeps_its_rate_after_a_stall_instead_of_catching_up() {
+        let (sender, mut receiver) = unbounded_channel();
+        let demo = Demo::new("hall", Arc::from([frame(1)]), 15, Arc::new(Tape { sender }));
+        let playing = tokio::spawn(async move { demo.play().await });
+        let first = receiver.recv().await.map(|record| record.3);
+        tokio::time::advance(Duration::from_secs(1)).await;
+        let mut after = Vec::new();
+        while after.len() < 3
+            && let Some(record) = receiver.recv().await
+        {
+            after.push(record.3);
+        }
+        playing.abort();
+        assert_eq!(
+            (
+                first.is_some(),
+                after
+                    .windows(2)
+                    .map(|pair| pair[1] - pair[0])
+                    .collect::<Vec<_>>()
+            ),
+            (true, vec![Duration::from_secs(1) / 15; 2])
+        );
+    }
+
+    #[tokio::test(start_paused = true)]
     async fn stops_when_a_picture_does_not_go_into_the_stream() {
         let demo = Demo::new(
             "hall",
