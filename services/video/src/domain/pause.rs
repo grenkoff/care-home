@@ -44,13 +44,16 @@ impl Waiting for Pause {
 
     fn longer(self) -> Self {
         Self {
-            length: self.first.max(self.longest),
+            length: self.length.saturating_mul(2).min(self.longest),
             ..self
         }
     }
 
     fn shortest(self) -> Self {
-        self
+        Self {
+            length: self.first,
+            ..self
+        }
     }
 }
 
