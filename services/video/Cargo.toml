@@ -11,6 +11,7 @@ publish.workspace = true
 anyhow.workspace = true
 axum.workspace = true
 contracts.workspace = true
+futures-core.workspace = true
 retina.workspace = true
 thiserror.workspace = true
 tokio = { workspace = true, features = ["time"] }
