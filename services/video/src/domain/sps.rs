@@ -401,6 +401,51 @@ mod tests {
     }
 
     #[test]
+    fn keeps_a_three_that_follows_no_zeros() {
+        let set = crafted(
+            [0x67, 0x42, 0xC0, 0x03],
+            "1 1 011 010 0 00000101000 000010111 1 1 1 1 010 1 00101",
+        );
+        assert_eq!(set.size(), Ok(Size::new(638, 360)));
+    }
+
+    #[test]
+    fn reads_the_longest_number_that_fits() {
+        let set = crafted(
+            [0x67, 0x42, 0xC0, 0x1E],
+            &format!(
+                "{}1{} 1 011 010 0 00000101000 000010111 1 1 1 1 010 1 00101",
+                "0".repeat(31),
+                "0".repeat(31)
+            ),
+        );
+        assert_eq!(set.size(), Ok(Size::new(638, 360)));
+    }
+
+    #[test]
+    fn skips_scaling_lists_read_to_their_end() {
+        let set = crafted(
+            [0x67, 0x64, 0x00, 0x1E],
+            &format!(
+                "1 010 1 1 0 1 1{} 00000 1{} 0 \
+                 1 011 010 0 00000101000 000010111 1 1 1 1 010 1 00101",
+                "1".repeat(16),
+                "1".repeat(64)
+            ),
+        );
+        assert_eq!(set.size(), Ok(Size::new(638, 360)));
+    }
+
+    #[test]
+    fn crops_rows_of_both_fields_in_four_two_zero() {
+        let set = crafted(
+            [0x67, 0x42, 0xC0, 0x1E],
+            "1 1 011 010 0 00000101000 000010001 0 0 1 1 1 1 1 010",
+        );
+        assert_eq!(set.size(), Ok(Size::new(640, 540)));
+    }
+
+    #[test]
     fn refuses_a_set_that_ends_too_early() {
         let set = SequenceSet::new(Unit::new(vec![0x67, 0x42, 0xC0]));
         assert_eq!(set.size(), Err(Unreadable::Short));
