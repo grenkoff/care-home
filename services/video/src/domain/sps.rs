@@ -446,6 +446,18 @@ mod tests {
     }
 
     #[test]
+    fn refuses_a_set_that_ends_inside_the_picture_order() {
+        let set = crafted([0x67, 0x42, 0xC0, 0x1E], "1 1");
+        assert_eq!(set.size(), Err(Unreadable::Short));
+    }
+
+    #[test]
+    fn refuses_a_set_that_ends_before_the_count_of_reference_frames() {
+        let set = crafted([0x67, 0x42, 0xC0, 0x1E], "1 1 011");
+        assert_eq!(set.size(), Err(Unreadable::Short));
+    }
+
+    #[test]
     fn refuses_a_number_too_large_for_a_picture() {
         let set = crafted([0x67, 0x42, 0xC0, 0x1E], &format!("{}1", "0".repeat(40)));
         assert_eq!(set.size(), Err(Unreadable::Broken));
