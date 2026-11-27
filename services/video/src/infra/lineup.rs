@@ -46,13 +46,25 @@ impl Lineup {
 
 impl Wired for Lineup {
     fn streams(&self) -> Streams {
-        let _ = (&self.listed, self.shape, RwLock::new(Window::new(0, 0)));
-        Streams::new(BTreeMap::new())
+        let (segments, target) = self.shape;
+        Streams::new(
+            self.listed
+                .iter()
+                .map(|(key, _)| (key.clone(), RwLock::new(Window::new(segments, target))))
+                .collect::<BTreeMap<_, _>>(),
+        )
     }
 
     fn sources<R>(&self, streams: &Arc<R>) -> Vec<Demo<R>> {
-        let _ = (&self.pattern, streams);
-        Vec::new()
+        let (frames, rate) = &self.pattern;
+        self.listed
+            .iter()
+            .map(|(key, source)| match source {
+                Source::Demo => {
+                    Demo::new(key.clone(), Arc::clone(frames), *rate, Arc::clone(streams))
+                }
+            })
+            .collect()
     }
 }
 
