@@ -9,6 +9,9 @@ from django.test import Client
 
 from server.apps.enquiries.models import Enquiry
 
+pytestmark = pytest.mark.django_db
+
+
 _PAGE: Final = '/en/enquiry/'
 _SENT = MappingProxyType({
     'name': 'Anna',

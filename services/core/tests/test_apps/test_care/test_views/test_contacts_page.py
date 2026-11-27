@@ -4,6 +4,8 @@ import pytest
 from django.conf import LazySettings
 from django.test import Client
 
+pytestmark = pytest.mark.django_db
+
 
 @pytest.mark.parametrize(
     'fragment',

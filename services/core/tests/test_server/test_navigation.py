@@ -3,6 +3,8 @@
 import pytest
 from django.test import Client
 
+pytestmark = pytest.mark.django_db
+
 
 def test_language_form_keeps_the_page(client: Client) -> None:
     response = client.post(

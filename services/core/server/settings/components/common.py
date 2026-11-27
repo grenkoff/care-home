@@ -179,6 +179,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
                 'server.common.django.context.site',
+                'server.apps.appearance.views.context.theme_context',
             ],
         },
     },

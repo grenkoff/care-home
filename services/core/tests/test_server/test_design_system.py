@@ -5,6 +5,8 @@ from django.conf import LazySettings
 from django.test import Client
 from django.urls import reverse
 
+pytestmark = pytest.mark.django_db
+
 
 @pytest.mark.django_db
 def test_pages_carry_the_theme_of_the_site(
