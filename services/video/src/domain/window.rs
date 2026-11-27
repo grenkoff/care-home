@@ -1,5 +1,7 @@
 //! Window of the last segments of one stream, kept in memory only.
 
+use std::sync::Arc;
+
 use crate::domain::frames::{Frame, Picture};
 use crate::domain::mp4::{Encoded, Fragment, Sample, TIMESCALE, Track};
 use crate::domain::sps::Unreadable;
@@ -28,8 +30,8 @@ struct Segment {
     sequence: u32,
     /// Duration in ticks of the media clock.
     duration: u32,
-    /// Bytes of the media segment.
-    bytes: Vec<u8>,
+    /// Bytes of the media segment, shared by every copy of the window.
+    bytes: Arc<[u8]>,
 }
 
 /// Last segments of one stream and the pictures of the next one.
@@ -101,7 +103,9 @@ impl Window {
         let segment = Segment {
             sequence: self.sequence,
             duration: self.elapsed,
-            bytes: Fragment::new(self.sequence, self.start, self.pending).encoded(),
+            bytes: Fragment::new(self.sequence, self.start, self.pending)
+                .encoded()
+                .into(),
         };
         let segments: Vec<Segment> = self.segments.into_iter().chain([segment]).collect();
         let surplus = segments.len().saturating_sub(self.capacity);
@@ -172,7 +176,7 @@ impl Live for Window {
         self.segments
             .iter()
             .find(|segment| segment.sequence == sequence)
-            .map(|segment| segment.bytes.clone())
+            .map(|segment| segment.bytes.to_vec())
             .ok_or(Missing::Gone(sequence))
     }
 }
