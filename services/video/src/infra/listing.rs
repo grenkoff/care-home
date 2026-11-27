@@ -100,12 +100,6 @@ impl Configured for Listing {
     }
 }
 
-/// Source that a text of the setting names.
-trait Named {
-    /// Returns the source the text names, or why it names none.
-    fn source(&self) -> Result<Source, Misconfigured>;
-}
-
 /// Text of the source of one stream, with the key of the stream.
 struct Written<'a> {
     /// Key of the stream.
@@ -114,7 +108,8 @@ struct Written<'a> {
     text: &'a str,
 }
 
-impl Named for Written<'_> {
+impl Written<'_> {
+    /// Returns the source the text names, or why it names none.
     fn source(&self) -> Result<Source, Misconfigured> {
         if self.text == DEMO {
             return Ok(Source::Demo);
@@ -140,16 +135,11 @@ impl Named for Written<'_> {
     }
 }
 
-/// Text that percent escapes can be taken out of.
-trait Decoded {
-    /// Returns the text with its escapes decoded, when they are whole and spell UTF-8.
-    fn decoded(&self) -> Option<String>;
-}
-
 /// Part of an address written with percent escapes.
 struct Escaped<'a>(&'a str);
 
-impl Decoded for Escaped<'_> {
+impl Escaped<'_> {
+    /// Returns the text with its escapes decoded, when they are whole and spell UTF-8.
     fn decoded(&self) -> Option<String> {
         let mut pieces = self.0.split('%');
         let first = pieces.next().unwrap_or_default().as_bytes().to_vec();
