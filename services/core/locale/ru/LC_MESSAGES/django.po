@@ -520,6 +520,14 @@ msgstr ""
 msgid "No account has this e-mail. Invite the relative first."
 msgstr "Учётной записи с таким e-mail нет. Сначала пригласите родственника."
 
+#: server/apps/appearance/templates/appearance/choice.html
+msgid "Theme"
+msgstr "Тема"
+
+#: server/apps/appearance/templates/appearance/choice.html
+msgid "Apply"
+msgstr "Применить"
+
 #: server/common/django/templates/layout/base.html
 msgid "Language"
 msgstr "Язык"
