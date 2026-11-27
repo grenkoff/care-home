@@ -10,8 +10,11 @@ publish.workspace = true
 [dependencies]
 contracts.workspace = true
 thiserror.workspace = true
-tokio.workspace = true
+tokio = { workspace = true, features = ["time"] }
 tonic.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["sync", "test-util"] }
 
 [lints]
 workspace = true
