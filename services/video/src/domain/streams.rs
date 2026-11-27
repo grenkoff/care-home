@@ -61,29 +61,34 @@ impl Streams {
 }
 
 impl Streams {
-    /// Returns a copy of the window of the stream, or why there is none.
-    fn window(&self, stream: &str) -> Result<Window, Refusal> {
-        Ok(self
-            .windows
-            .get(stream)
-            .ok_or_else(|| Refusal::Unknown(stream.to_owned()))?
-            .read()
-            .unwrap_or_else(PoisonError::into_inner)
-            .clone())
+    /// Returns the answer the window of the stream gives under its read lock.
+    fn read<T>(
+        &self,
+        stream: &str,
+        answer: impl FnOnce(&Window) -> Result<T, Missing>,
+    ) -> Result<T, Refusal> {
+        Ok(answer(
+            &self
+                .windows
+                .get(stream)
+                .ok_or_else(|| Refusal::Unknown(stream.to_owned()))?
+                .read()
+                .unwrap_or_else(PoisonError::into_inner),
+        )?)
     }
 }
 
 impl Watched for Streams {
     fn init(&self, stream: &str) -> Result<Vec<u8>, Refusal> {
-        Ok(self.window(stream)?.init()?)
+        self.read(stream, Live::init)
     }
 
     fn playlist(&self, stream: &str) -> Result<String, Refusal> {
-        Ok(self.window(stream)?.playlist()?)
+        self.read(stream, Live::playlist)
     }
 
     fn segment(&self, stream: &str, sequence: u32) -> Result<Vec<u8>, Refusal> {
-        Ok(self.window(stream)?.segment(sequence)?)
+        self.read(stream, |window| window.segment(sequence))
     }
 }
 
