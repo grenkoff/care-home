@@ -12,8 +12,8 @@ COPY tools ./tools
 COPY services/images ./services/images
 COPY services/video ./services/video
 
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
-  --mount=type=cache,target=/src/target \
+RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
+  --mount=type=cache,target=/src/target,sharing=locked \
   cargo build --release --locked -p images \
   && cp target/release/images /usr/local/bin/images
 
