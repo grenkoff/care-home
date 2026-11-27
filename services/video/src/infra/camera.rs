@@ -10,7 +10,7 @@ use retina::client::{
     Demuxed, PlayOptions, Session, SessionOptions, SetupOptions, TcpTransportOptions, Transport,
 };
 use retina::codec::{CodecItem, FrameFormat};
-use tokio::time::timeout;
+use tokio::time::{Instant, timeout, timeout_at};
 
 use crate::domain::clock::{Held, Jumped, Timed};
 use crate::domain::frames::Frame;
@@ -110,14 +110,16 @@ impl<R: Recorded + Send + Sync> Camera<R> {
         let (silence, _) = self.patience;
         let mut session = Box::pin(self.session().await?);
         let mut held = Held::new();
+        let mut deadline = Instant::now() + silence;
         loop {
-            let item = timeout(
-                silence,
+            let item = timeout_at(
+                deadline,
                 poll_fn(|context| session.as_mut().poll_next(context)),
             )
             .await?
             .ok_or(Lost::Closed)??;
             if let CodecItem::VideoFrame(frame) = item {
+                deadline = Instant::now() + silence;
                 let picture = Frame::new(AnnexB::new(frame.data()).units());
                 let (next, released) = held.followed(frame.timestamp().elapsed(), picture)?;
                 held = next;
