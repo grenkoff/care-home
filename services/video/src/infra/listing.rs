@@ -3,6 +3,9 @@
 /// Longest key of a stream, as long as the key a camera keeps in core.
 const KEY_LENGTH: usize = 64;
 
+/// Name of the demo source in the setting.
+const DEMO: &str = "demo";
+
 /// Source of the pictures of a stream.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Source {
@@ -50,7 +53,33 @@ impl Listing {
 
 impl Configured for Listing {
     fn streams(&self) -> Result<Vec<(String, Source)>, Misconfigured> {
-        Err(Misconfigured::Unsourced(self.text.clone()))
+        self.text
+            .split(',')
+            .map(str::trim)
+            .filter(|entry| !entry.is_empty())
+            .try_fold(Vec::new(), |streams: Vec<(String, Source)>, entry| {
+                let (key, source) = entry
+                    .split_once('=')
+                    .ok_or_else(|| Misconfigured::Unsourced(entry.to_owned()))?;
+                let key = key.trim();
+                let slug = key
+                    .chars()
+                    .all(|letter| letter.is_ascii_alphanumeric() || letter == '-' || letter == '_');
+                if key.is_empty() || key.len() > KEY_LENGTH || !slug {
+                    return Err(Misconfigured::Key(key.to_owned()));
+                }
+                if streams.iter().any(|(known, _)| known == key) {
+                    return Err(Misconfigured::Twice(key.to_owned()));
+                }
+                let source = match source.trim() {
+                    DEMO => Source::Demo,
+                    _ => return Err(Misconfigured::Unknown(key.to_owned())),
+                };
+                Ok(streams
+                    .into_iter()
+                    .chain([(key.to_owned(), source)])
+                    .collect())
+            })
     }
 }
 
