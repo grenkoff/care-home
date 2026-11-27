@@ -74,6 +74,27 @@ def test_header_offers_staff_the_themes_in_russian(
 
 
 @pytest.mark.django_db
+def test_language_switches_on_choice_and_by_button_without_scripts(
+    client: Client,
+) -> None:
+    page = client.get(reverse(_HOME)).content.decode()
+
+    choice = page.partition('<site-choice>')[2].partition('</site-choice>')[0]
+    noscript = page.partition('<noscript>')[2].partition('</noscript>')[0]
+    assert ('name="language"' in choice, 'Сменить' in noscript) == (True, True)
+
+
+@pytest.mark.django_db
+def test_visitors_get_the_script_of_the_choices(client: Client) -> None:
+    script = (
+        'script',
+        (('type', 'module'), ('src', '/static/components/site-choice.js')),
+    )
+
+    assert script in _tags(client, reverse(_HOME))
+
+
+@pytest.mark.django_db
 def test_visitors_get_no_theme_switcher(client: Client) -> None:
     response = client.get(reverse(_HOME))
 
