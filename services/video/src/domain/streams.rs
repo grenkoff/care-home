@@ -1,11 +1,11 @@
 //! Live streams of the cameras kept by their keys.
 
 use std::collections::BTreeMap;
-use std::sync::RwLock;
+use std::sync::{PoisonError, RwLock};
 
 use crate::domain::frames::Frame;
 use crate::domain::sps::Unreadable;
-use crate::domain::window::{Missing, Window};
+use crate::domain::window::{Growing, Live, Missing, Window};
 
 /// Why a stream cannot give what a viewer asked.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
@@ -60,24 +60,44 @@ impl Streams {
     }
 }
 
+impl Streams {
+    /// Returns a copy of the window of the stream, or why there is none.
+    fn window(&self, stream: &str) -> Result<Window, Refusal> {
+        Ok(self
+            .windows
+            .get(stream)
+            .ok_or_else(|| Refusal::Unknown(stream.to_owned()))?
+            .read()
+            .unwrap_or_else(PoisonError::into_inner)
+            .clone())
+    }
+}
+
 impl Watched for Streams {
     fn init(&self, stream: &str) -> Result<Vec<u8>, Refusal> {
-        Err(Refusal::Unknown(stream.to_owned()))
+        Ok(self.window(stream)?.init()?)
     }
 
     fn playlist(&self, stream: &str) -> Result<String, Refusal> {
-        Err(Refusal::Unknown(stream.to_owned()))
+        Ok(self.window(stream)?.playlist()?)
     }
 
     fn segment(&self, stream: &str, sequence: u32) -> Result<Vec<u8>, Refusal> {
-        Err(Refusal::Unknown(format!("{stream}{sequence}")))
+        Ok(self.window(stream)?.segment(sequence)?)
     }
 }
 
 impl Recorded for Streams {
     fn record(&self, stream: &str, frame: &Frame, duration: u32) -> Result<(), Unrecorded> {
-        let _ = (frame, duration, self.windows.len());
-        Err(Unrecorded::Unknown(stream.to_owned()))
+        let mut window = self
+            .windows
+            .get(stream)
+            .ok_or_else(|| Unrecorded::Unknown(stream.to_owned()))?
+            .write()
+            .unwrap_or_else(PoisonError::into_inner);
+        *window = window.clone().with(frame, duration)?;
+        drop(window);
+        Ok(())
     }
 }
 
