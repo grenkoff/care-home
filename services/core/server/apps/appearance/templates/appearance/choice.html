@@ -1,9 +1,5 @@
-{% load static i18n %}
+{% load i18n %}
 {% if user.is_staff %}
-  <script
-    type="module"
-    src="{% static 'components/site-choice.js' %}"
-  ></script>
   <form
     method="post"
     action="{% url 'appearance:theme' %}"
