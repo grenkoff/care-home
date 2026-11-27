@@ -21,6 +21,7 @@ from dmr.routing import Router, build_404_handler, build_500_handler, path
 from health_check.views import HealthCheckView
 
 from server.apps.accounts.views import urls as account_page_urls
+from server.apps.appearance.views import urls as appearance_page_urls
 from server.apps.cameras.views import urls as camera_page_urls
 from server.apps.care.views import urls as care_page_urls
 from server.apps.enquiries.views import urls as enquiry_page_urls
@@ -73,6 +74,7 @@ urlpatterns = [
         name='v1_redoc',
     ),
     # Pages:
+    path('', include((appearance_page_urls.urlpatterns, 'appearance'))),
     *i18n_patterns(
         path('', include((care_page_urls.urlpatterns, 'care'))),
         path('', include((enquiry_page_urls.urlpatterns, 'enquiries'))),

@@ -23,6 +23,7 @@
           class="font-heading text-xl font-semibold"
         >{{ site_name }}</a>
         {% block navigation %}{% endblock navigation %}
+        {% block tools %}{% endblock tools %}
         <form
           action="{% url 'set_language' %}"
           method="post"
