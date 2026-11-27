@@ -1,8 +1,14 @@
 //! Window of the last segments of one stream, kept in memory only.
 
-use crate::domain::frames::Frame;
-use crate::domain::mp4::{Sample, Track};
+use crate::domain::frames::{Frame, Picture};
+use crate::domain::mp4::{Encoded, Fragment, Sample, TIMESCALE, Track};
 use crate::domain::sps::Unreadable;
+
+/// Name of the init segment in the playlist.
+pub const INIT: &str = "init.mp4";
+
+/// Extension of the names of the media segments in the playlist.
+pub const MEDIA: &str = "m4s";
 
 /// Why the window cannot give what was asked.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
@@ -80,30 +86,94 @@ pub trait Live {
     fn segment(&self, sequence: u32) -> Result<Vec<u8>, Missing>;
 }
 
+impl Window {
+    /// Returns the window with the picture added to the pending segment.
+    fn extended(self, sample: Sample, duration: u32) -> Self {
+        Self {
+            pending: self.pending.into_iter().chain([sample]).collect(),
+            elapsed: self.elapsed.saturating_add(duration),
+            ..self
+        }
+    }
+
+    /// Returns the window with the pending segment closed and the picture opening the next one.
+    fn closed(self, sample: Sample, duration: u32) -> Self {
+        let segment = Segment {
+            sequence: self.sequence,
+            duration: self.elapsed,
+            bytes: Fragment::new(self.sequence, self.start, self.pending).encoded(),
+        };
+        let segments: Vec<Segment> = self.segments.into_iter().chain([segment]).collect();
+        let surplus = segments.len().saturating_sub(self.capacity);
+        Self {
+            segments: segments.into_iter().skip(surplus).collect(),
+            pending: vec![sample],
+            elapsed: duration,
+            start: self.start + u64::from(self.elapsed),
+            sequence: self.sequence + 1,
+            ..self
+        }
+    }
+}
+
 impl Growing for Window {
     fn with(self, frame: &Frame, duration: u32) -> Result<Self, Unreadable> {
-        let _ = (frame, duration);
-        Ok(self)
+        let track = frame.track()?.or(self.track);
+        let window = Self { track, ..self };
+        Ok(
+            if window.track.is_none() || (window.pending.is_empty() && !frame.key()) {
+                window
+            } else if frame.key() && window.elapsed >= window.target {
+                window.closed(frame.sample(duration), duration)
+            } else {
+                window.extended(frame.sample(duration), duration)
+            },
+        )
     }
 }
 
 impl Live for Window {
     fn init(&self) -> Result<Vec<u8>, Missing> {
-        let _ = (&self.track, &self.pending, self.elapsed, self.start);
-        Err(Missing::Empty)
+        self.track
+            .as_ref()
+            .map(Encoded::encoded)
+            .ok_or(Missing::Empty)
     }
 
     fn playlist(&self) -> Result<String, Missing> {
-        let _ = (self.capacity, self.target, self.sequence);
-        Err(Missing::Empty)
+        let first = self.segments.first().ok_or(Missing::Empty)?;
+        let longest = self
+            .segments
+            .iter()
+            .map(|segment| segment.duration)
+            .max()
+            .unwrap_or_default();
+        let header = format!(
+            "#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-TARGETDURATION:{}\n#EXT-X-MEDIA-SEQUENCE:{}\n\
+             #EXT-X-MAP:URI=\"{INIT}\"\n",
+            longest.div_ceil(TIMESCALE),
+            first.sequence
+        );
+        Ok(self.segments.iter().fold(header, |playlist, segment| {
+            let millis = u64::from(segment.duration) * 1000 / u64::from(TIMESCALE);
+            format!(
+                "{playlist}#EXTINF:{}.{:03},\n{}.{MEDIA}\n",
+                millis / 1000,
+                millis % 1000,
+                segment.sequence
+            )
+        }))
     }
 
     fn segment(&self, sequence: u32) -> Result<Vec<u8>, Missing> {
+        if self.segments.is_empty() {
+            return Err(Missing::Empty);
+        }
         self.segments
             .iter()
-            .find(|segment| segment.sequence == sequence && segment.duration == 0)
+            .find(|segment| segment.sequence == sequence)
             .map(|segment| segment.bytes.clone())
-            .ok_or(Missing::Empty)
+            .ok_or(Missing::Gone(sequence))
     }
 }
 
