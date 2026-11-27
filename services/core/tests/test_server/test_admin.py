@@ -11,6 +11,7 @@ from django.test import Client
 from django.urls import reverse
 
 from server.apps.accounts.models import Authenticator
+from server.apps.appearance.models import ThemeChoice
 from server.apps.cameras.models import Viewing
 from server.apps.residents.models import Relative
 
@@ -21,6 +22,7 @@ _RESTRICTED_ADMIN_ADD_MODELS = frozenset((
     AccessFailureLog,
     Authenticator,
     Relative,
+    ThemeChoice,
     Viewing,
 ))
 
