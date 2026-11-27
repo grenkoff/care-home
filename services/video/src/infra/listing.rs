@@ -26,15 +26,17 @@ pub enum Source {
 /// Why the setting of the streams cannot be read.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum Misconfigured {
-    /// An entry has no source after its key.
-    #[error("the stream `{0}` names no source, write it as key=source")]
-    Unsourced(String),
+    /// The entry at the position, counted from one, has no source after its key.
+    #[error("the entry {0} of the setting names no source, write it as key=source")]
+    Unsourced(usize),
     /// An entry names a source the service does not know.
     #[error("the stream `{0}` has an unknown source")]
     Unknown(String),
-    /// A key is empty, too long or has more than letters, digits, hyphens and underscores.
-    #[error("the key `{0}` of a stream is not a slug of at most {KEY_LENGTH} characters")]
-    Key(String),
+    /// The key of the entry at the position is empty, too long or not a slug.
+    #[error(
+        "the key of the entry {0} of the setting is not a slug of at most {KEY_LENGTH} characters"
+    )]
+    Key(usize),
     /// Two entries have the same key.
     #[error("the stream `{0}` is listed twice")]
     Twice(String),
@@ -68,15 +70,13 @@ impl Configured for Listing {
             .map(str::trim)
             .filter(|entry| !entry.is_empty())
             .try_fold(Vec::new(), |streams: Vec<(String, Source)>, entry| {
-                let (key, source) = entry
-                    .split_once('=')
-                    .ok_or_else(|| Misconfigured::Unsourced(entry.to_owned()))?;
+                let (key, source) = entry.split_once('=').ok_or(Misconfigured::Unsourced(0))?;
                 let key = key.trim();
                 let slug = key
                     .chars()
                     .all(|letter| letter.is_ascii_alphanumeric() || letter == '-' || letter == '_');
                 if key.is_empty() || key.len() > KEY_LENGTH || !slug {
-                    return Err(Misconfigured::Key(key.to_owned()));
+                    return Err(Misconfigured::Key(0));
                 }
                 if streams.iter().any(|(known, _)| known == key) {
                     return Err(Misconfigured::Twice(key.to_owned()));
@@ -219,9 +219,25 @@ mod tests {
     #[test]
     fn refuses_an_entry_without_a_source() {
         assert_eq!(
-            Listing::new("hall=demo,garden").streams(),
-            Err(Misconfigured::Unsourced(String::from("garden")))
+            Listing::new("hall=demo, ,garden").streams(),
+            Err(Misconfigured::Unsourced(2))
         );
+    }
+
+    #[test]
+    fn never_shows_the_password_of_a_refused_entry() {
+        let shown = [
+            "rtsp://keeper:secret@10.0.0.21/stream1?channel=1",
+            "hall=demo,porch=rtsp://keeper:se,cret@10.0.0.21/stream1",
+            "porch:rtsp://keeper:secret@10.0.0.21/stream1",
+            "porch=rtsp://keeper:secret@10.0.0.21:99999/stream1",
+        ]
+        .map(|text| {
+            Listing::new(text).streams().map_err(|refusal| {
+                refusal.to_string().contains("secret") || refusal.to_string().contains("cret")
+            })
+        });
+        assert_eq!(shown, [Err(false), Err(false), Err(false), Err(false)]);
     }
 
     #[test]
@@ -245,14 +261,14 @@ mod tests {
         assert_eq!(
             [
                 Listing::new("=demo").streams(),
-                Listing::new("main hall=demo").streams(),
-                Listing::new(format!("{long}=demo")).streams(),
+                Listing::new("hall=demo,main hall=demo").streams(),
+                Listing::new(format!("hall=demo,garden=demo,{long}=demo")).streams(),
                 Listing::new(format!("{}=demo", "k".repeat(64))).streams(),
             ],
             [
-                Err(Misconfigured::Key(String::new())),
-                Err(Misconfigured::Key(String::from("main hall"))),
-                Err(Misconfigured::Key(long)),
+                Err(Misconfigured::Key(1)),
+                Err(Misconfigured::Key(2)),
+                Err(Misconfigured::Key(3)),
                 Ok(vec![("k".repeat(64), Source::Demo)]),
             ]
         );
