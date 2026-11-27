@@ -63,6 +63,16 @@ def test_header_offers_staff_the_themes(
     assert tag in _tags(admin_client, reverse(_HOME))
 
 
+@pytest.mark.parametrize('label', ['<span>Тема</span>', 'Применить'])
+def test_header_offers_staff_the_themes_in_russian(
+    admin_client: Client,
+    label: str,
+) -> None:
+    response = admin_client.get(reverse(_HOME))
+
+    assert label in response.content.decode()
+
+
 @pytest.mark.django_db
 def test_visitors_get_no_theme_switcher(client: Client) -> None:
     response = client.get(reverse(_HOME))
