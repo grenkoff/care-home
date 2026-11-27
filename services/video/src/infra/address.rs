@@ -21,13 +21,17 @@ impl Address {
 
 impl fmt::Display for Address {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(formatter, "{}", self.location)
+        let host = self.location.host_str().unwrap_or_default();
+        match self.location.port() {
+            Some(port) => write!(formatter, "{host}:{port}"),
+            None => write!(formatter, "{host}"),
+        }
     }
 }
 
 impl fmt::Debug for Address {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(formatter, "{}", self.location)
+        fmt::Display::fmt(self, formatter)
     }
 }
 
