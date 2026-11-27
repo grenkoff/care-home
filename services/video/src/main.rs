@@ -3,6 +3,7 @@
 use std::sync::Arc;
 
 use contracts::video::v1::video_service_server::VideoServiceServer;
+use tokio::signal::unix::SignalKind;
 use tokio::task::JoinSet;
 use video::api::endpoint::Endpoint;
 use video::api::health::{Alive, Served};
@@ -41,19 +42,15 @@ async fn main() -> anyhow::Result<()> {
         .into_iter()
         .map(|source| async move { source.play().await })
         .collect();
+    let mut terminated = tokio::signal::unix::signal(SignalKind::terminate())?;
     tracing::info!(%grpc, sources = sources.len(), "video is starting");
-    let stop = || async {
-        if let Err(error) = tokio::signal::ctrl_c().await {
-            tracing::error!(%error, "cannot listen for the shutdown signal");
-        }
-    };
     let endpoint = VideoServiceServer::new(Endpoint::new(Arc::clone(&streams)));
     tokio::select! {
-        served = tonic::transport::Server::builder()
-            .add_service(endpoint)
-            .serve_with_shutdown(grpc, stop()) => served?,
-        served = axum::serve(http, Alive.router()).with_graceful_shutdown(stop()) => served?,
+        served = tonic::transport::Server::builder().add_service(endpoint).serve(grpc) => served?,
+        served = axum::serve(http, Alive.router()).into_future() => served?,
         Some(played) = sources.join_next() => played??,
+        Ok(()) = tokio::signal::ctrl_c() => tracing::info!("video is stopping on an interrupt"),
+        Some(()) = terminated.recv() => tracing::info!("video is stopping on termination"),
     }
     Ok(())
 }
