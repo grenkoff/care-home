@@ -51,8 +51,8 @@ const REFERENCES: [u8; 28] = [
 /// Resolution of 72 dots per inch.
 const RESOLUTION: [u8; 4] = [0, 0x48, 0, 0];
 
-/// Length of the header of the box that holds the data of the samples.
-const DATA_HEADER: usize = 8;
+/// Length of the header of a box: its size and its kind.
+const HEADER: usize = 8;
 
 /// Flags of a trun box: a data offset and a duration, size and flags per sample.
 const RUN: [u8; 4] = [0, 0, 0x07, 0x01];
@@ -82,7 +82,7 @@ impl Atom {
 impl Encoded for Atom {
     fn encoded(&self) -> Vec<u8> {
         [
-            &u32::try_from(self.body.len() + 8)
+            &u32::try_from(self.body.len() + HEADER)
                 .unwrap_or(u32::MAX)
                 .to_be_bytes()[..],
             &self.kind,
@@ -389,7 +389,7 @@ impl Fragment {
 
 impl Encoded for Fragment {
     fn encoded(&self) -> Vec<u8> {
-        let offset = self.movie(0).encoded().len() + DATA_HEADER;
+        let offset = self.movie(0).encoded().len() + HEADER;
         [
             self.movie(offset).encoded(),
             Atom::new(
