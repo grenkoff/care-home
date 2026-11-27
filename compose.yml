@@ -97,7 +97,7 @@ services:
     restart: unless-stopped
     logging: *logging
     environment:
-      VIDEO_STREAMS: hall=demo,garden=demo,dining-room=demo
+      VIDEO_STREAMS: ${VIDEO_STREAMS:-hall=demo,garden=demo,dining-room=demo}
 
 volumes:
   postgres-data:
