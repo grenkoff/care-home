@@ -16,6 +16,7 @@ tokio = { workspace = true, features = ["time"] }
 tonic.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+url.workspace = true
 
 [dev-dependencies]
 tower.workspace = true
