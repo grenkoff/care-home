@@ -11,6 +11,17 @@ DEVELOP_CONTRACTS := $(shell git ls-tree -r --name-only origin/develop -- proto 
 LOCKED = $(shell grep -A1 '^name = "$(1)"' $(CORE)/poetry.lock | sed -n 's/^version = "\(.*\)"/\1/p')
 UVX := uvx -q --python $(PYTHON_VERSION)
 PLAYWRIGHT := 1.64.1
+BROWSER_STAFF := browser-staff
+STAFF_SESSION = from importlib import import_module; \
+  from django.conf import settings; \
+  from django.contrib.auth import BACKEND_SESSION_KEY, HASH_SESSION_KEY, SESSION_KEY, get_user_model; \
+  users = get_user_model().objects; \
+  staff = users.filter(username='$(BROWSER_STAFF)').first() or users.create_superuser('$(BROWSER_STAFF)'); \
+  store = import_module(settings.SESSION_ENGINE).SessionStore(); \
+  store.update({SESSION_KEY: str(staff.pk), HASH_SESSION_KEY: staff.get_session_auth_hash(), \
+  BACKEND_SESSION_KEY: 'django.contrib.auth.backends.ModelBackend'}); \
+  store.create(); \
+  print(store.session_key)
 
 .PHONY: help
 help:
@@ -135,8 +146,11 @@ browser:
 	docker build -q -t monolith-first-browser \
 	  --build-arg PLAYWRIGHT=$(PLAYWRIGHT) \
 	  --build-arg PYTEST=$(call LOCKED,pytest) tests/browser
+	session=$$($(COMPOSE) exec -T core python manage.py shell -v 0 \
+	  -c "$(STAFF_SESSION)" | tail -1) && \
 	docker run --rm --network host --user "$$(id -u):$$(id -g)" \
 	  -e HOME=/tmp -e CORE_URL="$${CORE_URL:-http://localhost:8000}" \
+	  -e STAFF_SESSION="$$session" \
 	  -v "$$PWD/tests/browser:/tests:ro" monolith-first-browser \
 	  python -m pytest -q -p no:cacheprovider
 
