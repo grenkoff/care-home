@@ -20,7 +20,7 @@ pub struct Pattern;
 
 impl Framed for Pattern {
     fn frames(&self) -> Vec<Frame> {
-        Vec::new()
+        Pictures::new(AnnexB::new(PATTERN).units()).frames()
     }
 }
 
@@ -63,19 +63,12 @@ impl<R> Demo<R> {
 
 impl<R: Recorded + Send + Sync> Playing for Demo<R> {
     async fn play(&self) -> Result<(), Unrecorded> {
-        tokio::task::yield_now().await;
-        let _ = (
-            &self.stream,
-            &self.frames,
-            self.rate,
-            &self.streams,
-            Duration::ZERO,
-        );
-        let _ = (
-            TIMESCALE,
-            AnnexB::new(PATTERN).units(),
-            Pictures::new(Vec::new()),
-        );
+        let mut ticks = tokio::time::interval(Duration::from_secs(1) / self.rate);
+        for frame in self.frames.iter().cycle() {
+            ticks.tick().await;
+            self.streams
+                .record(&self.stream, frame, TIMESCALE / self.rate)?;
+        }
         Ok(())
     }
 }
