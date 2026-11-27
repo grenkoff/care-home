@@ -52,6 +52,8 @@ services:
         condition: service_completed_successfully
       images:
         condition: service_healthy
+      video:
+        condition: service_healthy
     ports:
       - "8000:8000"
     healthcheck:
@@ -86,6 +88,16 @@ services:
     image: "images:dev"
     restart: unless-stopped
     logging: *logging
+
+  video:
+    build:
+      context: .
+      dockerfile: ./services/video/Dockerfile
+    image: "video:dev"
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      VIDEO_STREAMS: hall=demo,garden=demo,dining-room=demo
 
 volumes:
   postgres-data:
