@@ -1,5 +1,7 @@
 //! Streams of the service as its setting lists them.
 
+use crate::infra::address::Address;
+
 /// Longest key of a stream, as long as the key a camera keeps in core.
 const KEY_LENGTH: usize = 64;
 
@@ -7,10 +9,12 @@ const KEY_LENGTH: usize = 64;
 const DEMO: &str = "demo";
 
 /// Source of the pictures of a stream.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Source {
     /// The committed test pattern played in a loop.
     Demo,
+    /// An IP camera that serves H.264 over RTSP.
+    Camera(Address),
 }
 
 /// Why the setting of the streams cannot be read.
@@ -85,7 +89,38 @@ impl Configured for Listing {
 
 #[cfg(test)]
 mod tests {
+    use retina::client::Credentials;
+    use url::Url;
+
     use super::{Configured, Listing, Misconfigured, Source};
+    use crate::infra::address::Address;
+
+    #[test]
+    fn lists_a_camera_with_its_address() {
+        let listed = Listing::new(
+            "porch=rtsp://keeper:se%2Ccret@10.0.0.21:554/stream1?channel=1, roof=rtsp://camera.home/live",
+        )
+        .streams();
+        let porch = Url::parse("rtsp://10.0.0.21:554/stream1?channel=1").unwrap();
+        let roof = Url::parse("rtsp://camera.home/live").unwrap();
+        let keeper = Credentials {
+            username: String::from("keeper"),
+            password: String::from("se,cret"),
+        };
+        assert_eq!(
+            listed,
+            Ok(vec![
+                (
+                    String::from("porch"),
+                    Source::Camera(Address::new(porch, Some(keeper)))
+                ),
+                (
+                    String::from("roof"),
+                    Source::Camera(Address::new(roof, None))
+                ),
+            ])
+        );
+    }
 
     #[test]
     fn lists_every_stream_with_its_source() {
@@ -114,9 +149,16 @@ mod tests {
 
     #[test]
     fn refuses_a_source_it_does_not_know() {
+        let refused = [
+            "hall=webcam",
+            "hall=http://10.0.0.21/stream1",
+            "hall=rtsp://",
+            "hall=rtsp://keeper:%FF@10.0.0.21/stream1",
+            "hall=rtsp://keeper:%2@10.0.0.21/stream1",
+        ];
         assert_eq!(
-            Listing::new("hall=webcam").streams(),
-            Err(Misconfigured::Unknown(String::from("hall")))
+            refused.map(|text| Listing::new(text).streams()),
+            refused.map(|_| Err(Misconfigured::Unknown(String::from("hall"))))
         );
     }
 

@@ -2,11 +2,14 @@
 
 use std::collections::BTreeMap;
 use std::sync::{Arc, RwLock};
+use std::time::Duration;
 
 use crate::domain::frames::Frame;
-use crate::domain::streams::Streams;
+use crate::domain::pause::Pause;
+use crate::domain::streams::{Recorded, Restarted, Streams, Unrecorded};
 use crate::domain::window::Window;
-use crate::infra::demo::Demo;
+use crate::infra::camera::Camera;
+use crate::infra::demo::{Demo, Playing};
 use crate::infra::listing::Source;
 
 /// Streams of the service and the sources that fill them.
@@ -14,7 +17,25 @@ pub trait Wired {
     /// Returns the streams, each with an empty window.
     fn streams(&self) -> Streams;
     /// Returns a source for every stream, each filling the given streams.
-    fn sources<R>(&self, streams: &Arc<R>) -> Vec<Demo<R>>;
+    fn sources<R>(&self, streams: &Arc<R>) -> Vec<Feed<R>>;
+}
+
+/// Source of one stream: the demo or a camera.
+#[derive(Debug)]
+pub enum Feed<R> {
+    /// The demo that plays the test pattern.
+    Demo(Demo<R>),
+    /// An IP camera over RTSP.
+    Camera(Camera<R>),
+}
+
+impl<R: Recorded + Restarted + Send + Sync> Playing for Feed<R> {
+    async fn play(&self) -> Result<(), Unrecorded> {
+        match self {
+            Self::Demo(demo) => demo.play().await,
+            Self::Camera(camera) => camera.play().await,
+        }
+    }
 }
 
 /// Factory: the streams of the setting with a window and a source each.
@@ -26,6 +47,8 @@ pub struct Lineup {
     shape: (usize, u32),
     /// Pictures of the demo and their rate.
     pattern: (Arc<[Frame]>, u32),
+    /// Longest silence of a camera and the pause before connecting to it again.
+    patience: (Duration, Pause),
 }
 
 impl Lineup {
@@ -35,11 +58,13 @@ impl Lineup {
         listed: Vec<(String, Source)>,
         shape: (usize, u32),
         pattern: (Arc<[Frame]>, u32),
+        patience: (Duration, Pause),
     ) -> Self {
         Self {
             listed,
             shape,
             pattern,
+            patience,
         }
     }
 }
@@ -55,14 +80,23 @@ impl Wired for Lineup {
         )
     }
 
-    fn sources<R>(&self, streams: &Arc<R>) -> Vec<Demo<R>> {
+    fn sources<R>(&self, streams: &Arc<R>) -> Vec<Feed<R>> {
         let (frames, rate) = &self.pattern;
         self.listed
             .iter()
             .map(|(key, source)| match source {
-                Source::Demo => {
-                    Demo::new(key.clone(), Arc::clone(frames), *rate, Arc::clone(streams))
-                }
+                Source::Demo => Feed::Demo(Demo::new(
+                    key.clone(),
+                    Arc::clone(frames),
+                    *rate,
+                    Arc::clone(streams),
+                )),
+                Source::Camera(address) => Feed::Camera(Camera::new(
+                    key.clone(),
+                    address.clone(),
+                    self.patience,
+                    Arc::clone(streams),
+                )),
             })
             .collect()
     }
@@ -71,13 +105,15 @@ impl Wired for Lineup {
 #[cfg(test)]
 mod tests {
     use std::sync::Arc;
+    use std::time::Duration;
 
     use tokio::sync::mpsc::{UnboundedSender, unbounded_channel};
 
     use super::{Lineup, Wired};
     use crate::domain::frames::Frame;
     use crate::domain::nal::Unit;
-    use crate::domain::streams::{Recorded, Refusal, Unrecorded, Watched};
+    use crate::domain::pause::Pause;
+    use crate::domain::streams::{Recorded, Refusal, Restarted, Unrecorded, Watched};
     use crate::domain::window::Missing;
     use crate::infra::demo::Playing;
     use crate::infra::listing::Source;
@@ -94,6 +130,12 @@ mod tests {
         }
     }
 
+    impl Restarted for Tape {
+        fn restart(&self, stream: &str) -> Result<(), Unrecorded> {
+            Err(Unrecorded::Unknown(stream.to_owned()))
+        }
+    }
+
     fn lineup() -> Lineup {
         Lineup::new(
             vec![
@@ -104,6 +146,10 @@ mod tests {
             (
                 Arc::from([Frame::new(vec![Unit::new(vec![0x65, 0x88])])]),
                 15,
+            ),
+            (
+                Duration::from_secs(10),
+                Pause::new(Duration::from_secs(1), Duration::from_secs(30)),
             ),
         )
     }

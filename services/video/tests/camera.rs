@@ -16,7 +16,9 @@ use video::domain::streams::{Recorded, Restarted, Streams, Unrecorded, Watched};
 use video::domain::window::{Growing, Live, Window};
 use video::infra::address::Address;
 use video::infra::camera::Camera;
-use video::infra::demo::{Pattern, Playing};
+use video::infra::demo::{PATTERN_RATE, Pattern, Playing};
+use video::infra::lineup::{Lineup, Wired};
+use video::infra::listing::{Configured, Listing};
 
 /// The committed test pattern the fake camera plays.
 const PATTERN: &[u8] = include_bytes!("../demo/pattern.h264");
@@ -451,4 +453,45 @@ async fn keeps_other_streams_going_when_a_camera_refuses_the_password() {
         _ = porch.play() => Err("the source of the porch stopped"),
     };
     assert_eq!(outcome, Ok((LOOP - 1, 3)));
+}
+
+/// Plays the first stream the setting lists until it got a loop of the pattern.
+async fn listed(setting: String) -> Result<usize, &'static str> {
+    let listed = Listing::new(setting)
+        .streams()
+        .map_err(|_| "the setting was refused")?;
+    let lineup = Lineup::new(
+        listed,
+        (5, 180_000),
+        (Pattern.frames().into(), PATTERN_RATE),
+        (
+            PATIENCE,
+            Pause::new(Duration::from_millis(10), Duration::from_millis(40)),
+        ),
+    );
+    let (events, mut heard) = unbounded_channel();
+    let watcher = Arc::new(Watcher {
+        streams: lineup.streams(),
+        events,
+    });
+    let sources = lineup.sources(&watcher);
+    let first = sources.first().ok_or("the setting lists no stream")?;
+    tokio::select! {
+        waited = tokio::time::timeout(PATIENCE, until(&mut heard, |events| events.len() >= LOOP - 1)) => {
+            waited.map(|events| events.len()).map_err(|_| "the stream was not filled in time")
+        }
+        _ = first.play() => Err("the source stopped"),
+    }
+}
+
+#[tokio::test]
+async fn plays_a_camera_the_setting_lists() {
+    let (at, _attempts) = camera(1, Ending::Silence).await.unwrap();
+    let setting = format!(
+        "porch=rtsp://keeper:%73ecret@{}:{}{}",
+        at.host_str().unwrap(),
+        at.port().unwrap(),
+        at.path()
+    );
+    assert_eq!(listed(setting).await, Ok(LOOP - 1));
 }
