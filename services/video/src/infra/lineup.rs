@@ -9,8 +9,9 @@ use crate::domain::pause::Pause;
 use crate::domain::streams::{Recorded, Restarted, Streams, Unrecorded};
 use crate::domain::window::Window;
 use crate::infra::camera::Camera;
-use crate::infra::demo::{Demo, Playing};
+use crate::infra::demo::Demo;
 use crate::infra::listing::Source;
+use crate::infra::sources::Playing;
 
 /// Streams of the service and the sources that fill them.
 pub trait Wired {
@@ -115,8 +116,8 @@ mod tests {
     use crate::domain::pause::Pause;
     use crate::domain::streams::{Recorded, Refusal, Restarted, Unrecorded, Watched};
     use crate::domain::window::Missing;
-    use crate::infra::demo::Playing;
     use crate::infra::listing::Source;
+    use crate::infra::sources::Playing;
 
     struct Tape {
         sender: UnboundedSender<(String, u32)>,
