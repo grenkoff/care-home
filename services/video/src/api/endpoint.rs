@@ -46,9 +46,7 @@ impl<S: Watched + Send + Sync + 'static> VideoService for Endpoint<S> {
         request: Request<SegmentRequest>,
     ) -> Result<Response<SegmentResponse>, Status> {
         let message = request.into_inner();
-        let sequence = u32::try_from(message.sequence)
-            .map_err(|_| Refusal::Missing(Missing::Gone(u32::MAX)))?;
-        let segment = self.streams.segment(&message.stream, sequence)?;
+        let segment = self.streams.segment(&message.stream, message.sequence)?;
         Ok(Response::new(SegmentResponse { segment }))
     }
 }
@@ -101,7 +99,7 @@ mod tests {
         streams
     }
 
-    async fn codes(endpoint: &Endpoint<Streams>, stream: &str, sequence: u64) -> [Code; 3] {
+    async fn codes(endpoint: &Endpoint<Streams>, stream: &str, sequence: u32) -> [Code; 3] {
         [
             endpoint
                 .playlist(Request::new(PlaylistRequest {
@@ -175,12 +173,6 @@ mod tests {
     #[tokio::test]
     async fn answers_not_found_for_a_segment_outside_the_window() {
         let endpoint = Endpoint::new(streams());
-        assert_eq!(
-            [
-                codes(&endpoint, "hall", 7).await[2],
-                codes(&endpoint, "hall", u64::from(u32::MAX) + 1).await[2],
-            ],
-            [Code::NotFound, Code::NotFound]
-        );
+        assert_eq!(codes(&endpoint, "hall", 7).await[2], Code::NotFound);
     }
 }

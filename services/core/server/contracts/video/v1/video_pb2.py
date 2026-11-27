@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14video/v1/video.proto\x12\x08video.v1\"!\n\x0fPlaylistRequest\x12\x0e\n\x06stream\x18\x01 \x01(\t\"$\n\x10PlaylistResponse\x12\x10\n\x08playlist\x18\x01 \x01(\t\"\x1d\n\x0bInitRequest\x12\x0e\n\x06stream\x18\x01 \x01(\t\"\x1c\n\x0cInitResponse\x12\x0c\n\x04init\x18\x01 \x01(\x0c\"2\n\x0eSegmentRequest\x12\x0e\n\x06stream\x18\x01 \x01(\t\x12\x10\n\x08sequence\x18\x02 \x01(\x04\"\"\n\x0fSegmentResponse\x12\x0f\n\x07segment\x18\x01 \x01(\x0c\x32\xc8\x01\n\x0cVideoService\x12\x41\n\x08Playlist\x12\x19.video.v1.PlaylistRequest\x1a\x1a.video.v1.PlaylistResponse\x12\x35\n\x04Init\x12\x15.video.v1.InitRequest\x1a\x16.video.v1.InitResponse\x12>\n\x07Segment\x12\x18.video.v1.SegmentRequest\x1a\x19.video.v1.SegmentResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14video/v1/video.proto\x12\x08video.v1\"!\n\x0fPlaylistRequest\x12\x0e\n\x06stream\x18\x01 \x01(\t\"$\n\x10PlaylistResponse\x12\x10\n\x08playlist\x18\x01 \x01(\t\"\x1d\n\x0bInitRequest\x12\x0e\n\x06stream\x18\x01 \x01(\t\"\x1c\n\x0cInitResponse\x12\x0c\n\x04init\x18\x01 \x01(\x0c\"2\n\x0eSegmentRequest\x12\x0e\n\x06stream\x18\x01 \x01(\t\x12\x10\n\x08sequence\x18\x02 \x01(\r\"\"\n\x0fSegmentResponse\x12\x0f\n\x07segment\x18\x01 \x01(\x0c\x32\xc8\x01\n\x0cVideoService\x12\x41\n\x08Playlist\x12\x19.video.v1.PlaylistRequest\x1a\x1a.video.v1.PlaylistResponse\x12\x35\n\x04Init\x12\x15.video.v1.InitRequest\x1a\x16.video.v1.InitResponse\x12>\n\x07Segment\x12\x18.video.v1.SegmentRequest\x1a\x19.video.v1.SegmentResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
