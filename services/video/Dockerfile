@@ -23,11 +23,11 @@ FROM debian:bookworm-slim AS runtime
 RUN apt-get update \
   && apt-get install --no-install-recommends -y ca-certificates curl \
   && rm -rf /var/lib/apt/lists/* \
-  && useradd --system --uid 1000 video
+  && useradd --system --uid 1000 live
 
 COPY --from=build /usr/local/bin/video /usr/local/bin/video
 
-USER video
+USER live
 EXPOSE 50051 8080
 HEALTHCHECK --interval=5s --timeout=3s --retries=10 \
   CMD curl -fsS http://localhost:8080/health || exit 1
