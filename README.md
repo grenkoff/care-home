@@ -31,6 +31,11 @@ make up       # starts the site on http://localhost:8000
 make e2e      # checks the pages of the running site in Russian and English
 ```
 
+Staff sign in at http://localhost:8000/admin/ (the password, then the
+code of an authenticator app) and switch the theme of the whole site
+from the dropdown "Theme" in the header. The first one is created with
+`docker compose exec core python manage.py createsuperuser`.
+
 Then tell your AI agent what to build, in any form: one sentence, a
 detailed prompt or a file with the brief. In Claude Code:
 `/new-product a website for a barbershop`, or
