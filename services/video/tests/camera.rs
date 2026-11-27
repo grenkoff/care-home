@@ -80,7 +80,7 @@ const OFFERED: [&str; 3] = [
 ];
 
 /// Longest a test waits for the source.
-const PATIENCE: Duration = Duration::from_secs(10);
+const PATIENCE: Duration = Duration::from_secs(3);
 
 /// What the fake camera does after it played the pattern.
 #[derive(Debug, Clone, Copy)]
