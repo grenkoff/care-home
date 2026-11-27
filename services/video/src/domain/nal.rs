@@ -3,6 +3,9 @@
 /// Start code that comes before every unit of the stream.
 const START: [u8; 3] = [0, 0, 1];
 
+/// Bit after the header of a slice that is set when the slice starts at the first macroblock.
+const FIRST_MACROBLOCK: u8 = 0x80;
+
 /// Kind of a NAL unit that the service tells apart.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
@@ -39,6 +42,8 @@ pub trait Nal {
     fn kind(&self) -> Kind;
     /// Returns the bytes of the unit, its header first.
     fn bytes(&self) -> &[u8];
+    /// Tells whether the unit is a slice of a picture.
+    fn sliced(&self) -> bool;
     /// Tells whether the unit is a slice that opens a picture.
     fn opening(&self) -> bool;
 }
@@ -58,8 +63,16 @@ impl Nal for Unit {
         &self.bytes
     }
 
+    fn sliced(&self) -> bool {
+        matches!(self.kind(), Kind::Slice | Kind::Key)
+    }
+
     fn opening(&self) -> bool {
-        false
+        self.sliced()
+            && self
+                .bytes
+                .get(1)
+                .is_some_and(|byte| byte & FIRST_MACROBLOCK != 0)
     }
 }
 
