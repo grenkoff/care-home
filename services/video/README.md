@@ -6,7 +6,8 @@ The Rust service of live video. It keeps the last seconds of every camera in mem
 
 | Variable | Default | Meaning |
 |----------|---------|---------|
-| `VIDEO_STREAMS` | `hall=demo` | the streams as `key=source` entries split by commas; the key is the stream key of a camera in the admin of `core`; the only source for now is `demo` |
+| `VIDEO_STREAMS` | `hall=demo` | the streams as `key=source` entries split by commas; the key is the stream key of a camera in the admin of `core`; the source is `demo` or the RTSP address of a camera, `rtsp://user:password@10.0.0.21:554/stream1` |
+| `VIDEO_RTSP_TIMEOUT` | `10` | seconds a camera may stay silent before the service connects to it again |
 | `VIDEO_GRPC_ADDR` | `0.0.0.0:50051` | gRPC for `core` |
 | `VIDEO_HTTP_ADDR` | `0.0.0.0:8080` | the health check on `/health` |
 | `RUST_LOG` | `info` | the level of the structured logs |
@@ -17,6 +18,15 @@ The Rust service of live video. It keeps the last seconds of every camera in mem
 - The playlist calls the init segment `init.mp4` and a media segment `<number>.m4s`; `core` serves them next to the page of the camera.
 - An unknown stream and a segment that already left the window give `NOT_FOUND`; a stream without a segment yet gives `UNAVAILABLE`.
 - The init segment follows the latest parameter sets of the stream; a camera that changes its resolution while it runs is not handled yet.
+
+## Cameras
+
+- A camera sends its H.264 over RTP inside the RTSP connection (TCP), without re-encoding; the service takes the first H.264 video the camera describes, through the `retina` crate.
+- Write a comma, `%` or `@` in the user or the password as `%2C`, `%25` and `%40`: entries of `VIDEO_STREAMS` are split by commas.
+- Addresses with passwords are secrets and never enter the repository: put `VIDEO_STREAMS` into `.env` at the root of the repository, which git ignores and Compose reads, or into the environment of the deployment. The logs name the stream and the host of the camera only.
+- A camera that hangs up, stays silent longer than `VIDEO_RTSP_TIMEOUT` or refuses the session is tried again after a pause that starts at 1 second and doubles up to 30 seconds; a session that brought pictures sets it back to 1 second. A camera that refuses the password or does not answer stops neither the service nor the other streams.
+- After a lost session the stream starts a new window: `UNAVAILABLE` until its first segment, with segment numbers that keep growing, so a player never gets an old number with new pictures.
+- The service must reach the cameras: the network between the server and the home (a VPN) is outside the repository.
 
 ## Demo pattern
 

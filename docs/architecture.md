@@ -114,7 +114,9 @@ another stack for heavy computation, far more CPU and memory than the
 rest of the site, and isolation of the video of residents. It keeps the
 last seconds of every camera in memory as fragmented MP4 and answers
 `core` over gRPC (`VideoService/Playlist`, `Init`, `Segment`); like
-`images` it owns no data, so it has neither a database nor NATS.
+`images` it owns no data, so it has neither a database nor NATS. It is
+the only process that reaches the cameras: it takes their H.264 over
+RTSP with the `retina` crate in `infra/`.
 
 A service follows the layout `services/<name>/src`: `api/` (tonic
 endpoint, axum health check) → `infra/` (NATS adapter, settings) →

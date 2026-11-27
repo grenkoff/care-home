@@ -66,7 +66,8 @@ areas, kept by staff; the pages "Cameras" for relatives of residents in
 the home and the journal of viewings, read by staff in the admin). The
 Rust service [`video`](services/video/README.md) keeps the last seconds
 of every camera in memory as fragmented MP4 and serves them to `core`
-over gRPC; for now its streams play a test pattern in a loop.
+over gRPC; it takes H.264 from the IP cameras of the home over RTSP, or
+plays a test pattern in a loop for local runs.
 
 ## Checks
 
