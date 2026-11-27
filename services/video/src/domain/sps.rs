@@ -184,7 +184,7 @@ impl Reading for Bits<'_> {
     fn number(self, count: u32) -> Result<(u32, Self), Unreadable> {
         (0..count).try_fold((0, self), |(value, bits), _| {
             let (flag, bits) = bits.flag()?;
-            Ok((value << 1 | u32::from(flag), bits))
+            Ok((value * 2 + u32::from(flag), bits))
         })
     }
 
