@@ -11,9 +11,10 @@ use video::api::health::{Alive, Served};
 use video::domain::frames::Framed;
 use video::domain::mp4::TIMESCALE;
 use video::domain::pause::Pause;
-use video::infra::demo::{PATTERN_RATE, Pattern, Playing};
+use video::infra::demo::{PATTERN_RATE, Pattern};
 use video::infra::lineup::{Lineup, Wired};
 use video::infra::listing::{Configured, Listing};
+use video::infra::sources::Playing;
 
 /// Segments every stream keeps in memory.
 const SEGMENTS: usize = 5;

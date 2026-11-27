@@ -9,6 +9,7 @@ use crate::domain::frames::{Frame, Framed, Pictures};
 use crate::domain::mp4::TIMESCALE;
 use crate::domain::nal::{AnnexB, Units};
 use crate::domain::streams::{Recorded, Unrecorded};
+use crate::infra::sources::Playing;
 
 /// Test pattern without people: H.264 in the Annex B format.
 const PATTERN: &[u8] = include_bytes!("../../demo/pattern.h264");
@@ -24,12 +25,6 @@ impl Framed for Pattern {
     fn frames(&self) -> Vec<Frame> {
         Pictures::new(AnnexB::new(PATTERN).units()).frames()
     }
-}
-
-/// Source that keeps putting pictures into a stream.
-pub trait Playing {
-    /// Plays the pictures until one does not go into the stream, and returns why.
-    fn play(&self) -> impl Future<Output = Result<(), Unrecorded>> + Send;
 }
 
 /// Demo that plays pictures in a loop into one stream at their rate.
@@ -85,12 +80,13 @@ mod tests {
     use tokio::sync::mpsc::{UnboundedSender, unbounded_channel};
     use tokio::time::Instant;
 
-    use super::{Demo, PATTERN_RATE, Pattern, Playing};
+    use super::{Demo, PATTERN_RATE, Pattern};
     use crate::domain::frames::{Frame, Framed, Picture};
     use crate::domain::mp4::Track;
     use crate::domain::nal::Unit;
     use crate::domain::sps::Size;
     use crate::domain::streams::{Recorded, Streams, Unrecorded};
+    use crate::infra::sources::Playing;
 
     struct Tape {
         sender: UnboundedSender<(String, Frame, u32, Instant)>,

@@ -16,9 +16,10 @@ use video::domain::streams::{Recorded, Restarted, Streams, Unrecorded, Watched};
 use video::domain::window::{Growing, Live, Window};
 use video::infra::address::Address;
 use video::infra::camera::Camera;
-use video::infra::demo::{PATTERN_RATE, Pattern, Playing};
+use video::infra::demo::{PATTERN_RATE, Pattern};
 use video::infra::lineup::{Lineup, Wired};
 use video::infra::listing::{Configured, Listing};
+use video::infra::sources::Playing;
 
 /// The committed test pattern the fake camera plays.
 const PATTERN: &[u8] = include_bytes!("../demo/pattern.h264");

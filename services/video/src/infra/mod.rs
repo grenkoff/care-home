@@ -5,3 +5,4 @@ pub mod camera;
 pub mod demo;
 pub mod lineup;
 pub mod listing;
+pub mod sources;

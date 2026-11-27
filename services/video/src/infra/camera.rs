@@ -18,7 +18,7 @@ use crate::domain::nal::{AnnexB, Units};
 use crate::domain::pause::{Pause, Waiting};
 use crate::domain::streams::{Recorded, Restarted, Unrecorded};
 use crate::infra::address::{Address, Reached};
-use crate::infra::demo::Playing;
+use crate::infra::sources::Playing;
 
 /// Name the service gives itself to the cameras.
 const AGENT: &str = "care-home-video";
