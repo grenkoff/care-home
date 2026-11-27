@@ -8,7 +8,8 @@ use contracts::video::v1::{
 };
 use tonic::{Request, Response, Status};
 
-use crate::domain::streams::Watched;
+use crate::domain::streams::{Refusal, Watched};
+use crate::domain::window::Missing;
 
 /// Adapter: answers the requests of core for the live streams over gRPC.
 #[derive(Debug)]
@@ -31,21 +32,35 @@ impl<S: Watched + Send + Sync + 'static> VideoService for Endpoint<S> {
         &self,
         request: Request<PlaylistRequest>,
     ) -> Result<Response<PlaylistResponse>, Status> {
-        let _ = (request, &self.streams);
-        Err(Status::internal("not yet"))
+        let playlist = self.streams.playlist(&request.into_inner().stream)?;
+        Ok(Response::new(PlaylistResponse { playlist }))
     }
 
     async fn init(&self, request: Request<InitRequest>) -> Result<Response<InitResponse>, Status> {
-        let _ = request;
-        Err(Status::internal("not yet"))
+        let init = self.streams.init(&request.into_inner().stream)?;
+        Ok(Response::new(InitResponse { init }))
     }
 
     async fn segment(
         &self,
         request: Request<SegmentRequest>,
     ) -> Result<Response<SegmentResponse>, Status> {
-        let _ = request;
-        Err(Status::internal("not yet"))
+        let message = request.into_inner();
+        let sequence = u32::try_from(message.sequence)
+            .map_err(|_| Refusal::Missing(Missing::Gone(u32::MAX)))?;
+        let segment = self.streams.segment(&message.stream, sequence)?;
+        Ok(Response::new(SegmentResponse { segment }))
+    }
+}
+
+impl From<Refusal> for Status {
+    fn from(refusal: Refusal) -> Self {
+        match refusal {
+            Refusal::Missing(Missing::Empty) => Self::unavailable(refusal.to_string()),
+            Refusal::Unknown(_) | Refusal::Missing(Missing::Gone(_)) => {
+                Self::not_found(refusal.to_string())
+            }
+        }
     }
 }
 
