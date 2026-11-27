@@ -18,7 +18,7 @@ pub struct Alive;
 
 impl Served for Alive {
     fn router(&self) -> Router {
-        Router::new().route("/", get(|| async { PATH }))
+        Router::new().route(PATH, get(|| async { "alive" }))
     }
 }
 
