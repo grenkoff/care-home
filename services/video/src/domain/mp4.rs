@@ -141,6 +141,7 @@ impl Track {
 impl Track {
     /// Returns the box of the track with its header and its media.
     fn track(&self) -> Atom {
+        let (width, height) = self.size.sides();
         let header = Atom::new(
             *b"tkhd",
             [
@@ -149,8 +150,8 @@ impl Track {
                 &TRACK,
                 &[0; 24],
                 &MATRIX,
-                &(self.size.width() << 16).to_be_bytes(),
-                &(self.size.height() << 16).to_be_bytes(),
+                &(width << 16).to_be_bytes(),
+                &(height << 16).to_be_bytes(),
             ]
             .concat(),
         );
@@ -203,6 +204,7 @@ impl Track {
 
     /// Returns the description of the H.264 pictures with their parameter sets.
     fn entry(&self) -> Atom {
+        let (width, height) = self.size.sides();
         let configuration = Atom::new(
             *b"avcC",
             [
@@ -228,8 +230,8 @@ impl Track {
             [
                 &[0, 0, 0, 0, 0, 0, 0, 1][..],
                 &[0; 16],
-                &Short::new(usize::try_from(self.size.width()).unwrap_or(usize::MAX)).encoded(),
-                &Short::new(usize::try_from(self.size.height()).unwrap_or(usize::MAX)).encoded(),
+                &Short::new(usize::try_from(width).unwrap_or(usize::MAX)).encoded(),
+                &Short::new(usize::try_from(height).unwrap_or(usize::MAX)).encoded(),
                 &RESOLUTION,
                 &RESOLUTION,
                 &[0, 0, 0, 0, 0, 1],
