@@ -10,6 +10,7 @@ COPY proto ./proto
 COPY contracts ./contracts
 COPY tools ./tools
 COPY services/images ./services/images
+COPY services/video ./services/video
 
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
   --mount=type=cache,target=/src/target \
