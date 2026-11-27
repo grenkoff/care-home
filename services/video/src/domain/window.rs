@@ -78,6 +78,13 @@ pub trait Growing: Sized {
     fn with(self, frame: &Frame, duration: u32) -> Result<Self, Unreadable>;
 }
 
+/// Stream that its source starts anew, after the camera came back.
+pub trait Restarting {
+    /// Returns an empty stream that goes on with the numbers and the time of this one.
+    #[must_use]
+    fn restarted(self) -> Self;
+}
+
 /// Live stream as an HLS player reads it.
 pub trait Live {
     /// Returns the init segment of the stream.
@@ -136,6 +143,12 @@ impl Growing for Window {
     }
 }
 
+impl Restarting for Window {
+    fn restarted(self) -> Self {
+        self
+    }
+}
+
 impl Live for Window {
     fn init(&self) -> Result<Vec<u8>, Missing> {
         self.track
@@ -183,7 +196,7 @@ impl Live for Window {
 
 #[cfg(test)]
 mod tests {
-    use super::{Growing, Live, Missing, Window};
+    use super::{Growing, Live, Missing, Restarting, Window};
     use crate::domain::frames::{Frame, Picture};
     use crate::domain::mp4::{Encoded, Fragment, Track};
     use crate::domain::nal::Unit;
@@ -225,6 +238,32 @@ mod tests {
             frames.iter().map(|frame| frame.sample(6000)).collect(),
         )
         .encoded()
+    }
+
+    #[test]
+    fn starts_a_new_window_that_keeps_counting_segments() {
+        let restarted = grown(3, &[first(), slice(), key(), slice(), key()]).restarted();
+        let empty = (restarted.init(), restarted.playlist(), restarted.segment(1));
+        let grown = [first(), slice(), key()]
+            .iter()
+            .try_fold(restarted, |window, frame| window.with(frame, 6000));
+        assert_eq!(
+            (
+                empty,
+                grown.map(|window| [window.segment(1), window.segment(3)])
+            ),
+            (
+                (
+                    Err(Missing::Empty),
+                    Err(Missing::Empty),
+                    Err(Missing::Empty)
+                ),
+                Ok([
+                    Err(Missing::Gone(1)),
+                    Ok(fragment(3, 30_000, &[first(), slice()]))
+                ])
+            )
+        );
     }
 
     #[test]
