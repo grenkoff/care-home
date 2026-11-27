@@ -1,7 +1,10 @@
 //! Entry point of the video service.
 
+use std::num::NonZeroU64;
 use std::sync::Arc;
 use std::time::Duration;
+
+use anyhow::Context;
 
 use contracts::video::v1::video_service_server::VideoServiceServer;
 use tokio::signal::unix::SignalKind;
@@ -40,7 +43,10 @@ async fn main() -> anyhow::Result<()> {
         .init();
     let grpc = setting("VIDEO_GRPC_ADDR", "0.0.0.0:50051").parse()?;
     let http = tokio::net::TcpListener::bind(setting("VIDEO_HTTP_ADDR", "0.0.0.0:8080")).await?;
-    let silence = Duration::from_secs(setting("VIDEO_RTSP_TIMEOUT", "10").parse()?);
+    let silence: NonZeroU64 = setting("VIDEO_RTSP_TIMEOUT", "10")
+        .parse()
+        .context("VIDEO_RTSP_TIMEOUT must be a whole number of seconds above zero")?;
+    let silence = Duration::from_secs(silence.get());
     let lineup = Lineup::new(
         Listing::new(setting("VIDEO_STREAMS", "hall=demo")).streams()?,
         (SEGMENTS, SEGMENT_SECONDS * TIMESCALE),
