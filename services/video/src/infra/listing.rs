@@ -1,5 +1,8 @@
 //! Streams of the service as its setting lists them.
 
+use retina::client::Credentials;
+use url::Url;
+
 use crate::infra::address::Address;
 
 /// Longest key of a stream, as long as the key a camera keeps in core.
@@ -7,6 +10,9 @@ const KEY_LENGTH: usize = 64;
 
 /// Name of the demo source in the setting.
 const DEMO: &str = "demo";
+
+/// Scheme of the address of a camera.
+const RTSP: &str = "rtsp";
 
 /// Source of the pictures of a stream.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -75,15 +81,86 @@ impl Configured for Listing {
                 if streams.iter().any(|(known, _)| known == key) {
                     return Err(Misconfigured::Twice(key.to_owned()));
                 }
-                let source = match source.trim() {
-                    DEMO => Source::Demo,
-                    _ => return Err(Misconfigured::Unknown(key.to_owned())),
-                };
+                let source = Written {
+                    key,
+                    text: source.trim(),
+                }
+                .source()?;
                 Ok(streams
                     .into_iter()
                     .chain([(key.to_owned(), source)])
                     .collect())
             })
+    }
+}
+
+/// Source that a text of the setting names.
+trait Named {
+    /// Returns the source the text names, or why it names none.
+    fn source(&self) -> Result<Source, Misconfigured>;
+}
+
+/// Text of the source of one stream, with the key of the stream.
+struct Written<'a> {
+    /// Key of the stream.
+    key: &'a str,
+    /// Text of its source.
+    text: &'a str,
+}
+
+impl Named for Written<'_> {
+    fn source(&self) -> Result<Source, Misconfigured> {
+        if self.text == DEMO {
+            return Ok(Source::Demo);
+        }
+        let unknown = || Misconfigured::Unknown(self.key.to_owned());
+        let mut location = Url::parse(self.text).map_err(|_| unknown())?;
+        if location.scheme() != RTSP || location.host_str().is_none_or(str::is_empty) {
+            return Err(unknown());
+        }
+        let credentials = if location.username().is_empty() && location.password().is_none() {
+            None
+        } else {
+            Some(Credentials {
+                username: Escaped(location.username()).decoded().ok_or_else(unknown)?,
+                password: Escaped(location.password().unwrap_or_default())
+                    .decoded()
+                    .ok_or_else(unknown)?,
+            })
+        };
+        location.set_username("").map_err(|()| unknown())?;
+        location.set_password(None).map_err(|()| unknown())?;
+        Ok(Source::Camera(Address::new(location, credentials)))
+    }
+}
+
+/// Text that percent escapes can be taken out of.
+trait Decoded {
+    /// Returns the text with its escapes decoded, when they are whole and spell UTF-8.
+    fn decoded(&self) -> Option<String>;
+}
+
+/// Part of an address written with percent escapes.
+struct Escaped<'a>(&'a str);
+
+impl Decoded for Escaped<'_> {
+    fn decoded(&self) -> Option<String> {
+        let mut pieces = self.0.split('%');
+        let first = pieces.next().unwrap_or_default().as_bytes().to_vec();
+        let bytes = pieces.try_fold(first, |bytes, piece| {
+            let byte = piece
+                .get(..2)
+                .filter(|digits| digits.bytes().all(|digit| digit.is_ascii_hexdigit()))
+                .and_then(|digits| u8::from_str_radix(digits, 16).ok())?;
+            Some(
+                bytes
+                    .into_iter()
+                    .chain([byte])
+                    .chain(piece.bytes().skip(2))
+                    .collect(),
+            )
+        })?;
+        String::from_utf8(bytes).ok()
     }
 }
 
