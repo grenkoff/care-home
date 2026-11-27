@@ -42,10 +42,11 @@ the site. It reads
 ## What is inside
 
 ```
-proto/               gRPC contracts of extracted services (images/v1)
+proto/               gRPC contracts of extracted services (images/v1, video/v1)
 contracts/           Rust crate generated from proto/
 services/core/       the Django monolith (pages, public HTTP API, admin, database)
-services/images/     the example Rust service: thumbnails over gRPC, kept until the video service replaces it
+services/images/     the example Rust service: thumbnails over gRPC; nothing uses it, it leaves in its own pull request
+services/video/      the Rust service of live video: the last seconds of every camera in memory, served to core over gRPC
 tools/eo-lint/       Elegant Objects linter for Rust
 tools/commit-lint/   commit message checker
 tools/clones/        finder of repeated code
@@ -63,8 +64,9 @@ the password and the code of an authenticator app), `residents`
 page "My family" of a relative) and `cameras` (the cameras of the common
 areas, kept by staff; the pages "Cameras" for relatives of residents in
 the home and the journal of viewings, read by staff in the admin). The
-Rust workspace, `eo-lint`, the `contracts` crate and buf stay ready and
-checked in CI for the day a module has to leave the monolith.
+Rust service [`video`](services/video/README.md) keeps the last seconds
+of every camera in memory as fragmented MP4 and serves them to `core`
+over gRPC; for now its streams play a test pattern in a loop.
 
 ## Checks
 
