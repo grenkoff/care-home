@@ -30,11 +30,21 @@ impl Held {
 
 impl Timed for Held {
     fn followed(self, time: i64, frame: Frame) -> Result<(Self, Option<(Frame, u32)>), Jumped> {
+        let released = self
+            .picture
+            .map(|(held, picture)| {
+                time.checked_sub(held)
+                    .filter(|gap| *gap > 0)
+                    .and_then(|gap| u32::try_from(gap).ok())
+                    .map(|duration| (picture, duration))
+                    .ok_or(Jumped(held, time))
+            })
+            .transpose()?;
         Ok((
             Self {
                 picture: Some((time, frame)),
             },
-            None,
+            released,
         ))
     }
 }
