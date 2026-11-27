@@ -69,28 +69,34 @@ impl Configured for Listing {
             .split(',')
             .map(str::trim)
             .filter(|entry| !entry.is_empty())
-            .try_fold(Vec::new(), |streams: Vec<(String, Source)>, entry| {
-                let (key, source) = entry.split_once('=').ok_or(Misconfigured::Unsourced(0))?;
-                let key = key.trim();
-                let slug = key
-                    .chars()
-                    .all(|letter| letter.is_ascii_alphanumeric() || letter == '-' || letter == '_');
-                if key.is_empty() || key.len() > KEY_LENGTH || !slug {
-                    return Err(Misconfigured::Key(0));
-                }
-                if streams.iter().any(|(known, _)| known == key) {
-                    return Err(Misconfigured::Twice(key.to_owned()));
-                }
-                let source = Written {
-                    key,
-                    text: source.trim(),
-                }
-                .source()?;
-                Ok(streams
-                    .into_iter()
-                    .chain([(key.to_owned(), source)])
-                    .collect())
-            })
+            .zip(1..)
+            .try_fold(
+                Vec::new(),
+                |streams: Vec<(String, Source)>, (entry, position)| {
+                    let (key, source) = entry
+                        .split_once('=')
+                        .ok_or(Misconfigured::Unsourced(position))?;
+                    let key = key.trim();
+                    let slug = key.chars().all(|letter| {
+                        letter.is_ascii_alphanumeric() || letter == '-' || letter == '_'
+                    });
+                    if key.is_empty() || key.len() > KEY_LENGTH || !slug {
+                        return Err(Misconfigured::Key(position));
+                    }
+                    if streams.iter().any(|(known, _)| known == key) {
+                        return Err(Misconfigured::Twice(key.to_owned()));
+                    }
+                    let source = Written {
+                        key,
+                        text: source.trim(),
+                    }
+                    .source()?;
+                    Ok(streams
+                        .into_iter()
+                        .chain([(key.to_owned(), source)])
+                        .collect())
+                },
+            )
     }
 }
 
