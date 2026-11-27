@@ -40,6 +40,9 @@
     </li>
   </ul>
 {% endblock navigation %}
+{% block tools %}
+  {% include "appearance/choice.html" %}
+{% endblock tools %}
 {% block footer %}
   <a
     href="{% url 'privacy' %}"
