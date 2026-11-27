@@ -1,4 +1,4 @@
-//! Demo source: the committed test pattern played in a loop.
+//! Demo source that plays the committed test pattern in a loop.
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -30,7 +30,7 @@ pub trait Playing {
     fn play(&self) -> impl Future<Output = Result<(), Unrecorded>> + Send;
 }
 
-/// Demo: pictures played in a loop into one stream at their rate.
+/// Demo that plays pictures in a loop into one stream at their rate.
 #[derive(Debug)]
 pub struct Demo<R> {
     /// Key of the stream.
