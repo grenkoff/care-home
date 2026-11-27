@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["contracts", "services/images", "tools/clones", "tools/commit-lint", "tools/eo-lint"]
+members = ["contracts", "services/images", "services/video", "tools/clones", "tools/commit-lint", "tools/eo-lint"]
 
 [workspace.package]
 edition = "2024"
