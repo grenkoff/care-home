@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package video.v1;
+
+service VideoService {
+  rpc Playlist(PlaylistRequest) returns (PlaylistResponse);
+  rpc Init(InitRequest) returns (InitResponse);
+  rpc Segment(SegmentRequest) returns (SegmentResponse);
+}
+
+message PlaylistRequest {
+  string stream = 1;
+}
+
+message PlaylistResponse {
+  string playlist = 1;
+}
+
+message InitRequest {
+  string stream = 1;
+}
+
+message InitResponse {
+  bytes init = 1;
+}
+
+message SegmentRequest {
+  string stream = 1;
+  uint64 sequence = 2;
+}
+
+message SegmentResponse {
+  bytes segment = 1;
+}
