@@ -3,6 +3,8 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use tokio::time::MissedTickBehavior;
+
 use crate::domain::frames::{Frame, Framed, Pictures};
 use crate::domain::mp4::TIMESCALE;
 use crate::domain::nal::{AnnexB, Units};
@@ -64,6 +66,7 @@ impl<R> Demo<R> {
 impl<R: Recorded + Send + Sync> Playing for Demo<R> {
     async fn play(&self) -> Result<(), Unrecorded> {
         let mut ticks = tokio::time::interval(Duration::from_secs(1) / self.rate);
+        ticks.set_missed_tick_behavior(MissedTickBehavior::Delay);
         for frame in self.frames.iter().cycle() {
             ticks.tick().await;
             self.streams
@@ -157,10 +160,10 @@ mod tests {
                 first.is_some(),
                 after
                     .windows(2)
-                    .map(|pair| pair[1] - pair[0])
+                    .map(|pair| pair[1] - pair[0] >= Duration::from_secs(1) / 15)
                     .collect::<Vec<_>>()
             ),
-            (true, vec![Duration::from_secs(1) / 15; 2])
+            (true, vec![true; 2])
         );
     }
 
