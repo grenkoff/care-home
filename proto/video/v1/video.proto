@@ -26,7 +26,7 @@ message InitResponse {
 
 message SegmentRequest {
   string stream = 1;
-  uint64 sequence = 2;
+  uint32 sequence = 2;
 }
 
 message SegmentResponse {
