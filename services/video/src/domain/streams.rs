@@ -45,6 +45,12 @@ pub trait Recorded {
     fn record(&self, stream: &str, frame: &Frame, duration: u32) -> Result<(), Unrecorded>;
 }
 
+/// Streams that their sources start anew.
+pub trait Restarted {
+    /// Starts the stream anew, keeping the numbers of its segments growing.
+    fn restart(&self, stream: &str) -> Result<(), Unrecorded>;
+}
+
 /// Windows of the streams by their keys, each behind its own lock.
 #[derive(Debug)]
 pub struct Streams {
@@ -106,12 +112,21 @@ impl Recorded for Streams {
     }
 }
 
+impl Restarted for Streams {
+    fn restart(&self, stream: &str) -> Result<(), Unrecorded> {
+        self.windows
+            .get(stream)
+            .map(|_| ())
+            .ok_or_else(|| Unrecorded::Unknown(stream.to_owned()))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::BTreeMap;
     use std::sync::RwLock;
 
-    use super::{Recorded, Refusal, Streams, Unrecorded, Watched};
+    use super::{Recorded, Refusal, Restarted, Streams, Unrecorded, Watched};
     use crate::domain::frames::{Frame, Picture};
     use crate::domain::mp4::{Encoded, Fragment};
     use crate::domain::nal::Unit;
@@ -175,6 +190,33 @@ mod tests {
                 Ok(expected(&frames).playlist().unwrap()),
                 Ok(Fragment::new(0, 0, vec![first().sample(6000), slice().sample(6000)]).encoded())
             )
+        );
+    }
+
+    #[test]
+    fn starts_a_stream_anew() {
+        let streams = recorded(&[first(), slice(), key(), slice(), key()]);
+        assert_eq!(
+            (
+                streams.restart("hall"),
+                streams.playlist("hall"),
+                streams.restart("porch")
+            ),
+            (
+                Ok(()),
+                Err(Refusal::Missing(Missing::Empty)),
+                Err(Unrecorded::Unknown(String::from("porch")))
+            )
+        );
+        for frame in [first(), slice(), key()] {
+            assert_eq!(streams.record("hall", &frame, 6000), Ok(()));
+        }
+        assert_eq!(
+            [
+                streams.segment("hall", 1).map(|_| ()),
+                streams.segment("hall", 3).map(|_| ())
+            ],
+            [Err(Refusal::Missing(Missing::Gone(1))), Ok(())]
         );
     }
 
