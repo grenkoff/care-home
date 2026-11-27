@@ -52,6 +52,16 @@ const DESCRIBED: [&str; 3] = [
      a=control:trackID=1\r\n",
 ];
 
+/// Status, headers and body of a description that offers a JPEG video before the H.264 one.
+const MIXED: [&str; 3] = [
+    "200 OK",
+    "Content-Type: application/sdp\r\n",
+    "v=0\r\no=- 0 0 IN IP4 127.0.0.1\r\ns=pattern\r\nc=IN IP4 0.0.0.0\r\nt=0 0\r\n\
+     m=video 0 RTP/AVP 26\r\na=control:trackID=0\r\n\
+     m=video 0 RTP/AVP 96\r\na=rtpmap:96 H264/90000\r\na=fmtp:96 packetization-mode=1\r\n\
+     a=control:trackID=1\r\n",
+];
+
 /// Status, headers and body of the answer to SETUP: RTP interleaved in the connection.
 const SET_UP: [&str; 3] = [
     "200 OK",
@@ -126,6 +136,8 @@ struct Fake {
     loops: usize,
     /// What it does after it played them.
     ending: Ending,
+    /// Answer to DESCRIBE.
+    described: [&'static str; 3],
     /// Channel that hears of every connection.
     attempts: UnboundedSender<()>,
 }
@@ -141,6 +153,7 @@ impl Fake {
                 reader: BufReader::new(connection),
                 loops: self.loops,
                 ending: self.ending,
+                described: self.described,
             };
             tokio::spawn(visit.answer());
         }
@@ -155,6 +168,8 @@ struct Visit {
     loops: usize,
     /// What to do after playing them.
     ending: Ending,
+    /// Answer to DESCRIBE.
+    described: [&'static str; 3],
 }
 
 impl Visit {
@@ -163,7 +178,7 @@ impl Visit {
         while let Some((method, sequence, authorization)) = self.request().await {
             let reply = match method.as_str() {
                 "DESCRIBE" if authorization.as_deref() != Some(ACCEPTED) => UNAUTHORIZED,
-                "DESCRIBE" => DESCRIBED,
+                "DESCRIBE" => self.described,
                 "SETUP" => SET_UP,
                 "PLAY" => PLAYING,
                 _ => OFFERED,
@@ -301,10 +316,19 @@ fn pictures() -> Vec<Vec<Unit>> {
         })
 }
 
-/// Starts a fake camera and returns its address and the channel of its connections.
+/// Starts a fake camera that describes one H.264 video.
 async fn camera(
     loops: usize,
     ending: Ending,
+) -> Result<(Url, UnboundedReceiver<()>), Box<dyn std::error::Error>> {
+    offering(loops, ending, DESCRIBED).await
+}
+
+/// Starts a fake camera and returns its address and the channel of its connections.
+async fn offering(
+    loops: usize,
+    ending: Ending,
+    described: [&'static str; 3],
 ) -> Result<(Url, UnboundedReceiver<()>), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind("127.0.0.1:0").await?;
     let at = Url::parse(&format!("rtsp://{}/pattern/", listener.local_addr()?))?;
@@ -314,6 +338,7 @@ async fn camera(
             listener,
             loops,
             ending,
+            described,
             attempts,
         }
         .serve(),
@@ -344,24 +369,29 @@ fn watched(keys: &[&str]) -> (Arc<Watcher>, UnboundedReceiver<Event>) {
 }
 
 /// Source of the stream from the camera with the password, short pauses and the given silence.
-fn source(
-    stream: &str,
-    at: Url,
-    password: &str,
-    silence: Duration,
-) -> impl FnOnce(&Arc<Watcher>) -> Camera<Watcher> {
-    let stream = stream.to_owned();
-    let password = password.to_owned();
-    move |streams| {
-        Camera::new(
-            stream,
-            Address::new(at, Some(keeper(&password))),
-            (
-                silence,
-                Pause::new(Duration::from_millis(10), Duration::from_millis(40)),
-            ),
-            Arc::clone(streams),
-        )
+fn source(at: Url, password: &str, silence: Duration, streams: &Arc<Watcher>) -> Camera<Watcher> {
+    Camera::new(
+        "hall",
+        Address::new(at, Some(keeper(password))),
+        (
+            silence,
+            Pause::new(Duration::from_millis(10), Duration::from_millis(40)),
+        ),
+        Arc::clone(streams),
+    )
+}
+
+/// Plays the source until the stream got the count of pictures, and returns how many it got.
+async fn filled(
+    source: &(impl Playing + Sync),
+    heard: &mut UnboundedReceiver<Event>,
+    count: usize,
+) -> Result<usize, &'static str> {
+    tokio::select! {
+        waited = tokio::time::timeout(PATIENCE, until(heard, |events| events.len() >= count)) => {
+            waited.map(|events| events.len()).map_err(|_| "the stream was not filled in time")
+        }
+        _ = source.play() => Err("the source stopped"),
     }
 }
 
@@ -391,7 +421,7 @@ fn refilled(events: &[Event]) -> bool {
 async fn fills_a_stream_from_a_camera() {
     let (at, _attempts) = camera(3, Ending::Silence).await.unwrap();
     let (streams, mut heard) = watched(&["hall"]);
-    let hall = source("hall", at, "secret", PATIENCE)(&streams);
+    let hall = source(at, "secret", PATIENCE, &streams);
     let recorded = 3 * LOOP - 1;
     let events = tokio::select! {
         waited = tokio::time::timeout(PATIENCE, until(&mut heard, |events| events.len() >= recorded)) => {
@@ -428,7 +458,7 @@ async fn reconnected(ending: Ending, silence: Duration) -> Result<(), &'static s
         .await
         .map_err(|_| "the camera did not start")?;
     let (streams, mut heard) = watched(&["hall"]);
-    let hall = source("hall", at, "secret", silence)(&streams);
+    let hall = source(at, "secret", silence, &streams);
     tokio::select! {
         waited = tokio::time::timeout(PATIENCE, async {
             until(&mut heard, refilled).await;
@@ -467,9 +497,9 @@ async fn connects_again_when_the_camera_sends_reports_without_pictures() {
 async fn keeps_other_streams_going_when_a_camera_refuses_the_password() {
     let (hall_at, _hall_attempts) = camera(1, Ending::Silence).await.unwrap();
     let (porch_at, mut porch_attempts) = camera(1, Ending::Silence).await.unwrap();
-    let (streams, mut heard) = watched(&["hall", "porch"]);
-    let hall = source("hall", hall_at, "secret", PATIENCE)(&streams);
-    let porch = source("porch", porch_at, "wrong", PATIENCE)(&streams);
+    let (streams, mut heard) = watched(&["hall"]);
+    let hall = source(hall_at, "secret", PATIENCE, &streams);
+    let porch = source(porch_at, "wrong", PATIENCE, &streams);
     let outcome = tokio::select! {
         waited = tokio::time::timeout(PATIENCE, async {
             let events = until(&mut heard, |events| events.len() >= LOOP - 1).await;
@@ -506,12 +536,7 @@ async fn listed(setting: String) -> Result<usize, &'static str> {
     });
     let sources = lineup.sources(&watcher);
     let first = sources.first().ok_or("the setting lists no stream")?;
-    tokio::select! {
-        waited = tokio::time::timeout(PATIENCE, until(&mut heard, |events| events.len() >= LOOP - 1)) => {
-            waited.map(|events| events.len()).map_err(|_| "the stream was not filled in time")
-        }
-        _ = first.play() => Err("the source stopped"),
-    }
+    filled(first, &mut heard, LOOP - 1).await
 }
 
 #[tokio::test]
@@ -524,4 +549,12 @@ async fn plays_a_camera_the_setting_lists() {
         at.path()
     );
     assert_eq!(listed(setting).await, Ok(LOOP - 1));
+}
+
+#[tokio::test]
+async fn takes_the_h264_video_of_a_camera_that_offers_more_streams() {
+    let (at, _attempts) = offering(1, Ending::Silence, MIXED).await.unwrap();
+    let (streams, mut heard) = watched(&["hall"]);
+    let hall = source(at, "secret", PATIENCE, &streams);
+    assert_eq!(filled(&hall, &mut heard, LOOP - 1).await, Ok(LOOP - 1));
 }

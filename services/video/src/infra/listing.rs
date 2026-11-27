@@ -171,9 +171,11 @@ mod tests {
     #[test]
     fn lists_a_camera_with_its_address() {
         let listed = Listing::new(
-            "porch=rtsp://keeper:se%2Ccret@10.0.0.21:554/stream1?channel=1, roof=rtsp://camera.home/live",
+            "porch=rtsp://keeper:se%2Ccret@10.0.0.21:554/stream1?channel=1, \
+             roof=rtsp://camera.home/live, gate=rtsp://keeper@10.0.0.22/live",
         )
         .streams();
+        let gate = Url::parse("rtsp://10.0.0.22/live").unwrap();
         let porch = Url::parse("rtsp://10.0.0.21:554/stream1?channel=1").unwrap();
         let roof = Url::parse("rtsp://camera.home/live").unwrap();
         let keeper = Credentials {
@@ -190,6 +192,16 @@ mod tests {
                 (
                     String::from("roof"),
                     Source::Camera(Address::new(roof, None))
+                ),
+                (
+                    String::from("gate"),
+                    Source::Camera(Address::new(
+                        gate,
+                        Some(Credentials {
+                            username: String::from("keeper"),
+                            password: String::new(),
+                        })
+                    ))
                 ),
             ])
         );
