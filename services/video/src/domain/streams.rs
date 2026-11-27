@@ -82,6 +82,23 @@ impl Streams {
                 .unwrap_or_else(PoisonError::into_inner),
         )?)
     }
+
+    /// Replaces the window of the stream by its change under its write lock.
+    fn write(
+        &self,
+        stream: &str,
+        change: impl FnOnce(Window) -> Result<Window, Unrecorded>,
+    ) -> Result<(), Unrecorded> {
+        let mut window = self
+            .windows
+            .get(stream)
+            .ok_or_else(|| Unrecorded::Unknown(stream.to_owned()))?
+            .write()
+            .unwrap_or_else(PoisonError::into_inner);
+        *window = change(window.clone())?;
+        drop(window);
+        Ok(())
+    }
 }
 
 impl Watched for Streams {
@@ -100,29 +117,13 @@ impl Watched for Streams {
 
 impl Recorded for Streams {
     fn record(&self, stream: &str, frame: &Frame, duration: u32) -> Result<(), Unrecorded> {
-        let mut window = self
-            .windows
-            .get(stream)
-            .ok_or_else(|| Unrecorded::Unknown(stream.to_owned()))?
-            .write()
-            .unwrap_or_else(PoisonError::into_inner);
-        *window = window.clone().with(frame, duration)?;
-        drop(window);
-        Ok(())
+        self.write(stream, |window| Ok(window.with(frame, duration)?))
     }
 }
 
 impl Restarted for Streams {
     fn restart(&self, stream: &str) -> Result<(), Unrecorded> {
-        let mut window = self
-            .windows
-            .get(stream)
-            .ok_or_else(|| Unrecorded::Unknown(stream.to_owned()))?
-            .write()
-            .unwrap_or_else(PoisonError::into_inner);
-        *window = window.clone().restarted();
-        drop(window);
-        Ok(())
+        self.write(stream, |window| Ok(window.restarted()))
     }
 }
 
