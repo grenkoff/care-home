@@ -17,7 +17,7 @@ pub trait Wired {
     fn sources<R>(&self, streams: &Arc<R>) -> Vec<Demo<R>>;
 }
 
-/// Streams of the setting with the shape of their windows and the demo pictures.
+/// Factory: the streams of the setting with a window and a source each.
 #[derive(Debug, Clone)]
 pub struct Lineup {
     /// Streams with their sources, as the setting lists them.
