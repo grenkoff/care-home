@@ -109,6 +109,13 @@ keeps the JPEG thumbnail in its own table. It owns no data and publishes
 no events, so it has neither a database nor NATS; a service that owns
 data gets both, as the rules above say.
 
+The product adds `video`, extracted at once for three of the criteria:
+another stack for heavy computation, far more CPU and memory than the
+rest of the site, and isolation of the video of residents. It keeps the
+last seconds of every camera in memory as fragmented MP4 and answers
+`core` over gRPC (`VideoService/Playlist`, `Init`, `Segment`); like
+`images` it owns no data, so it has neither a database nor NATS.
+
 A service follows the layout `services/<name>/src`: `api/` (tonic
 endpoint, axum health check) → `infra/` (NATS adapter, settings) →
 `domain/` (no I/O); `main.rs` wires them. `eo-lint` rule EO010 keeps I/O
