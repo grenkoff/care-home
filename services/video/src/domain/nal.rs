@@ -39,6 +39,8 @@ pub trait Nal {
     fn kind(&self) -> Kind;
     /// Returns the bytes of the unit, its header first.
     fn bytes(&self) -> &[u8];
+    /// Tells whether the unit is a slice that opens a picture.
+    fn opening(&self) -> bool;
 }
 
 impl Nal for Unit {
@@ -54,6 +56,10 @@ impl Nal for Unit {
 
     fn bytes(&self) -> &[u8] {
         &self.bytes
+    }
+
+    fn opening(&self) -> bool {
+        false
     }
 }
 
@@ -148,6 +154,21 @@ mod tests {
                 Kind::Other
             ]
         );
+    }
+
+    #[test]
+    fn tells_a_slice_that_opens_a_picture() {
+        let opening: Vec<bool> = [
+            vec![0x41, 0x9A],
+            vec![0x65, 0x88],
+            vec![0x41, 0x1A],
+            vec![0x67, 0x9A],
+            vec![0x41],
+        ]
+        .into_iter()
+        .map(|bytes| Unit::new(bytes).opening())
+        .collect();
+        assert_eq!(opening, [true, true, false, false, false]);
     }
 
     #[test]
