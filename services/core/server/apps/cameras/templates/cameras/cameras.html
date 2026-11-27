@@ -8,7 +8,10 @@
       {% for screen in screens %}
         <li class="ds-card">
           <h2 class="ds-subheading">
-            <a class="ds-link" href="{% url 'cameras:camera' screen.id %}">{{ screen.name }}</a>
+            <a
+              class="ds-link"
+              href="{% url 'cameras:camera' screen.id %}"
+            >{{ screen.name }}</a>
           </h2>
         </li>
       {% endfor %}
