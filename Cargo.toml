@@ -12,9 +12,11 @@ publish = false
 anyhow = "1.0.104"
 axum = "0.8.9"
 contracts = { path = "contracts" }
+futures-core = "0.3.34"
 image = { version = "0.25.10", default-features = false, features = ["jpeg", "png", "webp"] }
 prost = "0.14.4"
 proc-macro2 = { version = "1.0.107", features = ["span-locations"] }
+retina = "0.4.22"
 syn = { version = "3", features = ["full", "visit", "extra-traits"] }
 thiserror = "2.0.21"
 tokio = { version = "1.54.1", features = ["macros", "rt-multi-thread", "signal", "net"] }
@@ -24,6 +26,7 @@ tonic-prost-build = "0.14.9"
 tower = { version = "0.5.3", features = ["util"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
+url = "2.5.9"
 walkdir = "2.5.0"
 
 [workspace.lints.rust]
