@@ -1,8 +1,8 @@
 //! Pictures of a stream: the units of one access unit each.
 
 use crate::domain::mp4::{Sample, Track};
-use crate::domain::nal::Unit;
-use crate::domain::sps::Unreadable;
+use crate::domain::nal::{Kind, Nal, Unit};
+use crate::domain::sps::{Dimensioned, SequenceSet, Unreadable};
 
 /// Picture of a stream with every unit that belongs to it.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -29,17 +29,45 @@ pub trait Picture {
     fn track(&self) -> Result<Option<Track>, Unreadable>;
 }
 
+impl Frame {
+    /// Returns the first unit of the kind, when the picture has one.
+    fn first(&self, kind: Kind) -> Option<&Unit> {
+        self.units.iter().find(|unit| unit.kind() == kind)
+    }
+}
+
 impl Picture for Frame {
     fn key(&self) -> bool {
-        self.units.is_empty()
+        self.first(Kind::Key).is_some()
     }
 
     fn sample(&self, duration: u32) -> Sample {
-        Sample::new(Vec::new(), duration, self.units.is_empty())
+        Sample::new(
+            self.units
+                .iter()
+                .filter(|unit| unit.sliced())
+                .flat_map(|unit| {
+                    u32::try_from(unit.bytes().len())
+                        .unwrap_or(u32::MAX)
+                        .to_be_bytes()
+                        .into_iter()
+                        .chain(unit.bytes().iter().copied())
+                })
+                .collect(),
+            duration,
+            self.key(),
+        )
     }
 
     fn track(&self) -> Result<Option<Track>, Unreadable> {
-        Ok(None)
+        match (self.first(Kind::Sequence), self.first(Kind::Picture)) {
+            (Some(sequence), Some(picture)) => Ok(Some(Track::new(
+                SequenceSet::new(sequence.clone()).size()?,
+                sequence.bytes().to_vec(),
+                picture.bytes().to_vec(),
+            ))),
+            _ => Ok(None),
+        }
     }
 }
 
@@ -66,7 +94,23 @@ impl Pictures {
 
 impl Framed for Pictures {
     fn frames(&self) -> Vec<Frame> {
-        vec![Frame::new(self.units.clone())]
+        self.units
+            .iter()
+            .fold(Vec::<Vec<Unit>>::new(), |mut frames, unit| {
+                match frames.last_mut() {
+                    Some(current)
+                        if !(current.iter().any(Nal::sliced)
+                            && (unit.opening() || !unit.sliced())) =>
+                    {
+                        current.push(unit.clone());
+                    }
+                    _ => frames.push(vec![unit.clone()]),
+                }
+                frames
+            })
+            .into_iter()
+            .map(Frame::new)
+            .collect()
     }
 }
 
