@@ -4,7 +4,7 @@ use crate::domain::frames::Frame;
 
 /// Why a picture cannot be timed by the clock of the camera.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
-#[error("the clock of the camera jumped from {0} to {1}")]
+#[error("the clock of the camera went from {0} to {1}; cameras with B-frames are not supported")]
 pub struct Jumped(i64, i64);
 
 /// Pictures that learn their duration from the time of the next one.
