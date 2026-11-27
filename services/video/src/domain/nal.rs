@@ -1,5 +1,8 @@
 //! Units of an H.264 stream in the Annex B byte format.
 
+/// Start code that comes before every unit of the stream.
+const START: [u8; 3] = [0, 0, 1];
+
 /// Kind of a NAL unit that the service tells apart.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
@@ -40,7 +43,13 @@ pub trait Nal {
 
 impl Nal for Unit {
     fn kind(&self) -> Kind {
-        Kind::Other
+        match self.bytes.first().map(|header| header & 0x1F) {
+            Some(1) => Kind::Slice,
+            Some(5) => Kind::Key,
+            Some(7) => Kind::Sequence,
+            Some(8) => Kind::Picture,
+            _ => Kind::Other,
+        }
     }
 
     fn bytes(&self) -> &[u8] {
@@ -71,7 +80,31 @@ impl<'a> AnnexB<'a> {
 
 impl Units for AnnexB<'_> {
     fn units(&self) -> Vec<Unit> {
-        vec![Unit::new(self.bytes.to_vec())]
+        let starts: Vec<usize> = self
+            .bytes
+            .windows(START.len())
+            .enumerate()
+            .filter(|(_, window)| *window == START)
+            .map(|(position, _)| position + START.len())
+            .collect();
+        let ends = starts
+            .iter()
+            .skip(1)
+            .map(|start| start - START.len())
+            .chain([self.bytes.len()]);
+        starts
+            .iter()
+            .zip(ends)
+            .map(|(&start, end)| &self.bytes[start..end])
+            .map(|unit| {
+                &unit[..unit
+                    .iter()
+                    .rposition(|byte| *byte != 0)
+                    .map_or(0, |last| last + 1)]
+            })
+            .filter(|unit| !unit.is_empty())
+            .map(|unit| Unit::new(unit.to_vec()))
+            .collect()
     }
 }
 
