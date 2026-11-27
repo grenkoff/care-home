@@ -78,6 +78,8 @@ enum Ending {
     HangUp,
     /// Keeps the connection open and sends nothing more.
     Silence,
+    /// Keeps sending RTCP sender reports and no pictures.
+    Reports,
 }
 
 /// What the source did to the stream.
@@ -250,8 +252,27 @@ impl Visit {
                 sequence = sequence.wrapping_add(1);
             }
         }
+        self.ended().await
+    }
+
+    /// Ends the session as told once the pattern was played, and tells whether the connection stays.
+    async fn ended(&mut self) -> bool {
         match self.ending {
             Ending::HangUp => false,
+            Ending::Reports => {
+                let mut reports = tokio::time::interval(Duration::from_millis(50));
+                let report: Vec<u8> = [b'$', 1, 0, 28, 0x80, 200, 0, 6]
+                    .into_iter()
+                    .chain(0x1234_5678_u32.to_be_bytes())
+                    .chain([0; 20])
+                    .collect();
+                loop {
+                    reports.tick().await;
+                    if self.reader.get_mut().write_all(&report).await.is_err() {
+                        return false;
+                    }
+                }
+            }
             Ending::Silence => {
                 let mut sink = Vec::new();
                 let _ = self.reader.read_to_end(&mut sink).await;
@@ -429,6 +450,14 @@ async fn connects_again_when_the_camera_hangs_up() {
 async fn connects_again_when_the_camera_falls_silent() {
     assert_eq!(
         reconnected(Ending::Silence, Duration::from_millis(300)).await,
+        Ok(())
+    );
+}
+
+#[tokio::test]
+async fn connects_again_when_the_camera_sends_reports_without_pictures() {
+    assert_eq!(
+        reconnected(Ending::Reports, Duration::from_millis(300)).await,
         Ok(())
     );
 }
