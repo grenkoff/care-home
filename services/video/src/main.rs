@@ -1,6 +1,7 @@
 //! Entry point of the video service.
 
 use std::sync::Arc;
+use std::time::Duration;
 
 use contracts::video::v1::video_service_server::VideoServiceServer;
 use tokio::signal::unix::SignalKind;
@@ -9,6 +10,7 @@ use video::api::endpoint::Endpoint;
 use video::api::health::{Alive, Served};
 use video::domain::frames::Framed;
 use video::domain::mp4::TIMESCALE;
+use video::domain::pause::Pause;
 use video::infra::demo::{PATTERN_RATE, Pattern, Playing};
 use video::infra::lineup::{Lineup, Wired};
 use video::infra::listing::{Configured, Listing};
@@ -18,6 +20,12 @@ const SEGMENTS: usize = 5;
 
 /// Seconds a segment reaches before the next key frame closes it.
 const SEGMENT_SECONDS: u32 = 2;
+
+/// Pause before connecting again to a camera that was lost after it sent pictures.
+const FIRST_PAUSE: Duration = Duration::from_secs(1);
+
+/// Longest pause between two attempts to reach a camera.
+const LONGEST_PAUSE: Duration = Duration::from_secs(30);
 
 /// Composition root: wires the streams, their sources, gRPC and the health check.
 #[tokio::main]
@@ -31,10 +39,12 @@ async fn main() -> anyhow::Result<()> {
         .init();
     let grpc = setting("VIDEO_GRPC_ADDR", "0.0.0.0:50051").parse()?;
     let http = tokio::net::TcpListener::bind(setting("VIDEO_HTTP_ADDR", "0.0.0.0:8080")).await?;
+    let silence = Duration::from_secs(setting("VIDEO_RTSP_TIMEOUT", "10").parse()?);
     let lineup = Lineup::new(
         Listing::new(setting("VIDEO_STREAMS", "hall=demo")).streams()?,
         (SEGMENTS, SEGMENT_SECONDS * TIMESCALE),
         (Pattern.frames().into(), PATTERN_RATE),
+        (silence, Pause::new(FIRST_PAUSE, LONGEST_PAUSE)),
     );
     let streams = Arc::new(lineup.streams());
     let mut sources: JoinSet<_> = lineup
