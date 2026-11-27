@@ -301,7 +301,7 @@ impl Sample {
     }
 }
 
-/// Media segment: one fragment of samples that follow each other.
+/// Media segment made of one fragment of samples that follow each other.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Fragment {
     /// Number of the fragment in the stream.

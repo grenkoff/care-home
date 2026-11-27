@@ -1,4 +1,4 @@
-//! Lineup: the streams of the setting with a window and a source each.
+//! Streams of the setting, each with a window and a source.
 
 use std::collections::BTreeMap;
 use std::sync::{Arc, RwLock};
