@@ -46,3 +46,15 @@ def test_relatives_sign_in_only_by_an_email_name(
     )
 
     assert not _signed_in(client, name)
+
+
+def test_shared_staff_emails_sign_in_no_one(client: Client) -> None:
+    for name in ('olga', 'oleg'):
+        User.objects.create_user(
+            username=name,
+            email='desk@example.test',
+            password=_CHOSEN,
+            is_staff=True,
+        )
+
+    assert not _signed_in(client, 'desk@example.test')
