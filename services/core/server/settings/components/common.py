@@ -200,7 +200,7 @@ MEDIA_ROOT = BASE_DIR.joinpath('media')
 
 AUTHENTICATION_BACKENDS = (
     'axes.backends.AxesBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    'server.apps.accounts.infra.accounts.SignInAccounts',
 )
 
 INVITATION_DAYS = config('DJANGO_INVITATION_DAYS', cast=int, default=7)
