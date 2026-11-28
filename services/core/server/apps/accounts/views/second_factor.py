@@ -137,6 +137,8 @@ class Later(_Factor):
 
     def post(self, request: HttpRequest) -> HttpResponse:
         """Signs staff in with the password alone and refuses everybody else."""
+        if self._has_app(request):
+            return redirect('accounts:code')
         pending = Pending(request)
         user = pending.user()
         if not user.is_staff:
