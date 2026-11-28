@@ -38,6 +38,8 @@ class SignInAccounts(ModelBackend):
 
     def _name(self, typed: str | None) -> str | None:
         """Returns the user name of the one staff with the e-mail, or the name."""
+        if not typed or '@' not in typed:
+            return typed
         match list(
             User.objects.filter(is_staff=True, email__iexact=typed).values_list(
                 'username',
