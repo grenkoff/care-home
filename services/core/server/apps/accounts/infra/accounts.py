@@ -42,13 +42,9 @@ class SignInAccounts(ModelBackend):
         """Returns the user name of the one staff with the e-mail, or the name."""
         if not typed or _EMAIL_SIGN not in typed:
             return typed
-        match list(
-            User.objects.filter(is_staff=True, email__iexact=typed).values_list(
-                'username',
-                flat=True,
-            ),
-        ):
-            case [name]:
+        staff = User.objects.filter(is_staff=True, email__iexact=typed)
+        match list(staff.values_list('username')):
+            case [(name,)]:
                 return name
             case _:
                 return typed
