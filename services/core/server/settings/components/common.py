@@ -208,6 +208,7 @@ AUTHENTICATION_BACKENDS = (
 AXES_COOLOFF_TIME = timedelta(
     minutes=config('DJANGO_SIGN_IN_LOCK_MINUTES', cast=int, default=15),
 )
+AXES_LOCKOUT_PARAMETERS = [('username', 'ip_address')]
 AXES_LOCKOUT_TEMPLATE = 'accounts/locked.html'
 
 INVITATION_DAYS = config('DJANGO_INVITATION_DAYS', cast=int, default=7)
