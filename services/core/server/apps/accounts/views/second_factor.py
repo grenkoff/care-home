@@ -114,12 +114,9 @@ class Connect(_Factor):
     ) -> HttpResponse:
         """Renders the key of the app with the form of the code."""
         pending = Pending(request)
+        user = pending.user()
         key = pending.offered(self.resolve(connect_authenticator.OfferKey))
-        offer = enrolment.Enrolment(
-            key,
-            pending.user().get_username(),
-            settings.SITE_NAME,
-        )
+        offer = enrolment.Enrolment(key, user.get_username(), settings.SITE_NAME)
         return render(
             request,
             'accounts/connect.html',
@@ -128,6 +125,16 @@ class Connect(_Factor):
                 'link': offer.link(),
                 'picture': offer.picture(),
                 'form': form,
+                'later': user.is_staff,
             },
             status=status,
         )
+
+
+@final
+class Later(_Factor):
+    """Button that lets staff sign in now and connect the app another time."""
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        """Leads back to the page that connects the app."""
+        return redirect('accounts:connect')

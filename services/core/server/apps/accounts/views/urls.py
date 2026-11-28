@@ -20,6 +20,7 @@ urlpatterns = [
         second_factor.Connect.as_view(),
         name='connect',
     ),
+    path('second-factor/later/', second_factor.Later.as_view(), name='later'),
     path('sign-out/', views.LogoutView.as_view(), name='sign_out'),
     path(
         'password/',
