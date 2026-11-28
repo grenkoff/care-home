@@ -67,6 +67,10 @@ msgid "Confirm"
 msgstr "Подтвердить"
 
 #: server/apps/accounts/templates/accounts/connect.html
+msgid "Later"
+msgstr "Позже"
+
+#: server/apps/accounts/templates/accounts/connect.html
 msgid "Connect an authenticator app"
 msgstr "Подключите приложение-аутентификатор"
 

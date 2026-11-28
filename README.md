@@ -32,8 +32,9 @@ make e2e      # checks the pages of the running site in Russian and English
 ```
 
 Staff sign in at http://localhost:8000/admin/ with their user name or
-e-mail (the password, then the code of an authenticator app) and switch
-the theme of the whole site from the dropdown "Theme" in the header.
+e-mail (the password, then the code of an authenticator app, which staff
+may connect later) and switch the theme of the whole site from the
+dropdown "Theme" in the header.
 The first one is created with
 `docker compose exec core python manage.py createsuperuser`.
 

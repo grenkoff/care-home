@@ -24,5 +24,13 @@
       >{% translate "Open in the authenticator app" %}</a>
     </p>
     {% include "accounts/code_form.html" %}
+    {% if later %}
+      <form method="post" action="{% url 'accounts:later' %}">
+        {% csrf_token %}
+        <button type="submit" class="ds-button-quiet">
+          {% translate "Later" %}
+        </button>
+      </form>
+    {% endif %}
   </div>
 {% endblock content %}
