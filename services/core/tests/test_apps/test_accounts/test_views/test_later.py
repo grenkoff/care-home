@@ -6,11 +6,13 @@ from typing import Final
 import pytest
 from django.test import Client
 
-from server.apps.accounts.models import User
+from server.apps.accounts.models import Authenticator, User
 
 pytestmark = pytest.mark.django_db
 
 _CHOSEN: Final = 'a long secret'
+_OLGA: Final = 'olga'
+_KEY: Final = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ'
 _LATER_PAGE: Final = '/en/second-factor/later/'
 _LATER: Final = f'action="{_LATER_PAGE}"'
 _CONNECT: Final = '/en/second-factor/connect/'
@@ -19,8 +21,8 @@ _CONNECT: Final = '/en/second-factor/connect/'
 @pytest.fixture
 def staff(client: Client) -> Client:
     """Client of staff without an app who gave the password for the admin."""
-    User.objects.create_user(username='olga', password=_CHOSEN, is_staff=True)
-    client.post('/en/sign-in/?next=/admin/', {'username': 'olga', 'password': _CHOSEN})
+    User.objects.create_user(username=_OLGA, password=_CHOSEN, is_staff=True)
+    client.post('/en/sign-in/?next=/admin/', {'username': _OLGA, 'password': _CHOSEN})
     return client
 
 
@@ -47,4 +49,19 @@ def test_later_signs_no_relative_in(pending: Client) -> None:
     assert (response.status_code, pending.get(_CONNECT).status_code) == (
         HTTPStatus.FORBIDDEN,
         HTTPStatus.OK,
+    )
+
+
+def test_later_skips_no_connected_app(staff: Client) -> None:
+    Authenticator.objects.create(
+        user=User.objects.get(username=_OLGA),
+        key=_KEY,
+        used_step=0,
+    )
+
+    response = staff.post(_LATER_PAGE)
+
+    assert (response.get('Location'), staff.get('/admin/').status_code) == (
+        '/en/second-factor/',
+        HTTPStatus.FOUND,
     )
