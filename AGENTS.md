@@ -798,6 +798,10 @@ anyway: the floor catches code written without tests, it is not a target.
 
 - Mutation testing: zero surviving mutants in covered code; it is what
   proves the tests check behaviour, not just run lines.
+- In a pull request mutation testing covers only what it changes: the
+  Rust lines of its diff and the Python modules it touches
+  (`MUTANTS_BASE=origin/develop`); every push to `develop` and
+  `production` mutates everything again.
 - Composition roots (`main.rs`, `build.rs`) are excluded in the tool
   configuration, never with a directive.
 
@@ -1192,8 +1196,8 @@ a pull request merges only with every required job green.
 | contracts | `make contracts`: `buf lint`, `buf format`, `buf breaking`; generated code and `docs/patterns.md` up to date |
 | architecture | `make architecture`: import-linter, calls and names of modules, relations between modules, UUIDv7 primary keys, calls to other modules inside transactions, ports and databases in Compose |
 | rust | rustfmt, clippy, tests, coverage (80% overall, 100% in `domain/`), `eo-lint`, cargo-machete, cargo-deny |
-| rust-mutants | cargo-mutants: zero survivors |
-| core | the wemake-django-template pipeline (ruff, wemake-python-styleguide, mypy, import-linter, pytest, schemathesis, Django checks, migration linters, deptry), pip-audit, vulture, transaction check, coverage (80% overall, 100% in `logic/`), mutmut |
+| rust-mutants | cargo-mutants: zero survivors (in a pull request, only in the lines it changes) |
+| core | the wemake-django-template pipeline (ruff, wemake-python-styleguide, mypy, import-linter, pytest, schemathesis, Django checks, migration linters, deptry), pip-audit, vulture, transaction check, coverage (80% overall, 100% in `logic/`), mutmut (in a pull request, only the modules it changes) |
 | core-ty | ty (non-blocking: reported, never fails the pull request) |
 | tooling | `make hooks` (ruff, mypy and pytest for `scripts/` and `tests/browser/`), `make js` (Biome), `make duplicates` (`clones`) |
 | e2e | `make up`, a request through every service and the browser tests (`make browser`) |
@@ -1296,7 +1300,7 @@ so local runs match CI.
 | `make rust` | rustfmt, clippy, tests, coverage, `eo-lint`, cargo-machete, cargo-deny |
 | `make core` | the wemake-django-template pipeline for `core` inside Docker |
 | `make ty` | ty for `core` (non-blocking) |
-| `make mutants` | cargo-mutants and mutmut: zero survivors |
+| `make mutants` | cargo-mutants and mutmut: zero survivors; `MUTANTS_BASE=origin/develop` mutates only what changed since it |
 | `make security` | gitleaks, pip-audit, cargo-deny advisories |
 | `make hooks` | ruff, mypy and pytest for the agent hooks in `scripts/`, ruff and mypy for `tests/browser/` |
 | `make js` | Biome over the web components |

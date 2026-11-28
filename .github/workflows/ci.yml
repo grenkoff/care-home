@@ -133,6 +133,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: taiki-e/install-action@v2
         with:
           tool: protoc
@@ -143,6 +145,8 @@ jobs:
           tool: cargo-mutants
       - uses: Swatinem/rust-cache@v2
       - run: make mutants-rust
+        env:
+          MUTANTS_BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || '' }}
       - name: Surviving mutants
         if: failure()
         run: cat mutants.out/missed.txt
@@ -152,10 +156,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - name: Lint, type check, test
         run: make core
       - name: Mutation testing (mutmut)
         run: make mutants-core
+        env:
+          MUTANTS_BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || '' }}
       - name: ty (second type checker, non-blocking)
         if: ${{ !cancelled() }}
         continue-on-error: true

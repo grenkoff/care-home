@@ -11,6 +11,12 @@ DEVELOP_CONTRACTS := $(shell git ls-tree -r --name-only origin/develop -- proto 
 LOCKED = $(shell grep -A1 '^name = "$(1)"' $(CORE)/poetry.lock | sed -n 's/^version = "\(.*\)"/\1/p')
 UVX := uvx -q --python $(PYTHON_VERSION)
 PLAYWRIGHT := 1.64.1
+MUTANTS_BASE ?=
+MUTATED_CORE = $(if $(MUTANTS_BASE),$(shell git diff --name-only --diff-filter=d \
+  $(MUTANTS_BASE)...HEAD -- '$(CORE)/server/*.py' '$(CORE)/scripts/*.py' \
+  ':!$(CORE)/server/settings/*' ':!$(CORE)/server/contracts/*' ':!*/migrations/*' \
+  ':!$(CORE)/server/asgi.py' ':!$(CORE)/server/wsgi.py' | \
+  sed -e 's|^$(CORE)/||' -e 's|\.py$$|.*|' -e 's|/|.|g'))
 BROWSER_STAFF := browser-staff
 STAFF_SESSION = from importlib import import_module; \
   from django.conf import settings; \
@@ -159,12 +165,16 @@ mutants: mutants-rust mutants-core
 
 .PHONY: mutants-rust
 mutants-rust:
-	cargo mutants --workspace
+	cargo mutants --workspace $(if $(MUTANTS_BASE),--in-diff <(git diff $(MUTANTS_BASE)...HEAD))
 
 .PHONY: mutants-core
 mutants-core: env
-	cd $(CORE) && $(COMPOSE) build web && \
-	  $(COMPOSE) run --rm web ./docker/django/mutants.sh
+	if [ -n "$(MUTANTS_BASE)" ] && [ -z "$(MUTATED_CORE)" ]; then \
+	  echo 'no Python code of core to mutate since $(MUTANTS_BASE)'; \
+	else \
+	  cd $(CORE) && $(COMPOSE) build web && \
+	  $(COMPOSE) run --rm -e MUTMUT_MUTANTS='$(MUTATED_CORE)' web ./docker/django/mutants.sh; \
+	fi
 
 .PHONY: core
 core: env
