@@ -15,12 +15,12 @@ class Enrolment:
     """Key of a new authenticator app as a link and as its QR code."""
 
     _key: str
-    _email: str
+    _account: str
     _issuer: str
 
     def link(self) -> str:
         """Returns the otpauth link that authenticator apps open."""
-        label = quote(f'{self._issuer}:{self._email}')
+        label = quote(f'{self._issuer}:{self._account}')
         query = urlencode(
             {'secret': self._key, 'issuer': self._issuer},
             quote_via=quote,
