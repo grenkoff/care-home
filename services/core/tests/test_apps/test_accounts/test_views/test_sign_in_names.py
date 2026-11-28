@@ -4,6 +4,7 @@ from typing import Final
 
 import pytest
 from django.conf import LazySettings
+from django.contrib.auth import authenticate
 from django.test import Client
 
 from server.apps.accounts.models import User
@@ -73,3 +74,9 @@ def test_apps_of_staff_are_named_by_user_name(
     page = client.get('/en/second-factor/connect/').content.decode()
 
     assert 'otpauth://totp/Quiet%20Garden%3Aolga?' in page
+
+
+def test_blank_names_find_no_staff() -> None:
+    User.objects.create_user(username=_OLGA, password=_CHOSEN, is_staff=True)
+
+    assert authenticate(None, username='', password=_CHOSEN) is None
