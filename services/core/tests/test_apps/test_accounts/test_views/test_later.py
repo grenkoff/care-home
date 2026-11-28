@@ -1,5 +1,6 @@
 """Tests of putting off the authenticator app, which only staff may do."""
 
+from http import HTTPStatus
 from typing import Final
 
 import pytest
@@ -10,7 +11,8 @@ from server.apps.accounts.models import User
 pytestmark = pytest.mark.django_db
 
 _CHOSEN: Final = 'a long secret'
-_LATER: Final = 'action="/en/second-factor/later/"'
+_LATER_PAGE: Final = '/en/second-factor/later/'
+_LATER: Final = f'action="{_LATER_PAGE}"'
 _CONNECT: Final = '/en/second-factor/connect/'
 
 
@@ -24,3 +26,12 @@ def staff(client: Client) -> Client:
 
 def test_staff_may_connect_the_app_later(staff: Client) -> None:
     assert _LATER in staff.get(_CONNECT).content.decode()
+
+
+def test_later_signs_staff_in_where_they_go(staff: Client) -> None:
+    response = staff.post(_LATER_PAGE)
+
+    assert (response.get('Location'), staff.get('/admin/').status_code) == (
+        '/admin/',
+        HTTPStatus.OK,
+    )
