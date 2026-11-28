@@ -41,3 +41,7 @@ def test_wrong_passwords_lock_for_a_while(
     fragment: str,
 ) -> None:
     assert fragment in _locked(client)
+
+
+def test_lock_speaks_russian(client: Client) -> None:
+    assert 'Попробуйте снова через 15 минут.' in _locked(client, 'ru')
