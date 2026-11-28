@@ -1,5 +1,7 @@
 """Common Django settings of core."""
 
+from datetime import timedelta
+
 from decouple import Choices
 from django.utils.translation import gettext_lazy as _
 
@@ -202,6 +204,11 @@ AUTHENTICATION_BACKENDS = (
     'axes.backends.AxesBackend',
     'server.apps.accounts.infra.accounts.SignInAccounts',
 )
+
+AXES_COOLOFF_TIME = timedelta(
+    minutes=config('DJANGO_SIGN_IN_LOCK_MINUTES', cast=int, default=15),
+)
+AXES_LOCKOUT_TEMPLATE = 'accounts/locked.html'
 
 INVITATION_DAYS = config('DJANGO_INVITATION_DAYS', cast=int, default=7)
 

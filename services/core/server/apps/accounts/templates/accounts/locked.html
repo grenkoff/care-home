@@ -1,0 +1,16 @@
+{% extends "site/layout.html" %}
+{% load i18n %}
+{% block title %}{% translate "Sign in" %}{% endblock title %}
+{% block content %}
+  <h1 class="ds-heading mb-6">{% translate "Sign in" %}</h1>
+  <div class="ds-card grid max-w-md gap-4">
+    <p class="ds-alert" role="alert">
+      {% widthratio cooloff_timedelta.seconds 60 1 as minutes %}
+      {% blocktranslate trimmed count minutes=minutes|add:0 %}
+        Too many wrong passwords. Try again in {{ minutes }} minute.
+      {% plural %}
+        Too many wrong passwords. Try again in {{ minutes }} minutes.
+      {% endblocktranslate %}
+    </p>
+  </div>
+{% endblock content %}
