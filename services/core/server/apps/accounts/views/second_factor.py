@@ -136,5 +136,6 @@ class Later(_Factor):
     """Button that lets staff sign in now and connect the app another time."""
 
     def post(self, request: HttpRequest) -> HttpResponse:
-        """Leads back to the page that connects the app."""
-        return redirect('accounts:connect')
+        """Signs the user in with the password alone."""
+        pending = Pending(request)
+        return pending.signed_in(pending.user())
