@@ -7,13 +7,13 @@
     {% csrf_token %}
     {% if form.errors %}
       <p class="ds-alert" role="alert">
-        {% translate "Please enter a correct e-mail and password." %}
+        {% translate "Please enter a correct e-mail or user name and password." %}
       </p>
     {% endif %}
     <label class="ds-field">
-      {% translate "E-mail" %}
+      {% translate "E-mail or user name" %}
       <input
-        type="email"
+        type="text"
         name="username"
         value="{{ form.username.value|default:'' }}"
         class="ds-input"
