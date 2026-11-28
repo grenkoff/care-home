@@ -65,3 +65,16 @@ def test_later_skips_no_connected_app(staff: Client) -> None:
         '/en/second-factor/',
         HTTPStatus.FOUND,
     )
+
+
+def test_app_is_offered_again_at_the_next_sign_in(staff: Client) -> None:
+    staff.post(_LATER_PAGE)
+    staff.post('/en/sign-out/')
+
+    response = staff.post(
+        '/en/sign-in/',
+        {'username': _OLGA, 'password': _CHOSEN},
+        follow=True,
+    )
+
+    assert response.redirect_chain[-1] == (_CONNECT, HTTPStatus.FOUND)
