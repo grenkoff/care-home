@@ -19,7 +19,7 @@ STAFF_SESSION = from importlib import import_module; \
   staff = users.filter(username='$(BROWSER_STAFF)').first() or users.create_superuser('$(BROWSER_STAFF)'); \
   store = import_module(settings.SESSION_ENGINE).SessionStore(); \
   store.update({SESSION_KEY: str(staff.pk), HASH_SESSION_KEY: staff.get_session_auth_hash(), \
-  BACKEND_SESSION_KEY: 'django.contrib.auth.backends.ModelBackend'}); \
+  BACKEND_SESSION_KEY: settings.AUTHENTICATION_BACKENDS[-1]}); \
   store.create(); \
   print(store.session_key)
 

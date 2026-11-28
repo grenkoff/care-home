@@ -465,4 +465,5 @@ ignore_names = [
   "has_delete_permission",
   "stream",
   "theme_context",
+  "SignInAccounts",
 ]
