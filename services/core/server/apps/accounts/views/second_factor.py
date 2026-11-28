@@ -5,7 +5,7 @@ from http import HTTPStatus
 from typing import final
 
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 
 from server.apps.accounts.logic.errors import LockedCodesError, WrongCodeError
@@ -136,6 +136,9 @@ class Later(_Factor):
     """Button that lets staff sign in now and connect the app another time."""
 
     def post(self, request: HttpRequest) -> HttpResponse:
-        """Signs the user in with the password alone."""
+        """Signs staff in with the password alone and refuses everybody else."""
         pending = Pending(request)
-        return pending.signed_in(pending.user())
+        user = pending.user()
+        if not user.is_staff:
+            return HttpResponseForbidden()
+        return pending.signed_in(user)
