@@ -197,6 +197,19 @@ msgstr[2] ""
 msgstr[3] ""
 "Слишком много неверных кодов. Попробуйте снова через %(minutes)d минуты."
 
+#: server/apps/accounts/templates/accounts/locked.html
+#, python-format
+msgid "Too many wrong passwords. Try again in %(minutes)s minute."
+msgid_plural "Too many wrong passwords. Try again in %(minutes)s minutes."
+msgstr[0] ""
+"Слишком много неверных паролей. Попробуйте снова через %(minutes)s минуту."
+msgstr[1] ""
+"Слишком много неверных паролей. Попробуйте снова через %(minutes)s минуты."
+msgstr[2] ""
+"Слишком много неверных паролей. Попробуйте снова через %(minutes)s минут."
+msgstr[3] ""
+"Слишком много неверных паролей. Попробуйте снова через %(minutes)s минуты."
+
 #: server/apps/cameras/models.py server/apps/care/models.py
 msgid "name in Russian"
 msgstr "название на русском"
