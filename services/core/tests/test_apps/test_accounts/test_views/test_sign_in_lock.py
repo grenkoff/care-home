@@ -13,6 +13,7 @@ pytestmark = pytest.mark.django_db
 
 _CHOSEN: Final = 'a long secret'
 _OLGA: Final = 'olga@example.test'
+_ANNA: Final = 'anna@example.test'
 
 
 @pytest.fixture(autouse=True)
@@ -23,6 +24,12 @@ def _locks(settings: LazySettings) -> None:
         *settings.AUTHENTICATION_BACKENDS,
     )
     User.objects.create_user(username=_OLGA, password=_CHOSEN)
+
+
+def _signed_in(client: Client, name: str) -> bool:
+    """Tells whether the right password under the name reaches the second factor."""
+    response = client.post('/en/sign-in/', {'username': name, 'password': _CHOSEN})
+    return response.get('Location') == '/en/second-factor/'
 
 
 def _locked(client: Client, language: str = 'en') -> str:
@@ -45,3 +52,10 @@ def test_wrong_passwords_lock_for_a_while(
 
 def test_lock_speaks_russian(client: Client) -> None:
     assert 'Попробуйте снова через 15 минут.' in _locked(client, 'ru')
+
+
+def test_lock_leaves_other_names_open(client: Client) -> None:
+    _locked(client)
+    User.objects.create_user(username=_ANNA, password=_CHOSEN)
+
+    assert _signed_in(client, _ANNA)
