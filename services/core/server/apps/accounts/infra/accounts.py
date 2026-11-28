@@ -37,10 +37,14 @@ class SignInAccounts(ModelBackend):
         )
 
     def _name(self, typed: str | None) -> str | None:
-        """Returns the user name of staff with the e-mail, or the name typed."""
-        return (
-            User.objects
-            .filter(is_staff=True, email__iexact=typed)
-            .values_list('username', flat=True)
-            .first()
-        ) or typed
+        """Returns the user name of the one staff with the e-mail, or the name."""
+        match list(
+            User.objects.filter(is_staff=True, email__iexact=typed).values_list(
+                'username',
+                flat=True,
+            ),
+        ):
+            case [name]:
+                return name
+            case _:
+                return typed
