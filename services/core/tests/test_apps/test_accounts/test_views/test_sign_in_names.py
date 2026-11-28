@@ -32,3 +32,17 @@ def test_staff_sign_in_with_a_name_or_an_email(client: Client, name: str) -> Non
     )
 
     assert _signed_in(client, name)
+
+
+@pytest.mark.parametrize('name', ['boris', 'boris@example.test'])
+def test_relatives_sign_in_only_by_an_email_name(
+    client: Client,
+    name: str,
+) -> None:
+    User.objects.create_user(
+        username='boris',
+        email='boris@example.test',
+        password=_CHOSEN,
+    )
+
+    assert not _signed_in(client, name)
