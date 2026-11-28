@@ -24,9 +24,15 @@ def relative() -> User:
 
 @pytest.mark.parametrize(
     'fragment',
-    ['E-mail', 'name="username"', 'Password', 'name="password"'],
+    [
+        'E-mail or user name',
+        'type="text"',
+        'name="username"',
+        'Password',
+        'name="password"',
+    ],
 )
-def test_sign_in_page_asks_for_email_and_password(
+def test_sign_in_asks_for_a_name_and_password(
     client: Client,
     fragment: str,
 ) -> None:
@@ -66,7 +72,7 @@ def test_wrong_sign_in_names_no_field(
         {'username': email, 'password': password},
     ).content.decode()
 
-    assert 'Please enter a correct e-mail and password.' in page
+    assert 'Please enter a correct e-mail or user name and password.' in page
     assert 'Sign out' not in page
 
 

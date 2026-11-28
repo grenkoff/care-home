@@ -27,7 +27,7 @@ def test_wrong_sign_in_speaks_russian(client: Client) -> None:
         {'username': 'boris@example.test', 'password': 'a wrong guess'},
     ).content.decode()
 
-    assert 'Введите верные e-mail и пароль.' in page
+    assert 'Введите верные e-mail или логин и пароль.' in page
 
 
 @pytest.mark.django_db
