@@ -86,8 +86,8 @@ plays a test pattern in a loop for local runs.
 | commits | commit messages and pull request titles follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), one line |
 | contracts | `buf lint`, `buf format`, breaking changes against `develop`, generated Python code and `docs/patterns.md` are up to date |
 | rust | `cargo fmt`, clippy pedantic (warnings are errors), tests with line coverage of 80% overall and 100% in `src/domain/` (cargo-llvm-cov), `eo-lint`, cargo-machete, cargo-deny |
-| rust-mutants | mutation testing with cargo-mutants: no mutant may survive |
-| core | the full wemake-django-template pipeline: ruff, wemake-python-styleguide, import-linter, mypy, pytest with coverage of 80% overall and 100% in `logic/`, schemathesis + tracecov, Django deploy checks, migration linters, deptry, codespell, typos, yamllint; mutation testing with mutmut; plus [ty](https://github.com/astral-sh/ty) as a second, non-blocking type checker |
+| rust-mutants | mutation testing with cargo-mutants: no mutant may survive; a pull request mutates only the lines it changes, a push to `develop` everything |
+| core | the full wemake-django-template pipeline: ruff, wemake-python-styleguide, import-linter, mypy, pytest with coverage of 80% overall and 100% in `logic/`, schemathesis + tracecov, Django deploy checks, migration linters, deptry, codespell, typos, yamllint; mutation testing with mutmut (in a pull request, only the modules it changes); plus [ty](https://github.com/astral-sh/ty) as a second, non-blocking type checker |
 | tooling | lint, types and tests of the agent hooks; `clones` (duplicated Python and Rust code) |
 | e2e | `docker compose up`, the pages of the running site and a browser test of the language form |
 
