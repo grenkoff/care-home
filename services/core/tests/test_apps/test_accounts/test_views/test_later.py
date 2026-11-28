@@ -35,3 +35,16 @@ def test_later_signs_staff_in_where_they_go(staff: Client) -> None:
         '/admin/',
         HTTPStatus.OK,
     )
+
+
+def test_relatives_are_not_offered_later(pending: Client) -> None:
+    assert _LATER not in pending.get(_CONNECT).content.decode()
+
+
+def test_later_signs_no_relative_in(pending: Client) -> None:
+    response = pending.post(_LATER_PAGE)
+
+    assert (response.status_code, pending.get(_CONNECT).status_code) == (
+        HTTPStatus.FORBIDDEN,
+        HTTPStatus.OK,
+    )
