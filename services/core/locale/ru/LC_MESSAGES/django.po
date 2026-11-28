@@ -152,10 +152,13 @@ msgid "Your password has been changed"
 msgstr "Ваш пароль изменён"
 
 #: server/apps/accounts/templates/accounts/sign_in.html
-msgid "Please enter a correct e-mail and password."
-msgstr "Введите верные e-mail и пароль."
+msgid "Please enter a correct e-mail or user name and password."
+msgstr "Введите верные e-mail или логин и пароль."
 
 #: server/apps/accounts/templates/accounts/sign_in.html
+msgid "E-mail or user name"
+msgstr "Эл. почта или логин"
+
 #: server/apps/care/templates/care/contacts.html
 msgid "E-mail"
 msgstr "Эл. почта"
