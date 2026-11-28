@@ -466,4 +466,5 @@ ignore_names = [
   "stream",
   "theme_context",
   "SignInAccounts",
+  "user_can_authenticate",
 ]
