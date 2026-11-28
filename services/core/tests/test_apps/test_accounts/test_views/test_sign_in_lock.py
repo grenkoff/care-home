@@ -1,11 +1,14 @@
 """Tests of the lock that wrong passwords put on signing in."""
 
+from datetime import timedelta
 from http import HTTPStatus
 from typing import Final
 
 import pytest
+from axes.models import AccessAttempt
 from django.conf import LazySettings
 from django.test import Client
+from django.utils import timezone
 
 from server.apps.accounts.models import User
 
@@ -59,3 +62,12 @@ def test_lock_leaves_other_names_open(client: Client) -> None:
     User.objects.create_user(username=_ANNA, password=_CHOSEN)
 
     assert _signed_in(client, _ANNA)
+
+
+def test_lock_ends_after_its_time(client: Client) -> None:
+    _locked(client)
+    AccessAttempt.objects.update(
+        attempt_time=timezone.now() - timedelta(minutes=16),
+    )
+
+    assert _signed_in(client, _OLGA)
