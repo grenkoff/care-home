@@ -1,12 +1,15 @@
 """Tests of the pages of the second factor in Russian."""
 
 from datetime import timedelta
+from typing import Final
 
 import pytest
 from django.test import Client
 from django.utils import timezone
 
-from server.apps.accounts.models import Authenticator
+from server.apps.accounts.models import Authenticator, User
+
+_CHOSEN: Final = 'a long secret'
 
 
 @pytest.mark.django_db
@@ -46,3 +49,13 @@ def test_locked_codes_speak_russian(pending: Client, connected_key: str) -> None
     page = pending.post('/ru/second-factor/', {'code': '123456'}).content.decode()
 
     assert 'Слишком много неверных кодов. Попробуйте снова через 15 минут.' in page
+
+
+@pytest.mark.django_db
+def test_later_speaks_russian(client: Client) -> None:
+    User.objects.create_user(username='olga', password=_CHOSEN, is_staff=True)
+    client.post('/ru/sign-in/', {'username': 'olga', 'password': _CHOSEN})
+
+    page = client.get('/ru/second-factor/connect/').content.decode()
+
+    assert 'Позже' in page
