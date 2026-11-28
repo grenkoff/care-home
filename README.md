@@ -31,9 +31,10 @@ make up       # starts the site on http://localhost:8000
 make e2e      # checks the pages of the running site in Russian and English
 ```
 
-Staff sign in at http://localhost:8000/admin/ (the password, then the
-code of an authenticator app) and switch the theme of the whole site
-from the dropdown "Theme" in the header. The first one is created with
+Staff sign in at http://localhost:8000/admin/ with their user name or
+e-mail (the password, then the code of an authenticator app) and switch
+the theme of the whole site from the dropdown "Theme" in the header.
+The first one is created with
 `docker compose exec core python manage.py createsuperuser`.
 
 Then tell your AI agent what to build, in any form: one sentence, a
@@ -64,7 +65,8 @@ compose.yml          the whole system
 Modules of `core`: `care` (public pages, care services and prices),
 `enquiries` (the enquiry form of visitors, read by staff in the admin),
 `accounts` (users, invitations from staff, sign in with the e-mail,
-the password and the code of an authenticator app), `residents`
+or the user name for staff, the password and the code of an
+authenticator app), `residents`
 (residents and their links to relatives, kept by staff in the admin; the
 page "My family" of a relative) and `cameras` (the cameras of the common
 areas, kept by staff; the pages "Cameras" for relatives of residents in
